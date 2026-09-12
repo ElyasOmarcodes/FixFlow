@@ -1,0 +1,354 @@
+import { useRef } from 'react'
+import { useShallow } from 'zustand/react/shallow'
+import { useEditorStore } from '@/store'
+import { useAssetStore } from '@/store/assets'
+import type { PhoneLayer, Layer } from '@/types'
+import { fileToDataUrl } from '@/utils/files'
+import { ColorField, SliderField } from '@/components/properties/PropertyControls'
+import { OverrideDot } from '@/components/properties/OverrideDot'
+import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
+import { FileUploadButton } from '@/components/ui/FileUploadButton'
+import { computePhoneFitScale, PHONE_MODELS, getPhoneSpec } from '@/assets/mockups/specs'
+import { Icon, type IconName } from '@/components/ui/Icon'
+import { useT } from '@/i18n'
+import {
+  inputCls,
+  labelCls,
+  panelSectionCls,
+  pauseTemporal,
+  resumeTemporal,
+} from '@/components/properties/panelConstants'
+
+// ─── Locale Screenshot Row ────────────────────────────────────────────────────
+
+function LocaleScreenshotRow({
+  locale,
+  previewSrc,
+  onUpload,
+  onClear,
+}: {
+  locale: string
+  previewSrc?: string
+  onUpload: (file: File) => Promise<void>
+  onClear: () => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] text-[#6b6b7a] uppercase w-8 shrink-0 font-mono">{locale}</span>
+      {previewSrc ? (
+        <>
+          <img src={previewSrc} alt={locale} className="h-8 w-5 rounded object-cover border border-[rgba(255,255,255,0.12)] shrink-0" />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="flex-1 text-left text-[10px] text-[#7c6ef6] hover:text-[#9d90f8] transition-colors"
+          >
+            Change
+          </button>
+          <button
+            type="button"
+            onClick={onClear}
+            aria-label="Clear screenshot"
+            className="text-[#f87171] hover:text-[#fca5a5] transition-colors shrink-0"
+          >
+            <Icon name="close" size={12} strokeWidth={2.2} />
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="flex-1 text-left text-[10px] text-[#6b6b7a] hover:text-[#e8e8f0] border border-dashed border-[rgba(255,255,255,0.1)] rounded px-2 py-1 transition-colors hover:border-[rgba(124,110,246,0.4)]"
+        >
+          + Upload for {locale}
+        </button>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          const file = e.target.files?.[0]
+          if (!file) return
+          await onUpload(file)
+          e.target.value = ''
+        }}
+      />
+    </div>
+  )
+}
+
+// ─── PhoneProperties ──────────────────────────────────────────────────────────
+
+export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
+  const t = useT()
+  const { updateLayer, project, activeSlideGroupId, setLocaleContent, clearLocaleContent } = useEditorStore(
+    useShallow((s) => ({
+      updateLayer: s.updateLayer,
+      project: s.project,
+      activeSlideGroupId: s.activeSlideGroupId,
+      setLocaleContent: s.setLocaleContent,
+      clearLocaleContent: s.clearLocaleContent,
+    }))
+  )
+  const upd = (patch: Partial<PhoneLayer>) => updateLayer(layer.id, patch as Partial<Layer>)
+  const screenshotInputRef = useRef<HTMLInputElement>(null)
+  const addAsset = useAssetStore((s) => s.addAsset)
+  const assets = useAssetStore((s) => s.assets)  // reactive to IDB hydration
+
+  const handleScreenshotFile = async (file: File) => {
+    const dataUrl = await fileToDataUrl(file)
+    addAsset(file.name, dataUrl)
+    // Keep the inline data URL as a last-resort fallback. The asset store lives
+    // in IndexedDB and can fail/hydrate late; without this, phone screenshots
+    // can render blank in the editor, previews, or exports.
+    upd({ screenshotPath: file.name, screenshotDataUrl: dataUrl })
+  }
+
+  const previewSrc = layer.screenshotPath ? assets[layer.screenshotPath]?.dataUrl ?? layer.screenshotDataUrl : layer.screenshotDataUrl
+  const screenshotLabel = layer.screenshotPath ? layer.screenshotPath : layer.screenshotDataUrl ? 'Inline (legacy)' : null
+
+  // Only phone-shaped devices have a status bar. Watches (round/squircle screens) and
+  // frameless screens have `statusBar.height === 0` in their spec — the properties UI
+  // should not offer controls that render nothing.
+  const hasStatusBar = getPhoneSpec(layer.model).statusBar.height > 0
+
+  return (
+    <div className="space-y-4">
+      <div className={panelSectionCls}>
+        <div className="flex items-center mb-1">
+          <label className={labelCls + ' !mb-0'}>{t('phone.model')}</label>
+          <OverrideDot layerId={layer.id} propKey="model" />
+        </div>
+        <select
+          value={layer.model}
+          onChange={(e) => {
+            const nextModel = e.target.value as PhoneLayer['model']
+            const activeGroup = project.slideGroups.find((g) => g.id === activeSlideGroupId)
+            const nextSpec = getPhoneSpec(nextModel)
+            const nextScale = activeGroup ? computePhoneFitScale(activeGroup.slideHeight, nextSpec) : layer.scale
+            upd({
+              model: nextModel,
+              scale: nextScale,
+              ...(nextSpec.statusBar.height === 0
+                ? { showStatusBar: undefined, statusBarBg: undefined, statusBarTheme: undefined, statusBarColor: undefined }
+                : {}),
+            })
+          }}
+          className={inputCls}
+        >
+          {PHONE_MODELS.map((m) => (
+            <option key={m.id} value={m.id}>{m.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Position presets */}
+      {(() => {
+        const activeGroup = project.slideGroups.find((g) => g.id === activeSlideGroupId)
+        const slideWidth = activeGroup?.slideWidth ?? 1290
+        const slideHeight = activeGroup?.slideHeight ?? 2796
+        const spec = getPhoneSpec(layer.model)
+        const fw = spec.frameWidth * layer.scale
+        const fh = spec.frameHeight * layer.scale
+        const cx = (slideWidth - fw) / 2
+
+        const presets: { label: string; icon?: IconName; patch: Partial<PhoneLayer> }[] = [
+          { label: t('phone.presetCenter'),    patch: { x: cx, y: (slideHeight - fh) / 2, rotation: 0 } },
+          { label: t('phone.presetHero'),      patch: { x: cx, y: Math.round(slideHeight * 0.05), rotation: 0 } },
+          { label: t('phone.presetBleed'),     patch: { x: cx, y: Math.round(slideHeight * 0.38), rotation: 0 } },
+          { label: t('phone.presetTiltLeft'),  icon: 'rotate-ccw', patch: { x: cx, y: Math.round(slideHeight * 0.18), rotation: -10 } },
+          { label: t('phone.presetTiltRight'), icon: 'rotate-cw',  patch: { x: cx, y: Math.round(slideHeight * 0.18), rotation: 10 } },
+        ]
+
+        return (
+          <div className={panelSectionCls}>
+            <label className={labelCls}>{t('phone.composition')}</label>
+            <div className="grid grid-cols-5 gap-1">
+              {presets.map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => upd(preset.patch)}
+                  className="flex flex-col items-center gap-0.5 rounded border border-[rgba(255,255,255,0.1)] px-1 py-1.5 text-[10px] text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.04)] transition-colors leading-tight text-center"
+                >
+                  {preset.icon && <Icon name={preset.icon} size={12} />}
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
+
+      {hasStatusBar && (
+        <div className={panelSectionCls}>
+          {/* Status bar toggle */}
+          <div className="mb-3 flex items-center justify-between">
+            <label className={labelCls + ' !mb-0'}>{t('phone.statusBar')}</label>
+            <ToggleSwitch
+              checked={layer.showStatusBar ?? true}
+              onChange={(checked) => upd({ showStatusBar: checked })}
+              ariaLabel="Toggle status bar"
+            />
+          </div>
+          {/* Controls — only shown when status bar is on */}
+          {(layer.showStatusBar ?? true) && (
+            <div className="space-y-3">
+              {/* Background type */}
+              <div>
+                <label className={labelCls}>{t('phone.background')}</label>
+                <SegmentedControl
+                  value={layer.statusBarBg ?? 'transparent'}
+                  options={[
+                    { value: 'transparent', label: t('phone.transparent') },
+                    { value: 'solid', label: t('phone.solid') },
+                  ]}
+                  onChange={(b) => upd({ statusBarBg: b })}
+                  className="grid grid-cols-2 gap-2"
+                  optionClassName="rounded-lg border px-3 py-2 text-xs transition-colors"
+                />
+              </div>
+
+              {/* Colour picker — only for solid */}
+              {(layer.statusBarBg ?? 'transparent') === 'solid' && (
+                <div>
+                  <label className={labelCls}>Color</label>
+                  <ColorField
+                    value={layer.statusBarColor ?? '#000000'}
+                    onChange={(v) => upd({ statusBarColor: v })}
+                    onInteractionStart={pauseTemporal}
+                    onInteractionEnd={resumeTemporal}
+                  />
+                </div>
+              )}
+
+              {/* Icon theme */}
+              <div>
+                <label className={labelCls}>{t('phone.icons')}</label>
+                <SegmentedControl
+                  value={layer.statusBarTheme ?? 'dark'}
+                  options={[
+                    { value: 'dark', label: <span className="flex items-center justify-center gap-1.5"><Icon name="moon" size={13} />{t('phone.themeDark')}</span> },
+                    { value: 'light', label: <span className="flex items-center justify-center gap-1.5"><Icon name="sun" size={13} />{t('phone.themeLight')}</span> },
+                  ]}
+                  onChange={(t) => upd({ statusBarTheme: t })}
+                  className="grid grid-cols-2 gap-2"
+                  optionClassName="rounded-lg border px-3 py-2 text-xs transition-colors"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className={panelSectionCls}>
+        <div className="mb-1 flex items-center justify-between">
+          <label className={labelCls + ' !mb-0'}>{t('phone.scale')}</label>
+          <span className="text-xs text-[#e8e8f0]">{layer.scale.toFixed(2)}×</span>
+        </div>
+        <input type="range" min={0.5} max={4} step={0.05} value={layer.scale} onChange={(e) => upd({ scale: Number(e.target.value) })} onMouseDown={pauseTemporal} onMouseUp={resumeTemporal} className="w-full accent-[#7c6ef6]" />
+      </div>
+
+      <div className={panelSectionCls}>
+        <label className={labelCls}>{t('phone.screenshot')}</label>
+        <FileUploadButton
+          ref={screenshotInputRef}
+          variant="dropzone"
+          accept="image/*"
+          ariaLabel="Upload screenshot"
+          className="rounded-xl border border-dashed border-[rgba(255,255,255,0.14)] bg-[#0f0f13] p-4 text-center transition-colors hover:border-[rgba(124,110,246,0.55)] cursor-pointer"
+          onFiles={async (files) => {
+            const file = files[0]
+            if (!file) return
+            await handleScreenshotFile(file)
+          }}
+        >
+          {previewSrc ? <img src={previewSrc} alt="Screenshot" className="mx-auto max-h-24 rounded-lg object-contain" /> : <span className="text-xs text-[#6b6b7a]">{t('phone.screenshotDropzone')}</span>}
+        </FileUploadButton>
+        {screenshotLabel && <p className="mt-2 truncate text-[10px] text-[#6b6b7a]">{screenshotLabel}</p>}
+      </div>
+
+      <div className={panelSectionCls}>
+        <label className={labelCls}>{t('phone.fit')}</label>
+        <SegmentedControl
+          value={layer.screenshotFit}
+          options={([
+            ['cover', t('phone.fitCover')],
+            ['contain', t('phone.fitContain')],
+            ['fill', t('phone.fitFill')],
+          ] as const).map(([fit, label]) => ({ value: fit, label }))}
+          onChange={(fit) => upd({ screenshotFit: fit })}
+        />
+      </div>
+
+      <div className={panelSectionCls}>
+        <SliderField label="Offset X" value={layer.screenshotOffsetX} min={-500} max={500} unit="px" onChange={(v) => upd({ screenshotOffsetX: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
+        <SliderField label="Offset Y" value={layer.screenshotOffsetY} min={-500} max={500} unit="px" onChange={(v) => upd({ screenshotOffsetY: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
+      </div>
+
+      {/* Screenshot border */}
+      <div className={panelSectionCls}>
+        <div className="mb-3 flex items-center justify-between">
+          <label className={labelCls + ' !mb-0'}>Border</label>
+          <ToggleSwitch
+            checked={Boolean(layer.border)}
+            onChange={(checked) => upd({ border: checked ? { color: '#FFFFFF', width: 2, opacity: 0.5 } : undefined })}
+            ariaLabel="Toggle screenshot border"
+          />
+        </div>
+        {layer.border && (
+          <div className="space-y-3">
+            <ColorField
+              value={layer.border.color}
+              onChange={(v) => upd({ border: { ...layer.border!, color: v } })}
+              onInteractionStart={pauseTemporal}
+              onInteractionEnd={resumeTemporal}
+            />
+            <SliderField label="Width" value={layer.border.width} min={1} max={30} unit="px"
+              onChange={(v) => upd({ border: { ...layer.border!, width: v } })}
+              onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
+            <SliderField label="Opacity" value={Math.round(layer.border.opacity * 100)} min={0} max={100} unit="%"
+              onChange={(v) => upd({ border: { ...layer.border!, opacity: v / 100 } })}
+              onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
+          </div>
+        )}
+      </div>
+
+      {/* Per-locale screenshots */}
+      {(() => {
+        const locales = project.settings.locales ?? [project.settings.defaultLocale]
+        const nonDefaultLocales = locales.filter((l) => l !== project.settings.defaultLocale)
+        if (nonDefaultLocales.length === 0) return null
+        return (
+          <div className={panelSectionCls}>
+            <label className={labelCls}>Localized Screenshots</label>
+            <div className="space-y-2">
+              {nonDefaultLocales.map((locale) => {
+                const override = layer.localeContent?.[locale]
+                const path = override?.screenshotPath
+                const previewSrc = path ? assets[path]?.dataUrl ?? override?.screenshotDataUrl : override?.screenshotDataUrl
+                return (
+                  <LocaleScreenshotRow
+                    key={locale}
+                    locale={locale}
+                    previewSrc={previewSrc}
+                    onUpload={async (file) => {
+                      const dataUrl = await fileToDataUrl(file)
+                      addAsset(file.name, dataUrl)
+                      setLocaleContent(activeSlideGroupId, layer.id, locale, { screenshotPath: file.name, screenshotDataUrl: dataUrl })
+                    }}
+                    onClear={() => clearLocaleContent(activeSlideGroupId, layer.id, locale)}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        )
+      })()}
+    </div>
+  )
+}

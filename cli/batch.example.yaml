@@ -1,0 +1,15 @@
+# PixelDeck batch export config
+# Run: node cli/index.mjs export --config=batch.yaml
+
+jobs:
+  - project: ./projects/my-app-es.json
+    screenshots: ./screenshots/raw/es/light
+    output: ./output/store/es/light
+
+  - project: ./projects/my-app-en.json
+    screenshots: ./screenshots/raw/en/light
+    output: ./output/store/en/light
+
+  - project: ./projects/my-app-es.json
+    screenshots: ./screenshots/raw/es/dark
+    output: ./output/store/es/dark

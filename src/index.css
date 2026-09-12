@@ -1,0 +1,451 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', 'Vazirmatn', system-ui, sans-serif;
+  --color-surface: #0f0f13;
+  --color-panel: #18181f;
+  --color-border: rgba(255,255,255,0.08);
+  --color-muted: #6b6b7a;
+  --color-accent: #7c6ef6;
+  --color-accent-2: #ec4899;
+}
+
+:root {
+  /* Control-chrome tokens — the whole native-widget layer below reads these,
+     so a theme tweak is one edit instead of forty. */
+  --pd-field-bg: #0f0f13;
+  --pd-field-border: rgba(255,255,255,0.1);
+  --pd-field-border-hover: rgba(255,255,255,0.2);
+  --pd-accent: #7c6ef6;
+  --pd-accent-soft: rgba(124,110,246,0.5);
+  --pd-track: rgba(255,255,255,0.12);
+  --pd-scroll-thumb: rgba(255,255,255,0.16);
+  --pd-scroll-thumb-hover: rgba(255,255,255,0.3);
+}
+
+/* ─── Native-control layer ────────────────────────────────────────────────
+   Kept inside @layer base so every Tailwind utility on a component still
+   wins: these rules only replace what the browser would otherwise draw. */
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html, body {
+    /* Kills the browser's scroll-chaining / rubber-band bounce so panels feel
+       like app views rather than parts of one long page. */
+    overscroll-behavior: none;
+  }
+
+  body {
+    margin: 0;
+    background: #0f0f13;
+    color: #e8e8f0;
+    font-family: 'Inter', 'Vazirmatn', system-ui, sans-serif;
+    overflow: hidden;
+    /* Hints the OS/browser to theme native controls (select popups, checkboxes,
+       scrollbars) dark instead of defaulting to a light popup on a dark app. */
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* App chrome is not a document: no caret drag-select over labels and
+       buttons, and no blue flash on tap. Editable surfaces opt back in below. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Pashto and Persian need a face that carries the script. Vazirmatn leads
+     the stack for those UI languages (it also has Latin glyphs, so mixed
+     strings like "iPhone 16 Pro" stay consistent). */
+  :root[lang='ps'] body,
+  :root[lang='fa'] body {
+    font-family: 'Vazirmatn', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+  }
+
+  /* Anything the user genuinely reads or edits stays selectable. */
+  input, textarea, [contenteditable], [contenteditable] *,
+  .pd-selectable, .pd-selectable * {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  ::selection {
+    background: rgba(124,110,246,0.4);
+    color: #fff;
+  }
+
+  /* Images and links in the chrome must not start a native drag. */
+  img, svg, a { -webkit-user-drag: none; }
+
+  /* ─── Scrollbars ──────────────────────────────────────────────────────────
+     Overlay-style pill on a transparent track, sized via a transparent border
+     so it reads as a 4px rail with breathing room instead of a 10px web bar. */
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pd-scroll-thumb) transparent;
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+
+  ::-webkit-scrollbar-thumb {
+    min-height: 28px;
+    min-width: 28px;
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-color: var(--pd-scroll-thumb);
+    background-clip: padding-box;
+    transition: background-color 0.15s;
+  }
+
+  ::-webkit-scrollbar-thumb:hover { background-color: var(--pd-scroll-thumb-hover); }
+  ::-webkit-scrollbar-thumb:active { background-color: rgba(124,110,246,0.55); }
+
+  /* Chrome/Safari draw stepper arrows on some platforms — an app has none. */
+  ::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+
+  /* ─── Focus ───────────────────────────────────────────────────────────────
+     The platform focus ring (blue halo on macOS, dotted box on Windows) is the
+     single most "web page" tell in the UI. Replaced by an accent ring that only
+     appears for keyboard users. */
+
+  :focus { outline: none; }
+
+  :focus-visible {
+    outline: 2px solid var(--pd-accent-soft);
+    outline-offset: 1px;
+    border-radius: 4px;
+  }
+
+  /* ─── Text fields ─────────────────────────────────────────────────────────── */
+
+  input, textarea, select, button {
+    font: inherit;
+    color: inherit;
+  }
+
+  input::placeholder, textarea::placeholder { color: #575766; }
+
+  input, textarea { caret-color: var(--pd-accent); }
+
+  /* Number spinners are desktop-browser furniture — the app uses drag sliders
+     and typed values instead. */
+  input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+
+  /* Chrome's autofill paints a yellow field; keep the app surface. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e8e8f0;
+    -webkit-box-shadow: 0 0 0 1000px var(--pd-field-bg) inset;
+    caret-color: var(--pd-accent);
+  }
+
+  /* Chrome's built-in search clear "×" and Edge's password reveal eye. */
+  input::-webkit-search-cancel-button,
+  input::-webkit-search-decoration,
+  input::-ms-reveal,
+  input::-ms-clear { display: none; appearance: none; }
+
+  /* ─── Select ──────────────────────────────────────────────────────────────
+     Replaces the OS dropdown button with the app's own chevron. The arrow is an
+     inline SVG data URI so it needs no network request and no CSP allowance. */
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-inline-end: 26px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a86a0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px 12px;
+    cursor: pointer;
+  }
+
+  [dir='rtl'] select { background-position: left 8px center; }
+
+  select:hover { background-color: rgba(255,255,255,0.03); }
+  select:disabled { cursor: not-allowed; opacity: 0.45; }
+
+  /* The popup list itself is drawn by the OS; color-scheme: dark on <body>
+     themes it, and these keep the rows legible where the UA honours them. */
+  select option, select optgroup {
+    background: #18181f;
+    color: #e8e8f0;
+  }
+
+  /* ─── Range slider ────────────────────────────────────────────────────────
+     Native range inputs look completely different on each platform. This draws
+     one flat rail + accent knob everywhere. */
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 18px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--pd-track);
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -4px;
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    background: var(--pd-accent);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+
+  input[type='range']:hover::-webkit-slider-thumb { transform: scale(1.15); }
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 5px rgba(124,110,246,0.18);
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--pd-track);
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    background: var(--pd-accent);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  input[type='range']:disabled { cursor: not-allowed; opacity: 0.4; }
+
+  /* ─── Checkbox ────────────────────────────────────────────────────────────── */
+
+  input[type='checkbox'] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    border: 1px solid var(--pd-field-border);
+    border-radius: 4px;
+    background: var(--pd-field-bg);
+    cursor: pointer;
+    transition: background-color 0.12s, border-color 0.12s;
+  }
+
+  input[type='checkbox']:hover:not(:disabled) { border-color: var(--pd-field-border-hover); }
+
+  input[type='checkbox']:checked {
+    border-color: var(--pd-accent);
+    background-color: var(--pd-accent);
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 10px 10px;
+  }
+
+  input[type='checkbox']:indeterminate {
+    border-color: var(--pd-accent);
+    background-color: var(--pd-accent);
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 10px 10px;
+  }
+
+  input[type='checkbox']:disabled { cursor: not-allowed; opacity: 0.4; }
+
+  /* ─── Color swatch ────────────────────────────────────────────────────────
+     The native control ships a thick inset border and light padding; strip it
+     back to a flat rounded chip. */
+
+  input[type='color'] {
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+    border: 1px solid var(--pd-field-border);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  input[type='color']:hover { border-color: var(--pd-field-border-hover); }
+  input[type='color']::-webkit-color-swatch-wrapper { padding: 0; }
+  input[type='color']::-webkit-color-swatch { border: none; border-radius: 5px; }
+  input[type='color']::-moz-color-swatch { border: none; border-radius: 5px; }
+
+  /* ─── Buttons ─────────────────────────────────────────────────────────────── */
+
+  button:not(:disabled) { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+
+  /* ─── File input ──────────────────────────────────────────────────────────
+     Every visible upload affordance in the app is a styled button that proxies
+     to a hidden input, so the native "Choose File" widget should never show. */
+  input[type='file']::-webkit-file-upload-button,
+  input[type='file']::file-selector-button { display: none; }
+}
+
+@keyframes pixeldeck-loader-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pixeldeck-loader-words {
+  0%, 11% { transform: translateY(0); }
+  16.667%, 27.667% { transform: translateY(-14.286%); }
+  33.333%, 44.333% { transform: translateY(-28.571%); }
+  50%, 61% { transform: translateY(-42.857%); }
+  66.667%, 77.667% { transform: translateY(-57.143%); }
+  83.333%, 94.333% { transform: translateY(-71.429%); }
+  100% { transform: translateY(-85.714%); }
+}
+
+.pixeldeck-loader-enter {
+  animation: pixeldeck-loader-enter 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.pixeldeck-loader-enter-delay {
+  animation-delay: 90ms;
+}
+
+.pixeldeck-loader-words {
+  --pixeldeck-loader-bg: #18181f;
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 8px 14px;
+  overflow: hidden;
+  border: 1px solid rgba(203,191,255,0.09);
+  border-radius: 12px;
+  background: var(--pixeldeck-loader-bg);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.22), 0 0 22px rgba(124,110,246,0.055);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.pixeldeck-loader-label {
+  color: #7d7a90;
+}
+
+.pixeldeck-loader-window {
+  position: relative;
+  display: block;
+  width: 90px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.pixeldeck-loader-window::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--pixeldeck-loader-bg) 0%,
+    transparent 28%,
+    transparent 72%,
+    var(--pixeldeck-loader-bg) 100%
+  );
+  pointer-events: none;
+  content: '';
+}
+
+.pixeldeck-loader-word-track {
+  display: flex;
+  height: 168px;
+  flex-direction: column;
+  color: #9b8fff;
+  animation: pixeldeck-loader-words 10s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  will-change: transform;
+}
+
+.pixeldeck-loader-word-track > span {
+  height: 24px;
+  flex: 0 0 24px;
+  padding-left: 6px;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixeldeck-loader-enter,
+  .pixeldeck-loader-word-track {
+    animation: none;
+  }
+
+  .pixeldeck-loader-word-track { transform: translateY(0); }
+}
+
+/* The shell follows the usable viewport, including rotation and system insets. */
+.pd-app {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.pd-sidebar { flex: 0 0 auto; min-height: 0; }
+.pd-mobile-nav, .pd-panel-close { display: none; }
+.pd-modal-panel { max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); min-width: 0; }
+.pd-modal-backdrop { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+.pd-modal-panel > * { min-width: 0; }
+.pd-slide-options summary { font-size: 10px; color: #8f90a3; list-style: none; pointer-events: none; }
+
+@media (max-width: 1023px) {
+  .pd-toolbar { flex-wrap: wrap; gap: 6px; padding-block: 6px; max-height: 26dvh; overflow: auto; }
+  .pd-toolbar > * { flex-shrink: 0; }
+  .pd-editor { position: relative; }
+  .pd-sidebar { display: none; }
+  .pd-sidebar-open { display: flex; flex-direction: column; position: absolute; inset-block: 0; inset-inline-start: 0; width: min(340px, 100%); z-index: 20; background: #18181f; box-shadow: 8px 0 24px #0008; }
+  .pd-properties { inset-inline-start: auto; inset-inline-end: 0; }
+  .pd-sidebar > aside { width: 100%; min-height: 0; flex: 1; }
+  .pd-panel-close { display: flex; align-self: flex-end; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+  .pd-mobile-nav { display: flex; flex-shrink: 0; background: #18181f; border-top: 1px solid #ffffff18; }
+  .pd-mobile-nav button { flex: 1; min-width: 0; min-height: 44px; font-size: 12px; padding: 6px; }
+  .pd-mobile-nav button[aria-expanded='true'], .pd-mobile-nav button[aria-pressed='true'] { color: #b5aaff; background: #7c6ef620; }
+  .pd-slides { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; padding: 6px 8px; position: relative; }
+  .pd-slide-thumbnails { grid-column: 1 / -1; grid-row: 1; min-height: 58px; }
+  .pd-slide-options { width: auto; border: 0; padding: 0; min-width: 0; }
+  .pd-slide-options summary { pointer-events: auto; min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+  .pd-slide-options:not([open]) > :not(summary) { display: none; }
+  .pd-slide-options[open] > :not(summary) { position: relative; padding: 6px; background: #18181f; }
+  .pd-slide-options[open] { position: absolute; bottom: 0; inset-inline-start: 8px; z-index: 25; border: 1px solid #ffffff30; border-radius: 8px; padding: 8px; background: #18181f; }
+  .pd-modal-panel { margin-inline: 8px; max-width: calc(100% - 16px); }
+}
+@media (pointer: coarse) {
+  .pd-toolbar button, .pd-slides button, .pd-sidebar button, .pd-modal-panel button { min-height: 40px; }
+  .pd-toolbar button { min-width: 40px; }
+  input, select, textarea { font-size: 16px; }
+}
+@media (max-height: 500px) and (max-width: 1023px) {
+  .pd-slide-thumbnails { display: none; }
+  .pd-toolbar { max-height: 22dvh; }
+}
+@media (max-width: 600px) {
+  .pd-editing-context { height: auto; min-height: 44px; padding-inline: 6px; }
+  .pd-editing-context > div { flex-wrap: wrap; }
+  .pd-editing-context section { min-height: 38px; }
+  .pd-editing-context section[aria-label='Editing locale'] { margin-inline-start: 0; padding-inline-start: 0; max-width: 100%; width: 100%; border: 0; }
+}

@@ -1,0 +1,64 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+
+# ─── Build output ─────────────────────────────────────────────────────────────
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# ─── Environment variables ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.local
+
+# ─── AI agent tooling (never commit) ──────────────────────────────────────────
+.engram/
+.opencode/
+.cursorrules
+.aider*
+.slim/deepwork/
+
+# ─── User-generated runtime dirs ──────────────────────────────────────────────
+# Local workspace data — not part of the source. The CLI creates these on demand.
+# To share a sample project or template, put it under public/templates/ instead.
+/projects/
+/screenshots/
+/output/
+/templates/
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── OS / Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Native app shells ────────────────────────────────────────────────────────
+# The desktop shell's source lives in src-tauri/; everything below is generated
+# by a build and must not be committed.
+/src-tauri/target/
+/src-tauri/gen/
+/src-tauri/icons/
+/src-tauri/Cargo.lock
+
+# The Android and iOS projects are generated from capacitor.config.json by
+# `npx cap add <platform>` (see .github/workflows/apps.yml). Keeping them out of
+# the repo avoids ~2k generated Gradle/Xcode files and stops the committed
+# project drifting from the pinned Capacitor version.
+/android/
+/ios/
+
+/test-results/

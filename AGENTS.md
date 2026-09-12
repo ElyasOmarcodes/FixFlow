@@ -1,0 +1,304 @@
+# AGENTS.md: AI Navigation Guide
+
+> This file is for AI coding agents. It maps the codebase so you can navigate, modify, and extend it without needing to read everything first.
+
+## What This Codebase Does
+
+PixelDeck is a React + TypeScript visual editor for designing App Store screenshot layouts. It has two runtime modes: an interactive GUI editor (Vite SPA), and a headless CLI export path (Playwright). Designs are stored as JSON `Project` documents and exported as PNGs.
+
+---
+
+## Canonical File Locations
+
+| Task | File(s) |
+|---|---|
+| Domain types | `src/types/index.ts` (read this first) |
+| State + actions | `src/store/index.ts` (assembly), `src/store/slices/*.ts` (domain actions), `src/store/helpers.ts` |
+| Asset store | `src/store/assets.ts` |
+| App entry / mode routing | `src/main.tsx` |
+| Editor shell | `src/App.tsx` |
+| Konva canvas | `src/components/canvas/StageCanvas.tsx` (composition) + `src/components/canvas/stage/*` (viewport/selection/drop/transformer hooks, overlays) |
+| Layer type router | `src/components/canvas/LayerNode.tsx` |
+| Layer renderers | `src/components/canvas/*Node.tsx` |
+| Shared node hooks | `src/hooks/useLayerTransform.ts`, `useLayerEffects.ts`, `useLayerInteraction.ts`, `useBrandColors.ts` |
+| Shared UI primitives | `src/components/ui/` (ModalShell, NumberInput, ToggleSwitch, SegmentedControl, FileUploadButton, InlineEditableLabel) |
+| UI icons | `src/components/ui/Icon.tsx` — the single icon sprite. Never use an emoji or a Unicode dingbat as a UI icon |
+| Interface language (i18n) | `src/i18n/index.ts` (store + `useT`), `src/i18n/locales/{en,ps,fa}.ts` |
+| Native-control styling | `src/index.css` — the `@layer base` block restyles scrollbars, selects, ranges, checkboxes, colour inputs and focus rings |
+| Desktop shell | `src-tauri/` (Tauri v2); Android shell config `capacitor.config.json`; see `docs/native-apps.md` |
+| Properties inspector | `src/components/panels/PropertiesPanel.tsx` |
+| Layer list panel | `src/components/panels/LayersPanel.tsx` |
+| Slide navigator | `src/components/panels/SlideNavigator.tsx` |
+| Settings modal | `src/components/panels/SettingsModal.tsx` |
+| Export modal | `src/components/panels/ExportModal.tsx` |
+| Projects modal | `src/components/panels/ProjectsModal.tsx` |
+| Brand kit button | `src/components/toolbar/BrandKitButton.tsx` |
+| Pano geometry | `src/utils/panoGeometry.ts` |
+| Layer tree walkers | `src/utils/layerTree.ts` (mapLayerTree/updateLayerInTree/findLayerInTree — use these, do not hand-roll recursion) |
+| Export plan (pure) | `src/utils/exportPlan.ts` (locale × format × group × slide enumeration + naming, shared by browser and headless) |
+| Fill → Konva props | `src/utils/konvaFill.ts` |
+| Multi-format export | `src/utils/multiFormatExport.ts` |
+| Stage capture mutex | `src/utils/stageCapture.ts` |
+| Canvas formats | `src/utils/canvasFormats.ts` |
+| Brand color utils | `src/utils/brandColors.ts` |
+| Locale utils | `src/utils/locale.ts` |
+| Top toolbar | `src/components/toolbar/Toolbar.tsx` |
+| Browser PNG export | `src/utils/export.ts` |
+| Gradient conversion | `src/utils/gradients.ts` |
+| File/image utilities | `src/utils/files.ts` |
+| Headless CLI entry | `cli/index.mjs` |
+| Playwright export runner | `cli/export.mjs` |
+| Headless render page | `src/pages/ExportApp.tsx` |
+| Device specs | `src/assets/mockups/specs.ts` |
+| Device SVGs | `src/assets/mockups/iphone-16-pro.ts`, `pixel-9.ts` |
+| Font catalogue | `src/utils/fonts.ts` (`FONT_LIST`, `WEB_SAFE_FONTS`, `ARABIC_SCRIPT_FONTS`) |
+| App/Android build workflow | `.github/workflows/apps.yml` |
+
+---
+
+## Data Model (Quick Reference)
+
+```
+Project { id, name, settings, slideGroups: SlideGroup[] }
+  SlideGroup { id, name, numSlides, slideWidth, slideHeight, background, layers: Layer[], slideNames[] }
+    Layer = BackgroundLayer | PhoneLayer | TextLayer | ImageLayer | ShapeLayer | ChipsLayer | BrandLayer | GroupLayer
+    
+    All layers extend BaseLayer: { id, name, type, x, y, rotation, opacity, visible, locked, blur?, shadow? }
+    
+FillValue = string | LinearGradient | RadialGradient
+PanoSettings { gapPx: number; compensate: boolean }
+ProjectSettings { defaultSlideWidth, defaultSlideHeight, defaultLocale, locales?, brandName, brandColors?, pano?: PanoSettings, ... }
+```
+
+Full types: `src/types/index.ts`
+
+---
+
+## Locale Layout Adjustment Model (3-Tier)
+
+Layout properties (`x`, `y`, `rotation`, `width`, `height`, `fontSize`, `scale`) resolve through 3 tiers, composed in order:
+
+```
+base (authored) -> auto-scaled per format -> formatOverrides[F] (absolute, pinned, per-format only)
+  -> + localeAdjust[locale][scope] (delta-valued, composes rather than wins)
+```
+
+| Tier | Storage | Semantics |
+|---|---|---|
+| Base | flat `BaseLayer` fields | authored value, auto-scaled per format |
+| Format | `formatOverrides[F]` | absolute, pinned, applies only to that exact format |
+| Locale | `localeAdjust[locale][scope]` | delta-valued (`LayoutDelta`: additive `dx/dy/dRotation`, multiplicative `mWidth/mHeight/mFontSize/mScale`); `scope` is either `BASE_CANVAS_FORMAT` (a sentinel — composes at every format, scaled by that format's factor `f`) or a specific `CanvasFormatId` (composes only at that exact format, unscaled) |
+
+One-line mental model: **the format axis pins, the locale axis adjusts.**
+
+`localeAdjust` replaced the older `localeBaseDelta`/`localeLayoutOverrides` fields (a 4-tier "most-specific-wins" model). Read path: `resolveProjectView` in `src/utils/canvasFormats.ts`. Write path: `patchLayerForLocaleAdjust` in `src/store/helpers.ts`, wired into `src/store/slices/layerSlice.ts`/`groupSlice.ts`. Reference test for exact composition semantics: `src/store/localeLayoutInvariants.test.ts`.
+
+---
+
+## How to Add a New Layer Type
+
+1. **`src/types/index.ts`**
+   - Add `'mytype'` to `LayerType` union
+   - Define `interface MyTypeLayer extends BaseLayer { type: 'mytype'; ... }`
+   - Add `| MyTypeLayer` to the `Layer` union
+
+2. **`src/store/slices/layerSlice.ts`**
+   - Add an `addMyType` factory action (see `addPhone` / `addText` for the pattern)
+   - Declare it in the `EditorStore` interface in `src/store/types.ts`
+
+3. **`src/components/canvas/MyTypeNode.tsx`** (new file)
+   - Receive `layer: MyTypeLayer` as prop
+   - Return a `react-konva` component tree
+
+4. **`src/components/canvas/LayerNode.tsx`**
+   - Add `case 'mytype': return <MyTypeNode layer={layer as MyTypeLayer} />`
+
+5. **`src/components/properties/MyTypeProperties.tsx`** (new file)
+   - Per-type property editor (see `ShapeProperties.tsx` for the pattern)
+   - Register it in the type switch in `src/components/panels/PropertiesPanel.tsx`
+
+6. **`src/components/toolbar/Toolbar.tsx`**
+   - Add an "Add MyType" button that dispatches the factory + `addLayer`
+
+---
+
+## State Store API (Key Actions)
+
+```ts
+// Read
+const project = useEditorStore(s => s.project)
+const slideGroups = useEditorStore(s => s.project.slideGroups)
+const selection = useEditorStore(s => s.selection)
+
+// Write — layer actions operate on the ACTIVE slide group implicitly
+addLayer(layer: Layer): void
+updateLayer(layerId: string, patch: Partial<Layer>): void
+removeLayer(layerId: string): void
+duplicateLayer(layerId: string): void
+moveLayerUp(layerId: string): void
+moveLayerDown(layerId: string): void
+reorderLayers(layerIds: string[]): void
+
+addSlideGroup(): void                 // appends a new default group
+updateSlideGroup(id: string, patch: Partial<SlideGroup>): void
+removeSlideGroup(id: string): void
+setActiveSlideGroup(id: string): void
+
+select(layerId: string | null): void
+deselect(): void
+undo(): void                          // via useUndoRedo() hook
+redo(): void
+importProject(json: string): void     // takes a JSON string
+exportProject(): string               // returns a JSON string
+
+// Pano settings
+updatePanoSettings(patch: Partial<PanoSettings>): void
+setPanoRenderOverride(override: { gapPx: number; compensate: boolean } | null): void
+```
+
+Asset store (`src/store/assets.ts`) — persisted to IndexedDB, NOT undoable:
+```ts
+addAsset(filename: string, dataUrl: string): void
+getAsset(filename: string): string | undefined
+removeAsset(filename: string): void
+clearAssets(): void
+listAssets(): AssetEntry[]
+```
+
+---
+
+## Conventions
+
+| Convention | Rule |
+|---|---|
+| Path alias | `@/` → `src/` |
+| Component files | PascalCase, one component per file |
+| Layer IDs | `nanoid()` |
+| Store actions | camelCase verbs (`addLayer`, `updateLayer`) |
+| FillValue guard | Always `typeof fill === 'string'` before gradient branch |
+| Asset references | Use `screenshotPath` (store key) over inline `screenshotDataUrl` |
+| ESM | `package.json` `"type": "module"`; CLI files use `.mjs` |
+| No CSS modules | Global Tailwind + `src/index.css` theme vars only |
+
+---
+
+## Interface Language (i18n)
+
+Two different "locale" concepts live in this codebase. Do not mix them.
+
+| Concept | Where | What it controls |
+|---|---|---|
+| **UI language** | `src/i18n` (`useUiLanguageStore`, `useT`) | The editor chrome — labels, tooltips, buttons. Persisted to `localStorage` under `pixeldeck.ui-language`. Never touches project data. |
+| **Design locale** | `project.settings.locales` / `activeLocale` | The *designs* being localized — per-locale slide text and images. Part of the project document and of every export. |
+
+Adding a string:
+
+1. Add the key to `src/i18n/locales/en.ts` (English is the source of truth —
+   `TranslationKey` is derived from it).
+2. TypeScript will now fail until `ps.ts` and `fa.ts` have the key too.
+3. Render it with `const t = useT()` → `t('area.thing')`. `{name}`-style
+   placeholders interpolate via the second argument.
+4. `src/i18n/i18n.test.ts` enforces completeness, matching placeholders and
+   Arabic-script coverage — it will catch a forgotten or untranslated key.
+
+Pashto and Persian are RTL: `lang`/`dir` are stamped on `<html>` by
+`initUiLanguage()` in `src/main.tsx`. Prefer logical Tailwind utilities
+(`text-start`, `ms-*`, `me-*`, `ps-*`, `pe-*`) over physical ones in chrome so
+it mirrors correctly.
+
+---
+
+## Runtime Mode Detection
+
+`src/main.tsx` checks `window.__EXPORT_CONFIG__`:
+- **Defined** → mounts `<ExportApp />` (headless export, CLI path)
+- **Undefined** → mounts `<App />` (interactive editor)
+
+CLI (`cli/export.mjs`) injects `window.__EXPORT_CONFIG__` before page navigation via Playwright's `page.addInitScript()`.
+
+---
+
+## Non-Obvious Behaviors
+
+- **Pano canvas width**: A `SlideGroup` with `numSlides: 2` has an effective canvas width of `slideWidth × 2`. Layers in "slide 2" space have `x > slideWidth`.
+- **Gradient text in Konva**: Konva doesn't natively support gradient text. `TextNode` uses an offscreen canvas pattern trick to render gradient fills on text.
+- **Asset store is not undoable**: `assets.ts` is a separate Zustand store not wrapped by zundo. Asset imports don't appear in undo history.
+- **Phone SVGs are TypeScript files**: Device frames are embedded as exported string constants (not `.svg` files) so they can be imported at runtime without fetch.
+- **Export DPI**: `stage.toDataURL({ pixelRatio: 1 })` exports at the canvas's logical pixel size. The CLI does not upscale; match `slideWidth`/`slideHeight` to your target App Store resolution.
+- **Seam guides**: `StageCanvas` renders dashed vertical lines at `x = slideWidth × i` for pano groups. These are visual-only and not included in exports.
+- **`screenshotFit: 'cover'`**: The phone screenshot is clipped to the screen rect. Cover mode crops center; contain mode letterboxes.
+- **Pano gap only applies when compensation is active**: `pano.gapPx` becomes visible in the canvas/preview only when `pano.compensate` is true. When `compensate` is false, pano geometry is continuous and export does not skip gap pixels.
+- **Capture mutex**: `stageCapture.ts` exports `acquireCaptureLock()` / `runExclusiveCapture()` — a FIFO mutex that prevents concurrent stage mutations during thumbnail generation, preview, and export. Always use it when mutating store state and then capturing the stage.
+- **Multi-format export**: `multiFormatExport.ts:exportProjectImages()` handles the full export pipeline: iterates locales × formats × groups, applies `applyLocale()` + `applyCanvasFormat()`, waits for stage settle, captures, and restores state. Use this instead of calling `exportSlide` directly.
+- **Brand color tokens**: Colors can be stored as `brand:id` tokens (e.g. `brand:abc123`). Use `resolveBrandColor(value, brandColors)` from `src/utils/brandColors.ts` before passing to Konva. Never pass raw tokens to Konva.
+- **Canvas formats**: `activeCanvasFormat` controls which format is being previewed/edited. `applyCanvasFormat(project, formatId)` returns a project with format overrides merged. The base format is not exported — only formats in `project.settings.activeFormats` are.
+- **Localization**: Default-locale content lives in each layer's flat fields and is mirrored into `localeContent[defaultLocale]`; non-default content lives in `localeContent[locale]`. `applyLocale(project, locale)` merges that locale content into layers, with a no-op fast path for the default locale. `activeLocale` controls the current preview locale.
+
+---
+
+## ⚠️ DO NOT SIMPLIFY: Hard-Won Decisions
+
+- **Konva transformer rotation pivot**: Layers rotate around their visual bounding-box center via `offsetX`/`offsetY` in `GroupNode` and all transform handlers. Do NOT remove the `offsetX`/`offsetY` logic to “simplify” it. It was a deliberate fix for rotation jumping.
+- **Asset store intentionally not undoable**: `src/store/assets.ts` is a separate Zustand store NOT wrapped by zundo. This is intentional: asset imports are file-system side effects and do not belong in undo history. Do not “fix” undo gaps by wrapping assets in temporal.
+- **Phone SVGs as TypeScript constants**: Device frames are `.ts` files exporting SVG strings, not `.svg` files. This is intentional so they can be imported at build time without a fetch. Do not convert them to `.svg` imports.
+- **Gradient text via offscreen canvas**: Konva does not natively support gradient text fills. `TextNode.tsx` uses an offscreen canvas to create a pattern. Do not replace it with a “simpler” approach without verifying gradient text still works.
+- **`screenshotFit` cover/contain/fill math**: The clip rect calculation in `PhoneNode.tsx` handles aspect ratio correctly for all three modes. Do not refactor the geometry unless you are explicitly fixing and verifying that behavior.
+- **Pano gap gated on compensate**: `StageCanvas.tsx` uses `effectiveCompensationPx = group && panoCompensate ? panoCompensationPx : 0` — the gap is applied to canvas geometry only while compensation is active. Do NOT make the gap always visible unless the product decision changes again.
+- **Capture mutex is mandatory**: Any code that mutates `activeSlideGroupId`, `activeCanvasFormat`, `activeLocale`, or `panoRenderOverride` and then captures the stage MUST use `acquireCaptureLock()` from `stageCapture.ts`. Removing it causes race conditions between thumbnail generation and export.
+- **`localeAdjust`'s base-format guard is not redundant**: `applyLocaleAdjust`/`applyLocaleAdjustToGroup` in `canvasFormats.ts` explicitly skip the format-scoped `localeAdjust[locale][format]` lookup when `format === BASE_CANVAS_FORMAT`. At the base view, `localeAdjust[locale][BASE_CANVAS_FORMAT]` (base-scoped) and `localeAdjust[locale][format]` (format-scoped) are the *same map cell* — without the guard, the same delta gets applied twice. This exact double-apply shipped once during the locale-adjust rework and was caught by `localeLayoutInvariants.test.ts`. Do not remove the guard as "dead code."
+- **The canvas wrapper is pinned `dir="ltr"`**: `src/App.tsx` sets `dir="ltr"` on the div holding `StageCanvas`. The UI mirrors for Pashto/Persian, but the design surface must not — mirroring it would flip slide coordinates and pano seams under the user while the exported PNGs stayed identical. Do not "fix" the inconsistency by removing it.
+- **The control CSS lives inside `@layer base`**: the native-widget rules in `src/index.css` are wrapped in `@layer base` so Tailwind utilities still win. Unlayered CSS beats every layered rule in the cascade, so moving those rules out of the layer would override `border`, `bg-*`, `w-*` and `px-*` classes on every button and input in the app.
+- **The `android/` and `src-tauri/icons/` directories are generated, not missing**: CI creates them with `npx cap add android` and `tauri icon`. Do not commit them.
+- **`LegacyLocaleLayoutFields` must not be deleted**: `migrateProjectToLocaleAdjust` in `helpers.ts` reads old projects' `localeLayoutOverrides`/`localeBaseDelta` fields through the internal-only `LegacyLocaleLayoutFields` type (via `getLegacyLocaleLayoutFields()`), even though those fields were removed from `BaseLayer` itself. This is the only way old project files on disk still migrate correctly. Deleting it as "dead code referencing deleted fields" silently destroys every legacy project's locale layout on load.
+
+---
+
+## Common Tasks
+
+### Change a layer's property
+```ts
+useEditorStore.getState().updateLayer(layerId, { fontSize: 24 })
+```
+
+### Access the current slide group
+```ts
+const { project, selection } = useStore.getState()
+const group = project.slideGroups.find(g => g.id === selection.slideGroupId)
+```
+
+### Add a new device mockup
+1. Add SVG string export to `src/assets/mockups/my-device.ts`
+2. Add `PhoneModelSpec` entry to `PHONE_SPECS` in `src/assets/mockups/specs.ts`
+3. Add `'my-device'` to `PhoneModel` union in `src/types/index.ts`
+
+### Trigger a CLI export programmatically
+See `cli/export.mjs`: `exportJob(jobConfig)` is the main entry. It returns a promise that resolves when all PNGs are written.
+
+---
+
+## Verification Contract
+
+Every change, human or AI, must pass this gate before PR. Run and paste output in your PR description:
+
+```bash
+npm run lint       # zero warnings or errors
+npm run typecheck  # zero type errors
+npm run build      # must succeed, output to dist/
+npm test           # all tests must pass
+```
+
+If any command fails, fix it before opening the PR. Do not open a PR with "it mostly works."
+
+---
+
+## Build & Dev Commands
+
+```bash
+npm run dev       # Vite dev server → http://localhost:5173
+npm run build     # TypeScript + Vite build → dist/
+npm run lint      # ESLint
+npm run preview   # Serve dist/ locally
+node cli/index.mjs --help          # CLI help
+```
+
+> CLI export requires `dist/` to exist. Always `npm run build` before using the CLI.

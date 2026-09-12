@@ -1,0 +1,537 @@
+import { saveFile, isSaveCancelled } from '@/utils/saveFile'
+import { useState, useEffect, useRef } from 'react'
+import { notifyProjectConflict, useProjectsStore } from '@/store/projects'
+import { useEditorStore } from '@/store'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { ModalShell } from '@/components/ui/ModalShell'
+import { InlineEditableLabel } from '@/components/ui/InlineEditableLabel'
+import { FileUploadButton } from '@/components/ui/FileUploadButton'
+import { ProjectConflictError } from '@/store/storage/types'
+import { Icon } from '@/components/ui/Icon'
+
+
+interface ProjectsModalProps {
+  open: boolean
+  onClose: () => void
+}
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const s = Math.floor(diff / 1000)
+  if (s < 60) return 'just now'
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24)
+  return `${d}d ago`
+}
+
+export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
+  const { projects, createProject, openProject, deleteProject, renameProject } =
+    useProjectsStore()
+  const activeProjectId = useEditorStore((s) => s.project.id)
+
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+
+  const [creatingNew, setCreatingNew] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newNameError, setNewNameError] = useState('')
+  const [openingId, setOpeningId] = useState<string | null>(null)
+  const [creatingBusy, setCreatingBusy] = useState(false)
+  const [deletingBusy, setDeletingBusy] = useState(false)
+  const newNameInputRef = useRef<HTMLInputElement>(null)
+  const importInputRef = useRef<HTMLInputElement>(null)
+
+  // Focus new name input when creating
+  useEffect(() => {
+    if (creatingNew) newNameInputRef.current?.focus()
+  }, [creatingNew])
+
+  const startRename = (id: string) => {
+    setRenamingId(id)
+  }
+
+  const handleOpen = async (id: string) => {
+    if (id === activeProjectId) {
+      onClose()
+      return
+    }
+    setOpeningId(id)
+    try {
+      await openProject(id)
+      onClose()
+    } catch (err) {
+      if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
+      else console.error('[PixelDeck] Failed to open project', err)
+    } finally {
+      setOpeningId(null)
+    }
+  }
+
+  const handleNew = () => {
+    setCreatingNew(true)
+    setNewName('')
+    setNewNameError('')
+  }
+
+  const handleCreateConfirm = async () => {
+    const trimmed = newName.trim()
+    if (!trimmed) {
+      setNewNameError('Name is required')
+      return
+    }
+    setCreatingBusy(true)
+    try {
+      await createProject(trimmed)
+      setCreatingNew(false)
+      onClose()
+    } catch (err) {
+      if (err instanceof ProjectConflictError) {
+        notifyProjectConflict(err.projectId)
+        setNewNameError('Another tab or device changed this project. Export your local copy or reload before creating a new project.')
+      } else {
+        setNewNameError(err instanceof Error ? err.message : String(err))
+      }
+    } finally {
+      setCreatingBusy(false)
+    }
+  }
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    setDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    setDeletingBusy(true)
+    try {
+      await deleteProject(deleteId)
+      if (deleteId === activeProjectId) onClose()
+      setDeleteId(null)
+    } catch (err) {
+      if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
+      else console.error('[PixelDeck] Failed to delete project', err)
+    } finally {
+      setDeletingBusy(false)
+    }
+  }
+
+  const handleExportProject = async (id: string, name: string) => {
+    try {
+      const json = await useProjectsStore.getState().exportProjectBundle(id)
+      const blob = new Blob([json], { type: 'application/json' })
+      const slug = name.replace(/[^a-z0-9_-]/gi, '-').toLowerCase() || 'project'
+      await saveFile(blob, `${slug}.json`)
+    } catch (err) {
+      if (isSaveCancelled(err)) return
+      console.error('[PixelDeck] Failed to export project', err)
+      alert('Failed to export this project. Please try again.')
+    }
+  }
+
+  const handleImport = () => importInputRef.current?.click()
+
+  const handleImportFile = (files: File[]) => {
+    const file = files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = async () => {
+      try {
+        const { missing } = await useProjectsStore.getState()
+          .importProjectFromJson(reader.result as string)
+        onClose()
+        if (missing.length > 0) {
+          alert(`Project imported. ${missing.length} referenced image(s) were missing from the file and will appear blank.`)
+        }
+      } catch {
+        alert('Failed to open project file.')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  // Sort: active first, then by most recently updated
+  const sorted = [...projects].sort((a, b) => {
+    if (a.id === activeProjectId) return -1
+    if (b.id === activeProjectId) return 1
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  })
+
+  return (
+    <>
+      <ConfirmDialog
+        open={deleteId !== null}
+        title={`Delete project "${projects.find((p) => p.id === deleteId)?.name ?? 'this project'}"?`}
+        message="This cannot be undone."
+        confirmLabel="Delete Project"
+        danger
+        busy={deletingBusy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
+
+      <ModalShell
+        open={open}
+        onClose={onClose}
+        onEscape={() => {
+          if (deleteId) return
+          if (creatingNew) setCreatingNew(false)
+          else onClose()
+        }}
+        maxWidth="max-w-lg"
+        backdropClassName="fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-sm"
+        panelStyle={{ background: '#18181f', borderColor: 'rgba(255,255,255,0.1)', maxHeight: '75vh', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
+        showCloseButton={false}
+        header={<div
+            style={{
+              padding: '18px 20px 12px',
+              borderBottom: '1px solid rgba(255,255,255,0.07)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#e8e8f0' }}>
+              Projects
+            </h2>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button
+                onClick={handleImport}
+                style={{
+                  background: 'none',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 6,
+                  color: '#a0a0b0',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  padding: '5px 12px',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLButtonElement).style.color = '#e8e8f0'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.25)'
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLButtonElement).style.color = '#a0a0b0'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                }}
+              >
+                Import
+              </button>
+              <button
+                onClick={handleNew}
+                style={{
+                  background: '#7c6ef6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '5px 14px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                + New
+              </button>
+              <FileUploadButton
+                ref={importInputRef}
+                accept=".json"
+                onFiles={handleImportFile}
+                className="hidden"
+              >Import file</FileUploadButton>
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#6b6b7a',
+                  cursor: 'pointer',
+                  fontSize: 18,
+                  lineHeight: 1,
+                  padding: '2px 4px',
+                }}
+              >
+                ×
+              </button>
+            </div>
+          </div>}
+        footerClassName=""
+        footer={<div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: '#6b6b7a', textAlign: 'center' }}>Auto-saved · Double-click a name to rename</div>}
+      >
+
+          {/* New project form */}
+          {creatingNew && (
+            <div
+              style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid rgba(255,255,255,0.07)',
+                background: 'rgba(255,255,255,0.02)',
+              }}
+            >
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  ref={newNameInputRef}
+                  value={newName}
+                  onChange={(e) => {
+                    setNewName(e.target.value)
+                    if (newNameError) setNewNameError('')
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleCreateConfirm()
+                    if (e.key === 'Escape') setCreatingNew(false)
+                    e.stopPropagation()
+                  }}
+                  placeholder="Project name..."
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255,255,255,0.08)',
+                    border: `1px solid ${newNameError ? '#f87171' : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: 6,
+                    color: '#e8e8f0',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    padding: '6px 10px',
+                    outline: 'none',
+                  }}
+                />
+                <button
+                  onClick={handleCreateConfirm}
+                  disabled={!newName.trim() || creatingBusy}
+                  style={{
+                    background: newName.trim() && !creatingBusy ? '#7c6ef6' : 'rgba(124,110,246,0.4)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '6px 14px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: newName.trim() && !creatingBusy ? 'pointer' : 'not-allowed',
+                    flexShrink: 0,
+                  }}
+                >
+                  {creatingBusy ? 'Creating…' : 'Create'}
+                </button>
+                <button
+                  onClick={() => setCreatingNew(false)}
+                  style={{
+                    background: 'none',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 6,
+                    color: '#6b6b7a',
+                    fontSize: 12,
+                    fontWeight: 500,
+                    padding: '6px 10px',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+              {newNameError && (
+                <div style={{ fontSize: 11, color: '#f87171', marginTop: 6 }}>
+                  {newNameError}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Project list */}
+          <div style={{ overflowY: 'auto', flex: 1, padding: '8px 8px' }}>
+            {sorted.length === 0 && (
+              <p style={{ textAlign: 'center', color: '#6b6b7a', fontSize: 13, padding: '24px 0' }}>
+                No projects yet
+              </p>
+            )}
+
+            {sorted.map((p) => {
+              const isActive = p.id === activeProjectId
+              const isRenaming = renamingId === p.id
+
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => !isRenaming && !openingId && void handleOpen(p.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 12px',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    background: isActive ? 'rgba(124,110,246,0.15)' : 'transparent',
+                    border: isActive
+                      ? '1px solid rgba(124,110,246,0.4)'
+                      : '1px solid transparent',
+                    marginBottom: 4,
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive)
+                      (e.currentTarget as HTMLDivElement).style.background =
+                        'rgba(255,255,255,0.04)'
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive)
+                      (e.currentTarget as HTMLDivElement).style.background = 'transparent'
+                  }}
+                >
+                  {/* Icon */}
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      background: isActive
+                        ? 'rgba(124,110,246,0.25)'
+                        : 'rgba(255,255,255,0.07)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: isActive ? '#c4b9fc' : '#8a86a0',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Icon name="camera" size={18} />
+                  </div>
+
+                  {/* Name + meta */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <InlineEditableLabel
+                        value={p.name}
+                        editing={isRenaming}
+                        onEditingChange={(editing) => {
+                          setRenamingId(editing ? p.id : null)
+                        }}
+                        onCommit={(name) => {
+                          renameProject(p.id, name).catch((err) => {
+                            if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
+                            else console.error('[PixelDeck] Rename failed', err)
+                          })
+                        }}
+                        inputStyle={{
+                          background: 'rgba(255,255,255,0.08)',
+                          border: '1px solid rgba(124,110,246,0.6)',
+                          borderRadius: 4,
+                          color: '#e8e8f0',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          padding: '2px 6px',
+                          width: '100%',
+                          outline: 'none',
+                        }}
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: isActive ? '#c4b9fc' : '#e8e8f0',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        className="block"
+                      >
+                        {isActive && (
+                          <span
+                            style={{
+                              marginLeft: 8,
+                              fontSize: 10,
+                              background: 'rgba(124,110,246,0.35)',
+                              color: '#a89cf6',
+                              borderRadius: 4,
+                              padding: '1px 6px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            current
+                          </span>
+                        )}
+                      </InlineEditableLabel>
+                    <div style={{ fontSize: 11, color: '#6b6b7a', marginTop: 2 }}>
+                      {relativeTime(p.updatedAt)}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div
+                    style={{ display: 'flex', gap: 4 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      title="Export project as JSON"
+                      onClick={(e) => { e.stopPropagation(); void handleExportProject(p.id, p.name) }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#6b6b7a',
+                        cursor: 'pointer',
+                        fontSize: 14,
+                        padding: '4px',
+                        borderRadius: 4,
+                      }}
+                      onMouseEnter={(e) =>
+                        ((e.currentTarget as HTMLButtonElement).style.color = '#e8e8f0')
+                      }
+                      onMouseLeave={(e) =>
+                        ((e.currentTarget as HTMLButtonElement).style.color = '#6b6b7a')
+                      }
+                    >
+                      Export
+                    </button>
+                    <button
+                      title="Rename (double-click name)"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        startRename(p.id)
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#6b6b7a',
+                        cursor: 'pointer',
+                        fontSize: 14,
+                        padding: '4px',
+                        borderRadius: 4,
+                      }}
+                      onMouseEnter={(e) =>
+                        ((e.currentTarget as HTMLButtonElement).style.color = '#e8e8f0')
+                      }
+                      onMouseLeave={(e) =>
+                        ((e.currentTarget as HTMLButtonElement).style.color = '#6b6b7a')
+                      }
+                    >
+                      <Icon name="pencil" size={14} />
+                    </button>
+                    <button
+                      title="Delete project"
+                      onClick={(e) => handleDelete(e, p.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#6b6b7a',
+                        cursor: 'pointer',
+                        fontSize: 14,
+                        padding: '4px',
+                        borderRadius: 4,
+                      }}
+                      onMouseEnter={(e) =>
+                        ((e.currentTarget as HTMLButtonElement).style.color = '#f87171')
+                      }
+                      onMouseLeave={(e) =>
+                        ((e.currentTarget as HTMLButtonElement).style.color = '#6b6b7a')
+                      }
+                    >
+                      <Icon name="trash" size={14} />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+      </ModalShell>
+    </>
+  )
+}

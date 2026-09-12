@@ -1,0 +1,293 @@
+# Changelog
+
+All notable changes to PixelDeck are documented here.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- **Pashto and Persian/Dari interface languages, with right-to-left layout.** A new Language section in Settings switches the editor chrome between English, پښتو and فارسی / دری; the choice persists locally and is detected from the browser's languages on a first visit (Dari `prs` maps to Persian). `lang`/`dir` are stamped on `<html>` before first paint so an RTL interface never flashes left-to-right. The design canvas stays pinned left-to-right — mirroring it would flip slide coordinates and pano seams while the exported PNGs stayed identical. Interface language is deliberately separate from a project's design locales: switching it changes no slide and no export.
+- **20 Pashto / Persian / Arabic-script fonts**, led by Vazirmatn (وزیر متن), plus Noto Sans/Naskh/Kufi Arabic, IBM Plex Sans Arabic, Cairo, Tajawal, Almarai, Readex Pro, Baloo Bhaijaan 2, Reem Kufi, Lalezar, Amiri, Scheherazade New, Lateef, Harmattan, Alkalami, Markazi Text, Gulzar and Noto Nastaliq Urdu. All carry the extra Pashto letters (ټ ډ ړ ږ ژ ښ ګ ڼ ې ی) on top of the Arabic and Persian sets, so a Pashto headline no longer breaks joining mid-word.
+- **A script filter in the font picker** (All / Latin / پښتو) and a dedicated Arabic-script section whose rows preview each face with its own-script name — a Latin "Aa" sample says nothing about a Naskh or Nastaliq design. Font search now matches the native name too, so typing "وزیر" finds Vazirmatn.
+- **Desktop and Android app builds.** `.github/workflows/apps.yml` builds Windows (`nsis`), macOS (one universal `dmg`) and Linux (`deb`, `rpm`) installers via Tauri v2, plus an Android APK/AAB via Capacitor, and attaches them to every `v*` release. Both shells wrap the same web bundle, so there is no second codebase. The Linux `.deb` measures 1.8 MB around a 3.7 MB stripped binary, and the APK lands at ~4–6 MB, against roughly 120 MB for an equivalent Electron build: Tauri uses the OS webview instead of bundling Chromium, the Rust release profile is tuned for size (`opt-level = "s"`, LTO, one codegen unit, `panic = "abort"`, stripped), no Tauri plugins are linked in, and the Android release build runs R8 code and resource shrinking. See `docs/native-apps.md`.
+
+### Changed
+
+- **Every emoji and Unicode dingbat used as a UI icon is now a real SVG icon.** The editor drew its chrome with characters like 📱 🎨 ◉ ✕ ▾ ⠿ ⌫, which render differently on every platform, ignore the theme colour and look nothing like a native control. `src/components/ui/Icon.tsx` is a single hand-rolled 24×24 stroke sprite (no icon-font or runtime dependency added) wired through the toolbar, layers panel, assets, slide navigator, properties inspector, projects/templates/settings/help modals, canvas overlays, editing-context bar and the localization view. Emoji that are actual canvas *content* — the emoji-layer palette and the emoji layer's default value — are untouched.
+- **Native browser widgets restyled to read as app chrome.** Scrollbars are overlay pills on a transparent track (with Firefox `scrollbar-color` and no stepper arrows); `<select>` gets the app's own chevron instead of the OS dropdown button, mirrored under RTL; range sliders render one flat rail and accent knob across WebKit and Gecko; checkboxes are custom boxes with drawn check and indeterminate states; colour inputs are flat chips instead of the inset native swatch; number spinners, autofill tinting, search-clear and password-reveal chrome are suppressed; the platform focus ring is replaced by an accent `:focus-visible` ring; and chrome no longer drag-selects like a document while inputs and contenteditable surfaces stay selectable. The rules live inside `@layer base` so component Tailwind utilities still win over them.
+
+## [0.8.3](https://github.com/Pr0xS/PixelDeck/compare/v0.8.2...v0.8.3) - 2026-08-14
+
+### Fixed
+
+- Export button no longer stays permanently disabled after a fresh page load. Stage readiness was only re-checked when the active slide group's memoized reference happened to change (e.g. after opening Preview first); it's now re-checked whenever the Export modal opens and polls for the Konva stage to mount instead of giving up after a single synchronous check.
+- Export format checkboxes now respond correctly when clicking directly on the checkbox, not just its label text. A redundant click handler on the wrapping `<label>` (with `preventDefault()`) was firing alongside the checkbox's own `onChange`, double-toggling the selection back to its original state when clicking the tick itself.
+- Export formats and locales can now be freely checked/unchecked, including down to zero of either. Previously the last checked item silently refused to uncheck with no visible reason. The Export button now disables itself (with a clear "Select at least one format/locale to export" hint) instead of blocking the interaction.
+
+## [0.8.2](https://github.com/Pr0xS/PixelDeck/compare/v0.8.1...v0.8.2) - 2026-08-14
+
+### Security
+
+- `js-yaml` bumped from 4.3.0 to 4.3.1, fixing a high-severity quadratic-CPU-consumption DoS in `!!omap` resolution ([GHSA-5p4m-2wfm-xmqj](https://github.com/advisories/GHSA-5p4m-2wfm-xmqj)).
+- Transitive `nanoid` (pulled in by `postcss`/vite's toolchain) pinned to `^3.3.18` via `overrides`, fixing an infinite-loop DoS when a custom generator's `size` is zero ([GHSA-2v37-7h3g-55p8](https://github.com/advisories/GHSA-2v37-7h3g-55p8)). PixelDeck's own runtime `nanoid` (v5, used for layer IDs) is unaffected and untouched.
+- Transitive `brace-expansion` (pulled in by `eslint`'s `minimatch`) pinned to `^5.0.9` via `overrides`, fixing three high-severity DoS advisories ([GHSA-3jxr-9vmj-r5cp](https://github.com/advisories/GHSA-3jxr-9vmj-r5cp), [GHSA-mh99-v99m-4gvg](https://github.com/advisories/GHSA-mh99-v99m-4gvg), [GHSA-rgw5-rvv9-x895](https://github.com/advisories/GHSA-rgw5-rvv9-x895)).
+- `npm audit` now reports 0 vulnerabilities (was 3 high).
+
+## [0.8.1](https://github.com/Pr0xS/PixelDeck/compare/v0.8.0...v0.8.1) - 2026-08-14
+
+### Fixed
+
+- Preview modal loading bar now reflects real per-slide capture progress (e.g. "3 of 7") instead of a static animated placeholder, and only blurs the slide group currently regenerating instead of every thumbnail.
+- Export now shows real progress across format × locale combinations (e.g. "iPad · Italian") with a live percentage, and can be cancelled mid-export via a new Cancel button without corrupting editor or stage state.
+
+## [0.8.0](https://github.com/Pr0xS/PixelDeck/compare/v0.7.1...v0.8.0) - 2026-07-30
+
+### Added
+
+- Format families: every slide group now belongs to a device category — Phone, Tablet, Watch, Desktop, TV, VR, or Game — each with its own authoring Base canvas and default device-surface rebasing (e.g. switching to Tablet auto-rebases Phone mockups onto iPad/Android Tablet; Watch onto Apple Watch/Wear OS).
+- A family switcher in the editing bar, family forking (spin up a new family from an existing Base/format layout, scaled to fit), and a stable `slideKey` identity that links "the same conceptual slide" across families even once their layouts diverge.
+- "Bring content from…" — pulls text and images from the matching slide in another family into the current slide, without touching layout; previews every change before confirming and skips layers with no counterpart or a mismatched type.
+- New device mockups: Apple Watch, Wear OS, Android Tablet, and additional iPad variants.
+- Offscreen thumbnail precache pipeline: an inert offscreen capture stage precaches thumbnails per family/format in the background, with bounded settle waits and imageless-stage settling, instead of only generating thumbnails on-demand when a slide group is visited.
+- Sliding-well redesign of the format/locale editing tab bar.
+- Open-core extensibility seam and an async project storage layer, laying groundwork for pluggable storage backends.
+- `docs/help/*.md` — the in-app Help modal's 14 chapters are now plain Markdown files in the repo, the single source of truth for user-facing documentation (readable directly on GitHub and rendered in-app), replacing the hand-written `HelpContent.tsx` and the stale, unreferenced `HELP.md`. Documents the new format-family model and "Bring content from…" for the first time.
+
+### Fixed
+
+- Phone status bar/model no longer leaks onto Watch family layouts; corrected Apple Watch screen symmetry and redesigned Wear OS side controls.
+- Preview modal: no longer reverts to the previous slide instead of following the one you clicked, and no longer leaves `activeFamily` stale after a cross-family format switch (which previously left Preview showing zero slides).
+- Several thumbnail-capture race conditions: stale cache-key validation on read, decoded-image caching to stop a black flash on slide switch, and real pending-image-load tracking so stage settling doesn't declare victory before images actually finish loading.
+- Switching formats within the same family now does a relative pan + zoom rescale instead of a hard reset.
+- Responsive format/locale bar and editor chrome at small screens.
+
+## [0.7.1](https://github.com/Pr0xS/PixelDeck/compare/v0.7.0...v0.7.1) - 2026-07-26
+
+### Fixed
+
+- Nav thumbnails no longer go permanently blank after a tab is backgrounded for a long time (or the browser restarts and the tab is revisited). The capture polling loops (`waitForStage`/`waitForStageSettled`) were bounded by wall-clock time but could only advance via `requestAnimationFrame`, which browsers fully suspend for hidden tabs — on resume the clock had already passed the timeout before a single frame fired, so the capture silently gave up with no retry path. Thumbnails are now silently re-captured on `visibilitychange` when the tab becomes visible again.
+
+## [0.7.0](https://github.com/Pr0xS/PixelDeck/compare/v0.6.1...v0.7.0) - 2026-07-25
+
+### Added
+
+- Editing a layer's layout (position, size, rotation) while on the Base format tab with a non-default locale active now works, instead of being blocked with a warning. The adjustment is stored as a delta relative to the base value and composes across every active format, so a locale-wide fix (e.g. longer German text) no longer needs to be repeated per format.
+- A "Test Connection" button in AI provider settings that exercises the real chat-completion path (translating a short fixed string) instead of just listing models, so it catches providers/models that list fine but fail at call time.
+
+### Changed
+
+- Unified per-locale layout storage from two fields (`localeBaseDelta`, `localeLayoutOverrides`) into one (`localeAdjust`), with a single composing model instead of a most-specific-wins one: format overrides stay absolute/pinned, locale adjustments now always compose on top of them instead of occasionally being shadowed by them. Existing projects migrate automatically.
+- The layout-override indicator next to position/size fields now shows independently for format pins and locale adjustments (previously a locale adjustment could be silently shadowed by a format override with no visual indication).
+
+### Fixed
+
+- A per-format locale layout adjustment no longer goes stale when the shared base layout or a format override is edited afterward — it now tracks those upstream edits instead of silently freezing at whatever value it was pinned to.
+- Localization table: renamed "Change source" button to "Change default"; default phone layer name changed from "iPhone 16 Pro" to generic "Phone"; fixed sticky Layer column peek-through and scroll jump; synced horizontal scroll across all slide-group sections; added a real trailing gutter after the last locale column; kept the edited text cell fully visible when the docked styling panel opens.
+
+## [0.6.1](https://github.com/Pr0xS/PixelDeck/compare/v0.6.0...v0.6.1) - 2026-07-20
+
+### Added
+
+- Eager low-resolution slide thumbnail precache: the nav filmstrip now fills in thumbnails for every slide group shortly after project load/import/slide-group-add instead of only after a group is manually visited/previewed.
+- A branded global loading screen shown on app boot that blocks until the initial thumbnail precache completes, with a looping "loading …" word-reel indicator; it only appears once per session (later precache passes stay silent behind the existing lightweight canvas overlay).
+- Rebuilt the Help panel into a full 14-section user guide (Projects, Templates, Slides, Layers, Properties, Canvas Formats, Localization, Format × Locale editing, Brand Kit, Assets, Exporting, AI Features, Keyboard Shortcuts) with a searchable sidebar and section navigation, replacing the previous single-scroll overview.
+
+### Changed
+
+- The floating format/locale editing alert now has a single "↩ Base + Default" button that returns both the canvas format and locale to shared/default at once, replacing two separate buttons.
+- Removed the confirmation popups on "Use format layout as shared…" and "Reset pairing layout" — both actions are covered by undo (Ctrl/⌘+Z), so the "this cannot be undone" warning was inaccurate.
+
+### Fixed
+
+- Unified all interactive-editor capture paths (thumbnail precache, Preview high-res capture, export) onto the shared capture mutex, closing a latent race between Preview and Export that could corrupt `activeSlideGroupId`/`panoRenderOverride` restoration.
+- Preview and precache captures no longer restore a stale active slide group if the project changes mid-capture.
+- Slide navigator thumbnail spacing: pano/strip sub-slides now cluster with a tighter, consistent gap so they read as one continuous unit, distinct groups have clearer separation, and a group's name label no longer widens narrow thumbnail strips into uneven gutters.
+
+## [0.6.0](https://github.com/Pr0xS/PixelDeck/compare/v0.5.2...v0.6.0) - 2026-07-19
+
+### Added
+
+- Format-scoped per-locale layout overrides: adjust a layer's position, size, or rotation for a specific locale scoped to a specific canvas format (e.g. a German-only fix on Android) without affecting other formats or locales.
+- A merged format + locale editing bar and a floating, top-centered context alert that always states what's currently being edited and what's shared vs. scoped — replacing the previous stacked warning banners.
+- Grouped format and locale actions (reset layout, reset visibility, make layers shared, promote format layout to shared, reset a locale+format pairing) in a single, clearly sectioned menu.
+- Default-locale promotion: promote any locale to become the project's new default, with a dialog explaining what happens to incomplete translations.
+
+### Changed
+
+- Locale storage is now fully symmetric: default-locale content lives in each layer's flat fields (mirrored into `localeContent[defaultLocale]`), non-default content lives in `localeContent[locale]`. Removed the legacy `localeOverrides` field and its dual-path read fallback in the app runtime (the CLI still tolerates raw un-migrated files).
+
+### Fixed
+
+- Base-table locale edits (Localization view) no longer desync `localeContent[defaultLocale]`, which could surface stale source text in exported translation manifests.
+- Promoting a locale to default no longer replaces content with an empty string when the target locale has an empty manual override — it now correctly falls back to the previous default's content.
+- Inline canvas text editing is now restricted to the default locale, preventing translated content from being silently overwritten by default-locale text when a non-default locale tab is active.
+- Arrow-key nudging now reads the resolved (format/locale-aware) position instead of raw base coordinates, fixing a position jump on the first nudge when a format or locale override was already active.
+- Editing a layer's layout while on the Base format tab with a non-default locale active now shows an explicit warning that layout changes won't apply there, instead of silently reverting with no explanation.
+
+## [0.5.2](https://github.com/Pr0xS/PixelDeck/compare/v0.5.1...v0.5.2) - 2026-07-19
+
+### Added
+
+- Project-scoped asset library: images are now stored per-project in IndexedDB instead of one shared global store, preventing cross-project asset collisions.
+- Self-contained project export/import — exported project JSON now embeds every referenced image, so imported projects are portable across profiles/machines.
+- Shared UI primitives for modals, numeric inputs, toggles, segmented controls, file uploads, and inline labels.
+- Reusable layer-tree walkers, Konva fill conversion, layer interaction/effect hooks, and a pure browser/headless export plan.
+- AI transport and export-plan tests covering timeouts, retries, collision-safe filenames, nested layers, and gradients.
+
+### Changed
+
+- Split the canvas stage into focused viewport, selection, drop-target, transformer, geometry, and overlay modules.
+- Unified browser and headless export enumeration and made CLI output names collision-safe with `<group>__<slide>.png` naming.
+- Improved rich-text segmentation from quadratic scans to a sweep-line implementation and cached text measurements.
+- Narrowed Zustand selectors and consolidated repeated layer, property-panel, and modal behavior.
+
+### Fixed
+
+- Prevented deleting the active project from resurrecting it via a stale replacement-load race.
+- Fixed image-layer base-locale preview not rendering in the Localization panel (asset-store key wasn't resolved to a data URL).
+- Added AI request timeouts and transient retries while preventing non-idempotent image generation from retrying after transport failures.
+- Added consistent CLI validation and error reporting with non-zero exit codes.
+- Preserved project update timestamps when clearing format-specific state.
+
+## [0.5.1](https://github.com/Pr0xS/PixelDeck/compare/v0.4.1...v0.5.1) - 2026-07-16
+
+### Added
+
+- Editable background accent glows with independent color, opacity, blur, position, size, direct canvas manipulation, and overlap-aware selection.
+- OpenAI-compatible custom provider support with shared provider/model settings for OpenAI, OpenRouter, Google Gemini, and custom endpoints.
+- Four new bundled template sets for nutrition, finance, travel, and productivity.
+
+### Changed
+
+- Template phone screenshots are extracted into the IndexedDB asset store during import to avoid localStorage quota failures.
+- AI requests now use a unified OpenAI-compatible client and Google Gemini's compatibility endpoint.
+- Background and content interaction layers are separated while editing accents, preserving visual stacking and direct manipulation.
+
+### Fixed
+
+- Removed clipped edges and white halos from blurred canvas elements by padding filter caches and using native canvas blur filters.
+- Preserved project export filenames that already include non-PNG extensions.
+- Prevented project-library saves from persisting large inline screenshot data URLs.
+- Prevented template exports from including project screenshots, image layers, background images, or brand logos.
+
+## [0.4.1](https://github.com/Pr0xS/PixelDeck/compare/v0.4.0...v0.4.1) (2026-07-12)
+
+### Bug Fixes
+
+* support multiple simultaneous custom canvas formats ([#37](https://github.com/Pr0xS/PixelDeck/pull/37)) ([f3e8280](https://github.com/Pr0xS/PixelDeck/commit/f3e8280a0b9074e7704486592ad48aacc255f8f2))
+
+## [0.4.0](https://github.com/Pr0xS/PixelDeck/compare/v0.3.3...v0.4.0) (2026-07-07)
+
+
+### Features
+
+* add checkmark shape type ([170f1b9](https://github.com/Pr0xS/PixelDeck/commit/170f1b9d10c22766ba815133ccd192ab942a0017))
+* show real slide background behind text previews in LocalizationView ([30fd536](https://github.com/Pr0xS/PixelDeck/commit/30fd53634aa8d8ee520ae91a08a6dbdf803cf133))
+
+
+### Bug Fixes
+
+* apply text weight through rich-text mark system with selection support ([b5e713d](https://github.com/Pr0xS/PixelDeck/commit/b5e713d515a36e2f987d8097623954429722ad71))
+* correct noise toggle knob alignment in Background properties ([688f34f](https://github.com/Pr0xS/PixelDeck/commit/688f34fd5fb0a23b01e4213b49bfa17902e44871))
+* cross-slide paste offset cascade + add test coverage for export/import and geometry ([#35](https://github.com/Pr0xS/PixelDeck/issues/35)) ([5b048e5](https://github.com/Pr0xS/PixelDeck/commit/5b048e53ccd6f407e3afdf42b154d22dd17b0eac))
+* keep release-please tags on bare vX.Y.Z format ([#33](https://github.com/Pr0xS/PixelDeck/issues/33)) ([1459d94](https://github.com/Pr0xS/PixelDeck/commit/1459d94465c7b6f5975fa20c1e69228b339dc183))
+
+## [0.2.3] - 2026-06-14
+
+### Added
+
+- Logo and favicon: new SVG brand mark (two portrait screenshot cards with purple→pink gradient) replaces the generic bolt icon; added `public/logo.svg` wordmark for use in README and OG metadata.
+- Current project name displayed in the toolbar between the logo and the Projects button — click to rename inline (Enter to confirm, Escape to cancel).
+- README now shows the PixelDeck logo at the top, linked to the live demo.
+- Richer `index.html` metadata: page title, description, theme-color, Open Graph, and Twitter/X card tags.
+
+### Fixed
+
+- Infinite render loop (`Maximum update depth exceeded`) caused by `useProjectsStore` selector returning a new object on every render; fixed by wrapping with `useShallow`.
+
+## [0.2.2] - 2026-06-14
+
+### Fixed
+
+- OpenCode Go is now explicitly blocked in GitHub Pages/no-proxy production builds before any browser request is attempted, avoiding CORS console errors for both model loading and chat/image calls.
+- Removed the hardcoded OpenCode model list from static production mode; unsupported providers now show a clear error instead of exposing models that cannot run.
+
+### Changed
+
+- Image-editing capability hints now treat OpenCode as unavailable in no-proxy static builds.
+
+## [0.2.1] - 2026-06-14
+
+### Fixed
+
+- GitHub Pages AI provider compatibility: OpenCode now uses a local curated model list in no-proxy production builds instead of calling its `/models` endpoint, avoiding the browser CORS failure.
+- Google AI requests now switch correctly between direct browser API-key query parameters and proxy header auth when `VITE_AI_PROXY_BASE_URL` is configured.
+
+### Added
+
+- Optional production AI proxy routing via `VITE_AI_PROXY_BASE_URL`, while keeping static GitHub Pages direct-provider mode as the default.
+- Fallback model lists for providers when dynamic model discovery is blocked by CORS or network errors.
+- Tests covering AI URL routing and OpenCode no-proxy model fallback behavior.
+
+### Documentation
+
+- Documented static-host AI behavior and optional proxy configuration in the README.
+
+## [0.2.0] - 2026-06-14
+
+### Added
+
+- 80+ curated Google Fonts (expanded from 23; includes sans-serif, serif, display, monospace, handwriting)
+- Multi-format export: one project exports to multiple platform sizes (iPhone 6.9", Android Phone, iPad 13", Android Tablet) with per-format layout and visibility overrides
+- AI translation: auto-translate all text layers to any locale using OpenAI, Anthropic, or compatible APIs
+- Brand color system: named brand colors with token binding (`@brand:<id>`) across all fill fields
+- Gradient presets: 12 quick-pick gradient swatches in the gradient editor (Midnight, Ocean, Aurora, Candy, Sunset, Fire, Forest, Peach, Royal, Lavender, Neon, Nordic)
+- Phone position presets: one-click Center / Hero / Bleed / Tilt ↺ / Tilt ↻ placement for phone mockup layers
+- Text placement presets: one-click Top / Middle / Bottom positioning for text layers, pano-aware
+- OS file drop on canvas: drag image files from the OS file manager directly onto the canvas to replace a phone screenshot, replace an image layer, or create a new image layer; supports multiple files
+- Rich text marks system (`TextMark`): range-based per-character styling (start/end offsets) replacing the legacy `TextSpan` segment system; supports fill, fontWeight, italic, underline, strikethrough per range
+- Format-aware rendering: per-format visibility and layout overrides; base format for authoring, exportable formats for each platform
+- ZIP batch export from the browser: download all slides in a group as a ZIP in one click
+- Locale manifest generation and import via CLI for external translation workflows
+- `--locale` and `--all-locales` flags for CLI export
+
+### Changed
+
+- Asset store migrated from in-memory Map to IndexedDB for persistence across page reloads
+
+## [0.1.0] - 2026-06-09
+
+### Added
+
+- Visual canvas editor with Konva: drag, resize, rotate, group layers
+- Layer types: phone mockup, text, image, shape, chips (pill labels), brand lockup, group
+- Background layer: solid or gradient background; always at the bottom of the stack
+- Rich text: per-span color, gradient fill, font weight, italic within one text layer
+- 23 curated Google Fonts loaded on demand
+- Pano slide groups: canvas spanning multiple slides for phone-crossing-seam layouts
+- Gradient fills: linear and radial on backgrounds, shapes, and text
+- Full undo/redo via zundo
+- Multi-project management: create, open, rename, delete; auto-saved to localStorage
+- Layer panel: drag-to-reorder with dnd-kit, visibility toggle, lock, rename
+- Properties inspector: context-aware panel per selected layer
+- Contextual toolbar: floating quick-actions above selected layer
+- Asset library: import screenshots by file or folder, drag to canvas
+- Browser export: download individual slides or full groups as PNGs
+- CLI batch export: headless Playwright export for automation pipelines
+- Templates: import/export project decks as reusable JSON templates
+- Localization: per-locale text and image overrides; locale switcher in preview
+- Phone status bar simulation: iOS and Android styles (transparent / solid background)
+- Phone mockups: iPhone 16 Pro, iPhone 16 Pro (No Island), Pixel 9, Pixel 9 (No Camera)
+- Plain mockup variants without Dynamic Island / punch-hole for clean marketing shots
+- Asset persistence: IndexedDB storage for imported screenshots (survives page reload)
+- Preview modal: full-project filmstrip preview with high-res thumbnail capture
+- Slide navigator: thumbnail-based navigation with per-slide index
+
+[Unreleased]: https://github.com/Pr0xS/PixelDeck/compare/v0.5.1...HEAD
+[0.2.2]: https://github.com/Pr0xS/PixelDeck/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/Pr0xS/PixelDeck/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/Pr0xS/PixelDeck/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/Pr0xS/PixelDeck/releases/tag/v0.1.0

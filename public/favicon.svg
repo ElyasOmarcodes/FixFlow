@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="pd-fl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b49eff"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="pd-fr" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9d6ef6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left card: purple gradient -->
+  <rect x="2" y="3" width="13" height="26" rx="3" fill="url(#pd-fl)"/>
+  <!-- Left card content: title line -->
+  <rect x="4.5" y="9" width="8" height="1.5" rx="0.75" fill="white" fill-opacity="0.6"/>
+  <!-- Left card content: subtitle line -->
+  <rect x="4.5" y="12" width="5.5" height="1.5" rx="0.75" fill="white" fill-opacity="0.35"/>
+  <!-- Left card content: image block -->
+  <rect x="4.5" y="16" width="8" height="8" rx="1.5" fill="white" fill-opacity="0.15"/>
+
+  <!-- Right card: violet→pink gradient -->
+  <rect x="17" y="3" width="13" height="26" rx="3" fill="url(#pd-fr)"/>
+  <!-- Right card content: title line -->
+  <rect x="19.5" y="9" width="8" height="1.5" rx="0.75" fill="white" fill-opacity="0.6"/>
+  <!-- Right card content: subtitle line -->
+  <rect x="19.5" y="12" width="6" height="1.5" rx="0.75" fill="white" fill-opacity="0.35"/>
+  <!-- Right card content: image block -->
+  <rect x="19.5" y="16" width="8" height="8" rx="1.5" fill="white" fill-opacity="0.15"/>
+</svg>

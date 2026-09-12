@@ -1,0 +1,357 @@
+import { Capacitor } from '@capacitor/core'
+import { App as NativeApp } from '@capacitor/app'
+import { useT } from '@/i18n'
+import { Icon } from '@/components/ui/Icon'
+import { useRef, useEffect, useState, lazy, Suspense } from 'react'
+import type Konva from 'konva'
+import { useShallow } from 'zustand/react/shallow'
+import { Toolbar } from '@/components/toolbar/Toolbar'
+import { LayersPanel } from '@/components/panels/LayersPanel'
+import { PreviewModal } from '@/components/panels/PreviewModal'
+import { PropertiesPanel } from '@/components/panels/PropertiesPanel'
+import { SlideNavigator } from '@/components/panels/SlideNavigator'
+import { StageCanvas } from '@/components/canvas/StageCanvas'
+import { EditingContextAlert, EditingContextBar } from '@/components/canvas/EditingContext'
+import { AppLoadingScreen } from '@/components/AppLoadingScreen'
+import { useThumbnails } from '@/hooks/useThumbnails'
+import { useImageCacheWarmer } from '@/hooks/useImageCacheWarmer'
+import { useEditorStore, useUndoRedo } from '@/store'
+import { resolveGroupView } from '@/utils/canvasFormats'
+import { registerStage } from '@/utils/stageRegistry'
+import { getScopedEditingIndicator } from '@/utils/scopedEditingIndicator'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { useProjectsStore } from '@/store/projects'
+
+// Lazy-load the localization view — it's a separate mode and not needed on initial load.
+const LocalizationView = lazy(() =>
+  import('@/pages/LocalizationView').then((m) => ({ default: m.LocalizationView })),
+)
+
+const INITIAL_SPLASH_MIN_MS = 450
+
+export default function App() {
+  const t = useT()
+  const [mobilePanel, setMobilePanel] = useState<'layers' | 'properties' | null>(null)
+  const stageRef = useRef<Konva.Stage>(null)
+  const conflictNotice = useProjectsStore((s) => s.conflictNotice)
+
+  useEffect(() => {
+    if (Capacitor.getPlatform() !== 'android') return
+    const listener = NativeApp.addListener('backButton', () => {
+      if (document.querySelector('[role="dialog"]')) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      } else if (mobilePanel) {
+        setMobilePanel(null)
+      } else {
+        // Keep the editor's local state alive when leaving with Android Back.
+        void NativeApp.minimizeApp()
+      }
+    })
+    return () => { void listener.then((handle) => handle.remove()) }
+  }, [mobilePanel])
+
+  // Register the stage in the singleton registry so PropertiesPanel and other
+  // non-canvas components can access it for bounding-box queries (alignment).
+  useEffect(() => {
+    registerStage(stageRef.current)
+    return () => registerStage(null)
+  })
+  const { project, activeSlideGroupId, activeCanvasFormat, activeLocale, setActiveSlideGroup, exitGroupEdit, editingGroupId } =
+    useEditorStore(useShallow((s) => ({
+      project: s.project,
+      activeSlideGroupId: s.activeSlideGroupId,
+      activeCanvasFormat: s.activeCanvasFormat,
+      activeLocale: s.activeLocale,
+      setActiveSlideGroup: s.setActiveSlideGroup,
+      exitGroupEdit: s.exitGroupEdit,
+      editingGroupId: s.editingGroupId,
+    })))
+  const scopedEditingIndicator = getScopedEditingIndicator(project, activeLocale, activeCanvasFormat)
+  const { undo, redo } = useUndoRedo()
+  const [view, setView] = useState<'editor' | 'localization'>('editor')
+  const [previewOpen, setPreviewOpen] = useState(false)
+  // Locale the preview opens in + the view to return to when it closes.
+  const [previewLocale, setPreviewLocale] = useState<string | undefined>(undefined)
+  const [previewReturnTo, setPreviewReturnTo] = useState<'localization' | null>(null)
+  const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState(false)
+  const [hasMetMinimumSplashTime, setHasMetMinimumSplashTime] = useState(false)
+  const {
+    thumbnails,
+    staleGroupIds,
+    previewThumbs,
+    isCapturingPreview,
+    previewProgress,
+    captureNow,
+    captureAllHighRes,
+    cancelPreviewCapture,
+    offscreenThumbnailElement,
+  } = useThumbnails(stageRef, hasCompletedInitialLoad)
+  useImageCacheWarmer(hasCompletedInitialLoad)
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setHasMetMinimumSplashTime(true), INITIAL_SPLASH_MIN_MS)
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setHasCompletedInitialLoad(true), 3000)
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
+  useEffect(() => {
+    if (hasCompletedInitialLoad) return
+    if (!hasMetMinimumSplashTime) return
+
+    // Only the visible group gates first paint; background thumbnails precache at idle.
+    if (project.slideGroups.length > 0) {
+      if (!activeSlideGroupId || !thumbnails[activeSlideGroupId]) return
+    }
+
+    const timeoutId = window.setTimeout(() => setHasCompletedInitialLoad(true), 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [hasCompletedInitialLoad, hasMetMinimumSplashTime, project.slideGroups.length, activeSlideGroupId, thumbnails])
+  useEffect(() => {
+    if (project.slideGroups.length === 0) return
+    const groupExists = project.slideGroups.some((g) => g.id === activeSlideGroupId)
+    if (!activeSlideGroupId || !groupExists) {
+      setActiveSlideGroup(project.slideGroups[0].id)
+    }
+  }, [project.slideGroups, activeSlideGroupId, setActiveSlideGroup])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't fire when user is typing in an input or rich text editor
+      const active = document.activeElement as HTMLElement | null
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return
+
+      if (e.key === 'Escape') {
+        setMobilePanel(null)
+        if (editingGroupId) {
+          e.preventDefault()
+          exitGroupEdit()
+        }
+        return
+      }
+
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'g' && !e.shiftKey) {
+          e.preventDefault()
+          const { selectedLayerIds, createGroup } = useEditorStore.getState()
+          if (selectedLayerIds.length >= 2) createGroup(selectedLayerIds)
+        } else if (e.key === 'g' && e.shiftKey) {
+          e.preventDefault()
+          const { selection, editingGroupId, dissolveGroup } = useEditorStore.getState()
+          // Only dissolve when a top-level group is selected (not when inside group edit mode)
+          if (selection?.layerId && !editingGroupId) dissolveGroup(selection.layerId)
+        } else if (e.key === 'z' && !e.shiftKey) {
+          e.preventDefault()
+          undo()
+        } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+          e.preventDefault()
+          redo()
+        } else if (e.key === 'c' && !e.altKey) {
+          e.preventDefault()
+          useEditorStore.getState().copyLayers()
+        } else if (e.key === 'x') {
+          e.preventDefault()
+          useEditorStore.getState().cutLayers()
+        } else if (e.key === 'v' && !e.altKey) {
+          e.preventDefault()
+          useEditorStore.getState().pasteLayers()
+        } else if (e.key === 'c' && e.altKey) {
+          e.preventDefault()
+          const { selection: sel, copyLayerStyle: cls } = useEditorStore.getState()
+          if (sel?.layerId) cls(sel.layerId)
+        } else if (e.key === 'v' && e.altKey) {
+          e.preventDefault()
+          const { selection: sel, pasteLayerStyle: pls } = useEditorStore.getState()
+          if (sel?.layerId) pls(sel.layerId)
+        } else if (e.key === 'd') {
+          e.preventDefault()
+          const { selection, duplicateLayer } = useEditorStore.getState()
+          if (selection?.layerId) duplicateLayer(selection.layerId)
+        } else if (e.key === '0') {
+          // Ctrl+0: fit — delegate to canvas by resetting centering flag
+          e.preventDefault()
+          window.dispatchEvent(new Event('pixeldeck:fit'))
+        } else if (e.key === '1') {
+          e.preventDefault()
+          useEditorStore.getState().setZoom(1)
+        }
+      }
+
+      // Arrow keys — nudge selected layer 1px (Shift = 10px)
+      if (!e.ctrlKey && !e.metaKey) {
+        const { ArrowLeft, ArrowRight, ArrowUp, ArrowDown } = { ArrowLeft: 'ArrowLeft', ArrowRight: 'ArrowRight', ArrowUp: 'ArrowUp', ArrowDown: 'ArrowDown' }
+        if (e.key === ArrowLeft || e.key === ArrowRight || e.key === ArrowUp || e.key === ArrowDown) {
+          e.preventDefault()
+          const step = e.shiftKey ? 10 : 1
+          const dx = e.key === ArrowLeft ? -step : e.key === ArrowRight ? step : 0
+          const dy = e.key === ArrowUp ? -step : e.key === ArrowDown ? step : 0
+          const {
+            selection,
+            editingGroupId: egi,
+            updateLayer,
+            updateChildLayer,
+            project: p,
+            activeSlideGroupId: gid,
+            activeLocale,
+            activeCanvasFormat,
+          } = useEditorStore.getState()
+          if (!selection?.layerId) return
+          const rawGroup = p.slideGroups.find((group) => group.id === gid)
+          if (!rawGroup) return
+          const grp = resolveGroupView(rawGroup, p.settings, activeLocale, activeCanvasFormat)
+          if (egi) {
+            const groupLayer = grp.layers.find((l) => l.id === egi)
+            if (groupLayer?.type === 'group') {
+              const child = groupLayer.children.find((c) => c.id === selection.layerId)
+              if (child) updateChildLayer(egi, selection.layerId, { x: child.x + dx, y: child.y + dy } as Parameters<typeof updateLayer>[1])
+            }
+          } else {
+            const layer = grp.layers.find((l) => l.id === selection.layerId)
+            if (layer) updateLayer(selection.layerId, { x: layer.x + dx, y: layer.y + dy } as Parameters<typeof updateLayer>[1])
+          }
+        }
+
+        // Delete / Backspace — remove selected layer
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          e.preventDefault()
+          const { selection, selectedLayerIds, removeLayer } = useEditorStore.getState()
+          if (selectedLayerIds.length > 0) {
+            selectedLayerIds.forEach((id) => removeLayer(id))
+          } else if (selection?.layerId) {
+            removeLayer(selection.layerId)
+          }
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [undo, redo, exitGroupEdit, editingGroupId])
+
+  // Returning from localization starts the editor on the default locale.
+  const handleSetMode = (mode: 'editor' | 'localization') => {
+    if (mode === 'editor') {
+      const s = useEditorStore.getState()
+      s.setActiveLocale(s.project.settings.defaultLocale ?? 'en')
+    }
+    setView(mode)
+  }
+
+  // Preview from the Localization view: the Konva stage only exists in editor
+  // view, so switch to it underneath the fullscreen modal and return on close.
+  const handlePreviewLocale = (locale: string) => {
+    setPreviewLocale(locale)
+    setPreviewReturnTo('localization')
+    setView('editor')
+    setPreviewOpen(true)
+  }
+
+  const handleClosePreview = () => {
+    setPreviewOpen(false)
+    if (previewReturnTo === 'localization') setView('localization')
+    setPreviewReturnTo(null)
+    setPreviewLocale(undefined)
+  }
+
+  return (
+    <div className="pd-app flex flex-col overflow-hidden bg-[#0f0f13]">
+      <ConfirmDialog
+        open={conflictNotice !== null}
+        title="Project changed elsewhere"
+        message="This project was changed in another tab or device. Your local changes are not being saved. Save a copy of your local version, or manually reload the page to load the latest version and discard local changes."
+        confirmLabel="Save as Copy"
+        onConfirm={() => { void useProjectsStore.getState().saveConflictedProjectAsCopy() }}
+        onCancel={() => useProjectsStore.setState({ conflictNotice: null })}
+      />
+      <Toolbar
+        mode={view}
+        onSetMode={handleSetMode}
+      />
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        {/* Localization view — absolutely covers the editor when active */}
+        {view === 'localization' && (
+          <main className="absolute inset-0 z-10 overflow-hidden bg-[#111118]">
+            <Suspense>
+              <LocalizationView embedded onBack={() => handleSetMode('editor')} onPreview={handlePreviewLocale} />
+            </Suspense>
+          </main>
+        )}
+
+        {/* Editor view — always mounted so the Konva stage + ResizeObserver are always alive.
+            Hidden (pointer-events-none, invisible) when the localization view is on top. */}
+        <div
+          className="pd-editor flex min-w-0 min-h-0 flex-1 overflow-hidden"
+          style={view === 'localization' ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
+        >
+          {/* Layers panel — always visible */}
+          <div id="mobile-layers" className={`pd-sidebar pd-layers ${mobilePanel === 'layers' ? 'pd-sidebar-open' : ''}`}>
+            <button className="pd-panel-close" onClick={() => setMobilePanel(null)} aria-label={t('common.close')}><Icon name="close" size={18} /></button>
+            <LayersPanel />
+          </div>
+
+          {/* Canvas area — fills remaining space */}
+          <main
+            className="flex-1 overflow-hidden bg-[#111118] flex flex-col"
+            style={{ minWidth: 0 }}
+          >
+            {/* Both editing axes share one compact top bar. */}
+            <EditingContextBar />
+            <EditingContextAlert />
+
+            {/* Canvas fills remaining height — StageCanvas takes full space.
+                dir is pinned to ltr: an RTL interface must not mirror the design
+                surface, or slide coordinates and pano seams would flip under the
+                user while the exported PNGs stayed the same. */}
+            <div dir="ltr" style={{ flex: 1, position: 'relative', zIndex: 0, overflow: 'hidden' }}>
+              <StageCanvas stageRef={stageRef} />
+              {(scopedEditingIndicator.isFormatScoped || scopedEditingIndicator.isLocaleScoped) && (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 1,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div style={{ position: 'absolute', top: 0, right: 0, left: 0, height: 2, pointerEvents: 'none', background: scopedEditingIndicator.horizontalFrameBackground }} />
+                  <div style={{ position: 'absolute', right: 0, bottom: 0, left: 0, height: 2, pointerEvents: 'none', background: scopedEditingIndicator.horizontalFrameBackground }} />
+                  <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 2, pointerEvents: 'none', background: scopedEditingIndicator.leftFrameBackground }} />
+                  <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 2, pointerEvents: 'none', background: scopedEditingIndicator.rightFrameBackground }} />
+                </div>
+              )}
+            </div>
+          </main>
+
+          {/* Properties panel — always visible */}
+          <div id="mobile-properties" className={`pd-sidebar pd-properties ${mobilePanel === 'properties' ? 'pd-sidebar-open' : ''}`}>
+            <button className="pd-panel-close" onClick={() => setMobilePanel(null)} aria-label={t('common.close')}><Icon name="close" size={18} /></button>
+            <PropertiesPanel />
+          </div>
+        </div>
+      </div>
+      {view === 'editor' && <nav className="pd-mobile-nav">
+        <button aria-controls="mobile-layers" aria-expanded={mobilePanel === 'layers'} onClick={() => setMobilePanel(mobilePanel === 'layers' ? null : 'layers')}>{t('layers.insert')} / {t('layers.title')}</button>
+        <button aria-pressed={mobilePanel === null} onClick={() => setMobilePanel(null)}>{t('toolbar.backToDesign')}</button>
+        <button aria-controls="mobile-properties" aria-expanded={mobilePanel === 'properties'} onClick={() => setMobilePanel(mobilePanel === 'properties' ? null : 'properties')}>{t('props.title')}</button>
+      </nav>}
+      <SlideNavigator thumbnails={thumbnails} staleGroupIds={staleGroupIds} stageRef={stageRef} onCaptureThumbnail={(groupId) => { void captureNow(groupId) }} onOpenPreview={() => setPreviewOpen(true)} />
+
+      <PreviewModal
+        open={previewOpen}
+        onClose={handleClosePreview}
+        thumbnails={thumbnails}
+        previewThumbs={previewThumbs}
+        isCapturingPreview={isCapturingPreview}
+        previewProgress={previewProgress}
+        captureAllHighRes={captureAllHighRes}
+        cancelCapture={cancelPreviewCapture}
+        initialLocale={previewLocale}
+      />
+      <AppLoadingScreen visible={!hasCompletedInitialLoad} />
+      {offscreenThumbnailElement}
+    </div>
+  )
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "templates": [
+    {
+      "slug": "nutrition-coach",
+      "name": "Nutrition Coach",
+      "description": "Warm nutrition-tracker set: dark hero with a feature list, AI pano spread, planner and progress slides. Swap in your own screenshots.",
+      "category": "Health & Fitness",
+      "file": "/templates/nutrition-coach.template.json",
+      "slides": 7,
+      "previewSize": "1290×2796"
+    },
+    {
+      "slug": "ledger-dark",
+      "name": "Ledger Dark",
+      "description": "Sleek midnight finance set: gradient hero, 2-slide account pano, security and auto-invest slides, social-proof CTA. Brand Kit wired.",
+      "category": "Finance",
+      "file": "/templates/ledger-dark.template.json",
+      "slides": 7,
+      "previewSize": "1290×2796"
+    },
+    {
+      "slug": "wanderlight",
+      "name": "Wanderlight",
+      "description": "Sun-washed travel set: sky-blue hero, sunset itinerary pano, curated explore chips, group planning and a deep-blue ratings CTA.",
+      "category": "Travel",
+      "file": "/templates/wanderlight.template.json",
+      "slides": 6,
+      "previewSize": "1290×2796"
+    },
+    {
+      "slug": "deep-focus",
+      "name": "Deep Focus",
+      "description": "Clean light productivity set: minimal hero, self-organizing pano, capture checklist, streaks duo and an indigo CTA. Brand Kit wired.",
+      "category": "Productivity",
+      "file": "/templates/deep-focus.template.json",
+      "slides": 6,
+      "previewSize": "1290×2796"
+    }
+  ]
+}

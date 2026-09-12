@@ -1,0 +1,247 @@
+import { getStage } from '@/utils/stageRegistry'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEditorStore } from '@/store'
+import { getPanoTotalWidth } from '@/utils/panoGeometry'
+import type { CanvasFormatId, SlideGroup } from '@/types'
+
+interface UseStageViewportOptions {
+  group: SlideGroup | undefined
+  panoCompensate: boolean
+  panoCompensationPx: number
+  setZoom: (zoom: number) => void
+  setViewportPosition: (x: number, y: number) => void
+  /** Format family key (e.g. 'phone', 'watch', 'vr') — switching families triggers a full fit-to-view. */
+  activeFamily: string
+  /** Active canvas format id — switching formats within the same family re-anchors pan by relative position (see effect below), zoom untouched. */
+  activeCanvasFormat: CanvasFormatId
+}
+
+export function useStageViewport({
+  group,
+  panoCompensate,
+  panoCompensationPx,
+  setZoom,
+  setViewportPosition,
+  activeFamily,
+  activeCanvasFormat,
+}: UseStageViewportOptions) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerSize, setContainerSize] = useState({ w: 0, h: 0 })
+  const spaceRef = useRef(false)
+  const [spaceDown, setSpaceDown] = useState(false)
+  const [isPanning, setIsPanning] = useState(false)
+  const panStartRef = useRef<{ clientX: number; clientY: number; vpX: number; vpY: number } | null>(null)
+  const lastCenteredGroupId = useRef<string | null>(null)
+  const lastContainerW = useRef(0)
+  const lastContainerH = useRef(0)
+  const lastFamilyRef = useRef<string | null>(null)
+  const prevCanvasRef = useRef<{ format: CanvasFormatId; totalW: number; totalH: number } | null>(null)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setContainerSize({ w: Math.round(width), h: Math.round(height) })
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!containerSize.w || !containerSize.h || !group) return
+    const totalW = getPanoTotalWidth(group, panoCompensate ? panoCompensationPx : 0)
+    const totalH = group.slideHeight
+    const needsCenter = lastCenteredGroupId.current !== group.id || lastContainerW.current !== containerSize.w || lastContainerH.current !== containerSize.h
+    if (!needsCenter) return
+    lastCenteredGroupId.current = group.id
+    lastContainerW.current = containerSize.w
+    lastContainerH.current = containerSize.h
+    const { setZoom: sz, setViewportPosition: svp } = useEditorStore.getState()
+    const currentZoom = Math.max(0.05, Math.min(4, (containerSize.w - 32) / totalW, (containerSize.h - 48) / totalH))
+    sz(currentZoom)
+    const cx = (containerSize.w - totalW * currentZoom) / 2
+    const cy = (containerSize.h - totalH * currentZoom) / 2
+    svp(cx, cy)
+  }, [containerSize.w, containerSize.h, group?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const handler = (e: WheelEvent) => {
+      e.preventDefault()
+      if (e.ctrlKey || e.metaKey) {
+        const { zoom: cz, viewportX: vpX, viewportY: vpY, setZoom: sz, setViewportPosition: svp } =
+          useEditorStore.getState()
+        const rect = el.getBoundingClientRect()
+        const px = e.clientX - rect.left
+        const py = e.clientY - rect.top
+        const factor = e.deltaY < 0 ? 1.08 : 0.93
+        const newZoom = Math.max(0.05, Math.min(4, cz * factor))
+        const canvasX = (px - vpX) / cz
+        const canvasY = (py - vpY) / cz
+        sz(newZoom)
+        svp(px - canvasX * newZoom, py - canvasY * newZoom)
+      } else {
+        const { viewportX: vpX, viewportY: vpY, setViewportPosition: svp } =
+          useEditorStore.getState()
+        svp(vpX - e.deltaX, vpY - e.deltaY)
+      }
+    }
+    el.addEventListener('wheel', handler, { passive: false })
+    return () => el.removeEventListener('wheel', handler)
+  }, [])
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !e.repeat) {
+        const tag = (document.activeElement as HTMLElement | null)?.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return
+        e.preventDefault()
+        spaceRef.current = true
+        setSpaceDown(true)
+      }
+    }
+    const up = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        spaceRef.current = false
+        setSpaceDown(false)
+        panStartRef.current = null
+        setIsPanning(false)
+      }
+    }
+    window.addEventListener('keydown', down)
+    window.addEventListener('keyup', up)
+    return () => {
+      window.removeEventListener('keydown', down)
+      window.removeEventListener('keyup', up)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!panStartRef.current) return
+      const { clientX: sx, clientY: sy, vpX, vpY } = panStartRef.current
+      const { setViewportPosition: svp } = useEditorStore.getState()
+      svp(vpX + e.clientX - sx, vpY + e.clientY - sy)
+    }
+    const handleMouseUp = () => { panStartRef.current = null; setIsPanning(false) }
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [])
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    let gesture: { distance: number; zoom: number; x: number; y: number } | null = null
+    const touch = (event: TouchEvent) => {
+      if (event.touches.length < 2) {
+        if (gesture) { event.stopImmediatePropagation(); event.preventDefault() }
+        if (event.touches.length === 0) gesture = null
+        return
+      }
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      const [a, b] = Array.from(event.touches)
+      const rect = el.getBoundingClientRect()
+      const x = (a.clientX + b.clientX) / 2 - rect.left
+      const y = (a.clientY + b.clientY) / 2 - rect.top
+      const distance = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
+      const state = useEditorStore.getState()
+      if (!gesture) {
+        getStage()?.find((node: { isDragging: () => boolean }) => node.isDragging()).forEach((node) => node.stopDrag())
+        gesture = { distance: Math.max(1, distance), zoom: state.zoom, x: (x - state.viewportX) / state.zoom, y: (y - state.viewportY) / state.zoom }
+        return
+      }
+      const zoom = Math.max(0.05, Math.min(4, gesture.zoom * distance / gesture.distance))
+      state.setZoom(zoom)
+      state.setViewportPosition(x - gesture.x * zoom, y - gesture.y * zoom)
+    }
+    const options = { passive: false, capture: true }
+    for (const name of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) el.addEventListener(name, touch, options)
+    return () => {
+      for (const name of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) el.removeEventListener(name, touch, options)
+    }
+  }, [])
+
+  const handleContainerMouseDown = (e: React.MouseEvent) => {
+    if (!spaceRef.current) return
+    const { viewportX: vpX, viewportY: vpY } = useEditorStore.getState()
+    panStartRef.current = { clientX: e.clientX, clientY: e.clientY, vpX, vpY }
+    setIsPanning(true)
+  }
+
+  const handleFit = useCallback(() => {
+    if (!group || !containerSize.w || !containerSize.h) return
+    const totalW = getPanoTotalWidth(group, panoCompensate ? panoCompensationPx : 0)
+    const totalH = group.slideHeight
+    const PADDING = 80
+    const fitScale = Math.max(0.05, Math.min(4, Math.min(
+      (containerSize.w - PADDING) / totalW,
+      (containerSize.h - PADDING) / totalH,
+    )))
+    setZoom(fitScale)
+    setViewportPosition(
+      (containerSize.w - totalW * fitScale) / 2,
+      (containerSize.h - totalH * fitScale) / 2,
+    )
+  }, [group, containerSize.w, containerSize.h, setZoom, setViewportPosition, panoCompensate, panoCompensationPx])
+
+  useEffect(() => {
+    window.addEventListener('pixeldeck:fit', handleFit)
+    return () => window.removeEventListener('pixeldeck:fit', handleFit)
+  }, [handleFit])
+
+  // Switching device family (e.g. phone -> watch/vr) spans very different canvas
+  // sizes/aspect ratios; auto-fit so the new format isn't left tiny/oversized at
+  // the previous family's zoom. Switching *format within the same family* keeps
+  // continuity, but "keep the same zoom number" still looks like a jump because
+  // formats in a family still differ in absolute size — the canvas's apparent
+  // on-screen footprint would shrink/grow with it. Instead we rescale zoom by
+  // the ratio of canvas diagonals (so the design keeps roughly the same visual
+  // size on screen) and re-anchor pan so the same *relative* area stays centered.
+  useEffect(() => {
+    if (!containerSize.w || !containerSize.h || !group) return
+    const totalW = getPanoTotalWidth(group, panoCompensate ? panoCompensationPx : 0)
+    const totalH = group.slideHeight
+    const familyChanged = lastFamilyRef.current !== null && lastFamilyRef.current !== activeFamily
+    lastFamilyRef.current = activeFamily
+    const prevCanvas = prevCanvasRef.current
+
+    if (familyChanged) {
+      handleFit()
+    } else if (prevCanvas && prevCanvas.format !== activeCanvasFormat) {
+      const { zoom: currentZoom, viewportX: vpX, viewportY: vpY, setZoom: sz, setViewportPosition: svp } = useEditorStore.getState()
+      const oldCenterX = (containerSize.w / 2 - vpX) / currentZoom
+      const oldCenterY = (containerSize.h / 2 - vpY) / currentZoom
+      const fx = prevCanvas.totalW > 0 ? oldCenterX / prevCanvas.totalW : 0.5
+      const fy = prevCanvas.totalH > 0 ? oldCenterY / prevCanvas.totalH : 0.5
+      const prevDiag = Math.hypot(prevCanvas.totalW, prevCanvas.totalH)
+      const newDiag = Math.hypot(totalW, totalH)
+      const sizeRatio = prevDiag > 0 && newDiag > 0 ? prevDiag / newDiag : 1
+      const newZoom = Math.max(0.05, Math.min(4, currentZoom * sizeRatio))
+      sz(newZoom)
+      svp(
+        containerSize.w / 2 - fx * totalW * newZoom,
+        containerSize.h / 2 - fy * totalH * newZoom,
+      )
+    }
+
+    prevCanvasRef.current = { format: activeCanvasFormat, totalW, totalH }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFamily, activeCanvasFormat, containerSize.w, containerSize.h, group?.id])
+
+  return {
+    containerRef,
+    containerSize,
+    spaceRef,
+    spaceDown,
+    isPanning,
+    handleContainerMouseDown,
+    handleFit,
+  }
+}
