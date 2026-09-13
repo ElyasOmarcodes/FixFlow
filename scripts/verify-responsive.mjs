@@ -9,6 +9,8 @@ let browser
 await mkdir('test-results/responsive', { recursive: true })
 try {
   for (let attempt = 0; attempt < 50; attempt++) {
+    // Loopback-only readiness probe for our local test server; no credentials or user data.
+    // nosemgrep: typescript.react.security.react-insecure-request.react-insecure-request
     try { if ((await fetch('http://127.0.0.1:4173')).ok) break } catch { /* Wait for Vite. */ }
     await delay(200)
   }

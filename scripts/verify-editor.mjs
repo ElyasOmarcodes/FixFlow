@@ -4,6 +4,8 @@ import { chromium, expect } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5173'], { stdio: 'ignore' })
 for (let i = 0; i < 50; i++) {
+  // Loopback-only readiness probe for our local test server; no credentials or user data.
+  // nosemgrep: typescript.react.security.react-insecure-request.react-insecure-request
   try { if ((await fetch('http://127.0.0.1:5173')).ok) break } catch { /* Start server. */ }
   await delay(200)
 }
