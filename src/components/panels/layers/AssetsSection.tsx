@@ -361,7 +361,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
                 type="button"
                 aria-label="Import screenshot files"
                 onClick={() => screenshotsInputRef.current?.click()}
-                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[#b0b0c4] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[var(--pd-c-e8e8f0)]"
+                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[var(--pd-c-b0b0c4)] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[var(--pd-c-e8e8f0)]"
                 title="Import screenshot files into the asset library"
               >
                 {t('layers.importFiles')}
@@ -370,7 +370,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
                 type="button"
                 aria-label="Import screenshot folder"
                 onClick={handleImportScreenshotFolder}
-                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[#b0b0c4] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[var(--pd-c-e8e8f0)]"
+                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[var(--pd-c-b0b0c4)] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[var(--pd-c-e8e8f0)]"
                 title="Import a screenshots folder when the browser supports it; falls back to file import"
               >
                 {t('layers.importFolder')}

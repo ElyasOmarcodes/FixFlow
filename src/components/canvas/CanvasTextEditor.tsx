@@ -193,6 +193,14 @@ function CanvasTextEditorBox({
     }
   }, [])
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') stopTextEdit()
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [stopTextEdit])
+
   const scale = placement.scale
   const boxW = (layer.width ?? DEFAULT_TEXT_WIDTH) * scale
   const boxH = layer.height != null ? layer.height * scale : undefined

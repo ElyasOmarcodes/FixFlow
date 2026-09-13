@@ -55,23 +55,23 @@ export function SortableLayer({
         aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
         onClick={(e) => { e.stopPropagation(); onVisibilityToggle(layer.id, !layer.visible) }}
         className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0"
-        style={{ color: layer.visible ? '#e8e8f0' : '#3a3a4a' }}
+        style={{ color: layer.visible ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-3a3a4a)' }}
       >{layer.visible ? <Icon name="eye" size={13} /> : <Icon name="eye-off" size={13} />}</button>
 
-      <span className="shrink-0" style={{ color: '#8a86a0' }}><Icon name={LAYER_ICON[layer.type]} size={13} /></span>
+      <span className="shrink-0" style={{ color: 'var(--pd-c-8a86a0)' }}><Icon name={LAYER_ICON[layer.type]} size={13} /></span>
 
       <InlineEditableLabel
         value={layer.name}
         onCommit={onRename}
         className="flex-1 text-xs truncate"
-        style={{ color: isSelected ? '#e8e8f0' : '#b0b0c4', cursor: 'text' }}
+        style={{ color: isSelected ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-b0b0c4)', cursor: 'text' }}
       />
 
       <button
         aria-label={layer.locked ? `Unlock ${layer.name}` : `Lock ${layer.name}`}
         onClick={(e) => { e.stopPropagation(); onLockToggle(layer.id, !layer.locked) }}
         className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
-        style={{ color: layer.locked ? '#e8e8f0' : '#6b6b7a' }}
+        style={{ color: layer.locked ? 'var(--pd-c-e8e8f0)' : '#6b6b7a' }}
       >{layer.locked ? <Icon name="lock" size={12} /> : <Icon name="unlock" size={12} />}</button>
 
       <button
@@ -127,7 +127,7 @@ export function SortableChild({ child, groupId, isSelected, onSelect, onRename }
         value={child.name}
         onCommit={onRename}
         className="flex-1 text-xs truncate"
-        style={{ color: isSelected ? '#e8e8f0' : '#6b6b7a', cursor: 'text' }}
+        style={{ color: isSelected ? 'var(--pd-c-e8e8f0)' : '#6b6b7a', cursor: 'text' }}
       />
     </div>
   )
@@ -200,7 +200,7 @@ export function SortableGroup({
           aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
           onClick={(e) => { e.stopPropagation(); onVisibilityToggle(layer.id, !layer.visible) }}
           className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0"
-          style={{ color: layer.visible ? '#e8e8f0' : '#3a3a4a' }}
+          style={{ color: layer.visible ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-3a3a4a)' }}
         >{layer.visible ? <Icon name="eye" size={13} /> : <Icon name="eye-off" size={13} />}</button>
 
         <button
@@ -217,7 +217,7 @@ export function SortableGroup({
           value={layer.name}
           onCommit={onRename}
           className="flex-1 text-xs truncate font-semibold"
-          style={{ color: isSelected ? '#e8e8f0' : '#d8d2ff', cursor: 'text' }}
+          style={{ color: isSelected ? 'var(--pd-c-e8e8f0)' : '#d8d2ff', cursor: 'text' }}
         />
 
         <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none border border-[rgba(124,110,246,0.28)] bg-[rgba(124,110,246,0.12)] text-[#b6adff]">
@@ -228,7 +228,7 @@ export function SortableGroup({
           aria-label={layer.locked ? `Unlock ${layer.name}` : `Lock ${layer.name}`}
           onClick={(e) => { e.stopPropagation(); onLockToggle(layer.id, !layer.locked) }}
           className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
-          style={{ color: layer.locked ? '#e8e8f0' : '#8a84b6' }}
+          style={{ color: layer.locked ? 'var(--pd-c-e8e8f0)' : '#8a84b6' }}
         >{layer.locked ? <Icon name="lock" size={12} /> : <Icon name="unlock" size={12} />}</button>
 
         <button

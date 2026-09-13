@@ -26,6 +26,11 @@ try {
       await page.screenshot({ path: `test-results/editor/text-${width}.png` })
       await page.getByRole('button', { name: 'Done', exact: true }).click()
       await expect(page.locator('.pd-mobile-text-editor')).toHaveCount(0)
+      await page.locator('.pd-workspace-tools').getByRole('button', { name: 'Text', exact: true }).click()
+      await expect(page.locator('.pd-mobile-text-editor')).toBeVisible()
+      // Android Back dispatches Escape on window, rather than the focused editor.
+      await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })))
+      await expect(page.locator('.pd-mobile-text-editor')).toHaveCount(0)
     } else { await editor.press('Escape') }
     await expect(page.locator('.pd-editor canvas').first()).toBeVisible()
     // Real UI operations: duplicate, delete and undo.
@@ -37,7 +42,11 @@ try {
     if (width < 1024) await page.getByRole('button', { name: 'More tools', exact: true }).click()
     await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+    if (width < 1024) await page.locator('.pd-mobile-nav button').first().click()
+    await page.locator('.pd-layers').getByText('Text', { exact: true }).last().click()
+    if (width < 1024) await page.locator('.pd-mobile-nav button').last().click()
     await page.screenshot({ path: `test-results/editor/workspace-${width}-light.png` })
+    if (width < 1024) await page.locator('#mobile-properties .pd-panel-close').click()
     await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('dark')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     await page.screenshot({ path: `test-results/editor/workspace-${width}-dark.png` })

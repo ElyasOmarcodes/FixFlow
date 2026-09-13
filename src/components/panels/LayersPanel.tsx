@@ -320,7 +320,7 @@ export function LayersPanel() {
               title={`Add ${tool.label}`}
             >
               <span className="flex h-6 items-center justify-center text-[var(--pd-c-e8e8f0)]"><Icon name={tool.icon} size={17} /></span>
-              <span className="text-[10px] leading-none text-[#b0b0c4]">{tool.label}</span>
+              <span className="text-[10px] leading-none text-[var(--pd-c-b0b0c4)]">{tool.label}</span>
             </button>
           ))}
         </div>
@@ -418,13 +418,13 @@ export function LayersPanel() {
               aria-label={backgroundLayer.visible ? 'Hide Background' : 'Show Background'}
               onClick={(e) => { e.stopPropagation(); setLayerVisibility(backgroundLayer.id, !backgroundLayer.visible) }}
               className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0"
-              style={{ color: backgroundLayer.visible ? '#e8e8f0' : '#3a3a4a' }}
+              style={{ color: backgroundLayer.visible ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-3a3a4a)' }}
             >{backgroundLayer.visible ? <Icon name="eye" size={13} /> : <Icon name="eye-off" size={13} />}</button>
-            <span className="shrink-0" style={{ color: '#8a86a0' }}><Icon name="palette" size={13} /></span>
-            <span className="flex-1 text-xs truncate" style={{ color: selection?.layerId === backgroundLayer.id ? '#e8e8f0' : '#b0b0c4' }}>
+            <span className="shrink-0" style={{ color: 'var(--pd-c-8a86a0)' }}><Icon name="palette" size={13} /></span>
+            <span className="flex-1 text-xs truncate" style={{ color: selection?.layerId === backgroundLayer.id ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-b0b0c4)' }}>
               {backgroundLayer.name}
             </span>
-            <span className="shrink-0" style={{ color: '#3a3a4a' }} title="Background cannot be moved"><Icon name="lock" size={12} /></span>
+            <span className="shrink-0" style={{ color: 'var(--pd-c-3a3a4a)' }} title="Background cannot be moved"><Icon name="lock" size={12} /></span>
           </div>
         )}
       </div>

@@ -553,3 +553,24 @@ body { background: var(--pd-workspace); color: var(--pd-text); color-scheme: inh
 :root[data-theme='light'] .pd-sidebar { --pd-field-border: #d4d9e2; }
 :root[data-theme='light'] .pd-sidebar button { color: var(--pd-text); }
 .pd-mobile-text-editor > div:last-child { background: var(--pd-field-bg) !important; outline-color: var(--pd-accent-soft) !important; border-radius: 14px !important; }
+
+:root {
+  --pd-c-b0b0c4: #b0b0c4;
+  --pd-c-8a86a0: #8a86a0;
+  --pd-c-3a3a4a: #3a3a4a;
+  --pd-c-a8a8b8: #a8a8b8;
+  --pd-c-c4b5fd: #c4b5fd;
+  --pd-c-b8afff: #b8afff;
+  --pd-c-9b8fff: #9b8fff;
+  --pd-c-484858: #484858;
+}
+:root[data-theme="light"] {
+  --pd-c-b0b0c4: #414b60;
+  --pd-c-8a86a0: #667189;
+  --pd-c-3a3a4a: #8190a8;
+  --pd-c-a8a8b8: #4c586f;
+  --pd-c-c4b5fd: #6550dc;
+  --pd-c-b8afff: #6550dc;
+  --pd-c-9b8fff: #6550dc;
+  --pd-c-484858: #73819a;
+}
