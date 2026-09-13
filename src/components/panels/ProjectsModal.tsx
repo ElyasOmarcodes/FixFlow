@@ -183,7 +183,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
         }}
         maxWidth="max-w-lg"
         backdropClassName="fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-sm"
-        panelStyle={{ background: '#18181f', borderColor: 'rgba(255,255,255,0.1)', maxHeight: '75vh', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
+        panelStyle={{ background: 'var(--pd-c-18181f)', borderColor: 'rgba(255,255,255,0.1)', maxHeight: '75vh', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
         showCloseButton={false}
         header={<div
             style={{
@@ -194,7 +194,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
               justifyContent: 'space-between',
             }}
           >
-            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#e8e8f0' }}>
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--pd-c-e8e8f0)' }}>
               Projects
             </h2>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -204,7 +204,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                   background: 'none',
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 6,
-                  color: '#a0a0b0',
+                  color: 'var(--pd-c-a0a0b0)',
                   cursor: 'pointer',
                   fontSize: 12,
                   padding: '5px 12px',
@@ -224,7 +224,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
               <button
                 onClick={handleNew}
                 style={{
-                  background: '#7c6ef6',
+                  background: 'var(--pd-c-7c6ef6)',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 6,
@@ -247,7 +247,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#6b6b7a',
+                  color: 'var(--pd-c-6b6b7a)',
                   cursor: 'pointer',
                   fontSize: 18,
                   lineHeight: 1,
@@ -259,7 +259,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
             </div>
           </div>}
         footerClassName=""
-        footer={<div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: '#6b6b7a', textAlign: 'center' }}>Auto-saved · Double-click a name to rename</div>}
+        footer={<div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: 'var(--pd-c-6b6b7a)', textAlign: 'center' }}>Auto-saved · Double-click a name to rename</div>}
       >
 
           {/* New project form */}
@@ -290,7 +290,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                     background: 'rgba(255,255,255,0.08)',
                     border: `1px solid ${newNameError ? '#f87171' : 'rgba(255,255,255,0.1)'}`,
                     borderRadius: 6,
-                    color: '#e8e8f0',
+                    color: 'var(--pd-c-e8e8f0)',
                     fontSize: 13,
                     fontWeight: 500,
                     padding: '6px 10px',
@@ -320,7 +320,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                     background: 'none',
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: 6,
-                    color: '#6b6b7a',
+                    color: 'var(--pd-c-6b6b7a)',
                     fontSize: 12,
                     fontWeight: 500,
                     padding: '6px 10px',
@@ -342,7 +342,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
           {/* Project list */}
           <div style={{ overflowY: 'auto', flex: 1, padding: '8px 8px' }}>
             {sorted.length === 0 && (
-              <p style={{ textAlign: 'center', color: '#6b6b7a', fontSize: 13, padding: '24px 0' }}>
+              <p style={{ textAlign: 'center', color: 'var(--pd-c-6b6b7a)', fontSize: 13, padding: '24px 0' }}>
                 No projects yet
               </p>
             )}
@@ -416,7 +416,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                           background: 'rgba(255,255,255,0.08)',
                           border: '1px solid rgba(124,110,246,0.6)',
                           borderRadius: 4,
-                          color: '#e8e8f0',
+                          color: 'var(--pd-c-e8e8f0)',
                           fontSize: 13,
                           fontWeight: 500,
                           padding: '2px 6px',
@@ -449,7 +449,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                           </span>
                         )}
                       </InlineEditableLabel>
-                    <div style={{ fontSize: 11, color: '#6b6b7a', marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: 'var(--pd-c-6b6b7a)', marginTop: 2 }}>
                       {relativeTime(p.updatedAt)}
                     </div>
                   </div>
@@ -465,7 +465,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: '#6b6b7a',
+                        color: 'var(--pd-c-6b6b7a)',
                         cursor: 'pointer',
                         fontSize: 14,
                         padding: '4px',
@@ -489,7 +489,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: '#6b6b7a',
+                        color: 'var(--pd-c-6b6b7a)',
                         cursor: 'pointer',
                         fontSize: 14,
                         padding: '4px',
@@ -510,7 +510,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: '#6b6b7a',
+                        color: 'var(--pd-c-6b6b7a)',
                         cursor: 'pointer',
                         fontSize: 14,
                         padding: '4px',

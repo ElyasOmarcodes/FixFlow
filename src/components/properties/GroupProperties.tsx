@@ -25,9 +25,9 @@ export function GroupProperties({ layer }: { layer: GroupLayer }) {
       <div className={panelSectionCls}>
         <div className="mb-1 flex items-center justify-between">
           <label className={labelCls + ' !mb-0'}>Scale</label>
-          <span className="text-xs text-[#e8e8f0]">{scale.toFixed(2)}×</span>
+          <span className="text-xs text-[var(--pd-c-e8e8f0)]">{scale.toFixed(2)}×</span>
         </div>
-        <input type="range" min={0.1} max={4} step={0.05} value={scale} onChange={(e) => upd({ scale: Number(e.target.value) })} onMouseDown={pauseTemporal} onMouseUp={resumeTemporal} className="w-full accent-[#7c6ef6]" />
+        <input type="range" min={0.1} max={4} step={0.05} value={scale} onChange={(e) => upd({ scale: Number(e.target.value) })} onMouseDown={pauseTemporal} onMouseUp={resumeTemporal} className="w-full accent-[var(--pd-c-7c6ef6)]" />
       </div>
 
       {/* Children list */}
@@ -43,8 +43,8 @@ export function GroupProperties({ layer }: { layer: GroupLayer }) {
                 <span className="flex w-4 justify-center text-[#8a86a0] shrink-0">
                   <Icon name={LAYER_ICON[child.type] ?? 'shape'} size={13} />
                 </span>
-                <span className="text-xs text-[#a0a0b0] flex-1 truncate">{child.name}</span>
-                <span className="text-[10px] text-[#4a4a5a] shrink-0 uppercase tracking-wide">{child.type}</span>
+                <span className="text-xs text-[var(--pd-c-a0a0b0)] flex-1 truncate">{child.name}</span>
+                <span className="text-[10px] text-[var(--pd-c-4a4a5a)] shrink-0 uppercase tracking-wide">{child.type}</span>
               </div>
             ))}
           </div>

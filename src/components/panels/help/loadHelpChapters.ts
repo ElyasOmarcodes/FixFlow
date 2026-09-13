@@ -46,3 +46,15 @@ const modules = import.meta.glob('/docs/help/*.md', {
 export const HELP_CHAPTERS: HelpChapter[] = Object.entries(modules)
   .map(([path, raw]) => parseChapter(path, raw))
   .sort((a, b) => a.number - b.number)
+
+const localizedModules = import.meta.glob('/docs/help/{ps,fa}/*.md', {
+  eager: true, query: '?raw', import: 'default',
+}) as Record<string, string>
+export function getHelpChapters(language: string): HelpChapter[] {
+  if (language === 'en') return HELP_CHAPTERS
+  const chapters = Object.entries(localizedModules)
+    .filter(([path]) => path.includes(`/help/${language}/`))
+    .map(([path, raw]) => parseChapter(path, raw))
+    .sort((a, b) => a.number - b.number)
+  return chapters.length ? chapters : HELP_CHAPTERS
+}

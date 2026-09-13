@@ -1,3 +1,4 @@
+import { WorkspaceTools } from '@/components/toolbar/WorkspaceTools'
 import { Capacitor } from '@capacitor/core'
 import { App as NativeApp } from '@capacitor/app'
 import { useT } from '@/i18n'
@@ -256,7 +257,7 @@ export default function App() {
   }
 
   return (
-    <div className="pd-app flex flex-col overflow-hidden bg-[#0f0f13]">
+    <div className="pd-app flex flex-col overflow-hidden bg-[var(--pd-c-0f0f13)]">
       <ConfirmDialog
         open={conflictNotice !== null}
         title="Project changed elsewhere"
@@ -272,7 +273,7 @@ export default function App() {
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {/* Localization view — absolutely covers the editor when active */}
         {view === 'localization' && (
-          <main className="absolute inset-0 z-10 overflow-hidden bg-[#111118]">
+          <main className="absolute inset-0 z-10 overflow-hidden bg-[var(--pd-c-111118)]">
             <Suspense>
               <LocalizationView embedded onBack={() => handleSetMode('editor')} onPreview={handlePreviewLocale} />
             </Suspense>
@@ -285,6 +286,7 @@ export default function App() {
           className="pd-editor flex min-w-0 min-h-0 flex-1 overflow-hidden"
           style={view === 'localization' ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
         >
+          <WorkspaceTools onProperties={() => setMobilePanel('properties')} />
           {/* Layers panel — always visible */}
           <div id="mobile-layers" className={`pd-sidebar pd-layers ${mobilePanel === 'layers' ? 'pd-sidebar-open' : ''}`}>
             <button className="pd-panel-close" onClick={() => setMobilePanel(null)} aria-label={t('common.close')}><Icon name="close" size={18} /></button>
@@ -293,7 +295,7 @@ export default function App() {
 
           {/* Canvas area — fills remaining space */}
           <main
-            className="flex-1 overflow-hidden bg-[#111118] flex flex-col"
+            className="flex-1 overflow-hidden bg-[var(--pd-c-111118)] flex flex-col"
             style={{ minWidth: 0 }}
           >
             {/* Both editing axes share one compact top bar. */}
@@ -333,9 +335,9 @@ export default function App() {
         </div>
       </div>
       {view === 'editor' && <nav className="pd-mobile-nav">
-        <button aria-controls="mobile-layers" aria-expanded={mobilePanel === 'layers'} onClick={() => setMobilePanel(mobilePanel === 'layers' ? null : 'layers')}>{t('layers.insert')} / {t('layers.title')}</button>
-        <button aria-pressed={mobilePanel === null} onClick={() => setMobilePanel(null)}>{t('toolbar.backToDesign')}</button>
-        <button aria-controls="mobile-properties" aria-expanded={mobilePanel === 'properties'} onClick={() => setMobilePanel(mobilePanel === 'properties' ? null : 'properties')}>{t('props.title')}</button>
+        <button aria-controls="mobile-layers" aria-expanded={mobilePanel === 'layers'} onClick={() => setMobilePanel(mobilePanel === 'layers' ? null : 'layers')}><Icon name="layers" size={20} /><span>{t('layers.title')}</span></button>
+        <button aria-pressed={mobilePanel === null} onClick={() => setMobilePanel(null)}><Icon name="image" size={20} /><span>{t('toolbar.backToDesign')}</span></button>
+        <button aria-controls="mobile-properties" aria-expanded={mobilePanel === 'properties'} onClick={() => setMobilePanel(mobilePanel === 'properties' ? null : 'properties')}><Icon name="settings" size={20} /><span>{t('props.title')}</span></button>
       </nav>}
       <SlideNavigator thumbnails={thumbnails} staleGroupIds={staleGroupIds} stageRef={stageRef} onCaptureThumbnail={(groupId) => { void captureNow(groupId) }} onOpenPreview={() => setPreviewOpen(true)} />
 

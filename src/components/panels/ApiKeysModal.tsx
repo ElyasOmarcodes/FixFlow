@@ -18,11 +18,11 @@ export function ApiKeysModal({ open, onClose }: ApiKeysModalProps) {
       showCloseButton={false}
     >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-[#e8e8f0]">AI Settings</h2>
-          <button onClick={onClose} aria-label="Close" className="text-[#6b6b7a] hover:text-[#e8e8f0] transition-colors"><Icon name="close" size={15} /></button>
+          <h2 className="text-base font-semibold text-[var(--pd-c-e8e8f0)]">AI Settings</h2>
+          <button onClick={onClose} aria-label="Close" className="text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-colors"><Icon name="close" size={15} /></button>
         </div>
 
-        <p className="text-[12px] text-[#6b6b7a] mb-4 leading-relaxed">
+        <p className="text-[12px] text-[var(--pd-c-6b6b7a)] mb-4 leading-relaxed">
           API keys are stored locally in this browser and sent only to the selected provider.
           Consumer subscriptions like ChatGPT Plus or Claude Pro cannot be used as API access.
         </p>
@@ -31,7 +31,7 @@ export function ApiKeysModal({ open, onClose }: ApiKeysModalProps) {
 
         <button
           onClick={onClose}
-          className="mt-1 w-full rounded-lg bg-[#7c6ef6] hover:bg-[#6c5ed6] py-2 text-sm font-medium text-white transition-colors"
+          className="mt-1 w-full rounded-lg bg-[var(--pd-c-7c6ef6)] hover:bg-[#6c5ed6] py-2 text-sm font-medium text-white transition-colors"
         >
           Save
         </button>

@@ -130,6 +130,7 @@ export function useRichTextEditor(
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     e.stopPropagation()
+    if (e.nativeEvent.isComposing) return
     if (e.key === 'Enter') {
       e.preventDefault()
       if (e.ctrlKey || e.metaKey || e.shiftKey) {

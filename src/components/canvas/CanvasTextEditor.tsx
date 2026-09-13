@@ -1,3 +1,5 @@
+import { useT } from '@/i18n'
+import { textDirection } from '@/utils/textDirection'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type Konva from 'konva'
@@ -128,6 +130,14 @@ function CanvasTextEditorBox({
   parentGroup: GroupLayer | null
   placement: Placement
 }) {
+  const t = useT()
+  const [mobile, setMobile] = useState(() => matchMedia('(max-width: 1023px)').matches)
+  useEffect(() => {
+    const media = matchMedia('(max-width: 1023px)')
+    const update = () => setMobile(media.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
   const stopTextEdit = useEditorStore((s) => s.stopTextEdit)
   const updateLayer = useEditorStore((s) => s.updateLayer)
   const updateChildLayer = useEditorStore((s) => s.updateChildLayer)
@@ -194,10 +204,13 @@ function CanvasTextEditorBox({
         ? 'flex-end'
         : 'flex-start'
 
-  return (
+  const editor = (
     <div
+      className={mobile ? 'pd-mobile-text-editor' : undefined}
+      role={mobile ? 'dialog' : undefined}
+      aria-label={t('workspace.editText')}
       ref={wrapperRef}
-      style={{
+      style={mobile ? undefined : {
         position: 'absolute',
         left: placement.x,
         top: placement.y,
@@ -207,8 +220,11 @@ function CanvasTextEditorBox({
         zIndex: 80,
       }}
     >
+      {mobile && <header><strong>{t('workspace.editText')}</strong><button onClick={stopTextEdit}>{t('workspace.done')}</button></header>}
+      {mobile && <p>{t('workspace.textHint')}</p>}
+      {mobile && <RichTextToolbar api={api} fillPopoverClassName="mt-2" />}
       {/* Style toolbar — docked in the properties panel (Content tab) via portal */}
-      {toolbarSlot && createPortal(<RichTextToolbar api={api} fillPopoverClassName="mt-2" />, toolbarSlot)}
+      {!mobile && toolbarSlot && createPortal(<RichTextToolbar api={api} fillPopoverClassName="mt-2" />, toolbarSlot)}
 
       {/* Editable box aligned with the hidden Konva node */}
       <div
@@ -216,8 +232,8 @@ function CanvasTextEditorBox({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: justify,
-          height: boxH,
-          minHeight: minH,
+          height: mobile ? undefined : boxH,
+          minHeight: mobile ? 160 : minH,
           outline: '2px solid rgba(124,110,246,0.8)',
           outlineOffset: 2,
           borderRadius: 2,
@@ -226,28 +242,37 @@ function CanvasTextEditorBox({
       >
         <div
           ref={editorRef}
+          dir={textDirection(layer.text)}
           {...api.editableProps}
+          onKeyDown={(event) => {
+            if (mobile && event.key === 'Enter' && !event.ctrlKey && !event.metaKey) {
+              event.stopPropagation()
+              return
+            }
+            api.editableProps.onKeyDown(event)
+          }}
           style={{
             width: '100%',
             outline: 'none',
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            fontFamily: layer.fontFamily,
-            fontSize: layer.fontSize * scale,
+            fontFamily: `${layer.fontFamily}, 'Vazirmatn Variable'`,
+            fontSize: mobile ? 24 : layer.fontSize * scale,
             fontWeight: layer.fontWeight,
             fontStyle: layer.italic ? 'italic' : 'normal',
             lineHeight: String(layer.lineHeight),
-            letterSpacing: `${layer.letterSpacing * scale}px`,
+            letterSpacing: textDirection(layer.text) === 'rtl' ? 0 : `${layer.letterSpacing * (mobile ? 24 / layer.fontSize : scale)}px`,
             textAlign: layer.align,
             textDecoration:
               [layer.underline ? 'underline' : '', layer.strikethrough ? 'line-through' : '']
                 .filter(Boolean)
                 .join(' ') || undefined,
-            color: typeof baseFill === 'string' ? baseFill : '#ffffff',
+            color: mobile ? 'var(--pd-text)' : typeof baseFill === 'string' ? baseFill : '#ffffff',
             caretColor: '#7c6ef6',
           }}
         />
       </div>
     </div>
   )
+  return mobile ? createPortal(editor, document.body) : editor
 }

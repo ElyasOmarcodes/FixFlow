@@ -145,7 +145,7 @@ export function PreviewModal({
       maxWidth="max-w-[90vw]"
       backdropClassName="fixed inset-0 z-[9999] flex items-center justify-center bg-[#08080c] p-6"
       backdropStyle={undefined}
-      panelClassName="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-xl border bg-[#18181f] shadow-2xl"
+      panelClassName="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-xl border bg-[var(--pd-c-18181f)] shadow-2xl"
       panelStyle={{ borderColor: 'rgba(255,255,255,0.08)' }}
       showCloseButton={false}
       header={<div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.08)] px-6 py-4">
@@ -165,7 +165,7 @@ export function PreviewModal({
                   aria-valuenow={previewProgress.completedSlides}
                   aria-valuetext={`Generating preview ${previewProgress.completedSlides} of ${previewProgress.totalSlides}`}
                 >
-                  <div className="h-full bg-[#7c6ef6] transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${previewProgress.totalSlides ? (previewProgress.completedSlides / previewProgress.totalSlides) * 100 : 0}%` }} />
+                  <div className="h-full bg-[var(--pd-c-7c6ef6)] transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${previewProgress.totalSlides ? (previewProgress.completedSlides / previewProgress.totalSlides) * 100 : 0}%` }} />
                 </div>
                 <p className="mt-1 text-[10px] text-[#7d7a90]">Slide {previewProgress.completedSlides} of {previewProgress.totalSlides}{previewProgress.currentGroupName ? ` · ${previewProgress.currentGroupName}` : ''}</p>
               </div>
@@ -198,7 +198,7 @@ export function PreviewModal({
                     updatePanoSettings({ compensate: next })
                     captureAllHighRes({ panoCompensationPx: panoSettings.gapPx, panoCompensate: next })
                   }}
-                  checkboxClassName="h-3 w-3 accent-[#7c6ef6]"
+                  checkboxClassName="h-3 w-3 accent-[var(--pd-c-7c6ef6)]"
                 />
                 <span>Compensate</span>
                 <NumberInput
@@ -215,7 +215,7 @@ export function PreviewModal({
                     if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
                     e.stopPropagation()
                   }}
-                  className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[#0f0f13] px-1 py-0.5 text-right text-[#e8e8f0] disabled:opacity-40"
+                  className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-right text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
                 />
                 <span>px</span>
               </label>

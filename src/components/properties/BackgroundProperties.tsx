@@ -63,7 +63,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
     upd({
       accents: [
         ...layer.accents,
-        { color: '#7c6ef6', opacity: 0.25, ...preset },
+        { color: 'var(--pd-c-7c6ef6)', opacity: 0.25, ...preset },
       ],
     })
     selectAccent(n)
@@ -142,8 +142,8 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                   onClick={() => upd({ imageFit: fit })}
                   className={`rounded-lg border px-2 py-1.5 text-xs transition-colors ${
                     (layer.imageFit ?? 'cover') === fit
-                      ? 'border-[#7c6ef6] bg-[#7c6ef6] text-white'
-                      : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:text-[#e8e8f0]'
+                      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
+                      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >
                   {fit.charAt(0).toUpperCase() + fit.slice(1)}
@@ -222,7 +222,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                 onClick={() => selectAccent(i)}
                 className={`flex w-full cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors ${
                   selectedAccentIndex === i
-                    ? 'border-[#7c6ef6] bg-[rgba(124,110,246,0.14)] text-[#e8e8f0]'
+                    ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-[var(--pd-c-e8e8f0)]'
                     : 'border-[rgba(255,255,255,0.08)] text-[#9a9aaa] hover:border-[rgba(124,110,246,0.5)] hover:bg-[rgba(255,255,255,0.04)]'
                 }`}
               >
@@ -338,7 +338,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
               </div>
             )
           })() : (
-            <p className="text-xs text-[#6b6b7a]">Select an accent to edit it</p>
+            <p className="text-xs text-[var(--pd-c-6b6b7a)]">Select an accent to edit it</p>
           )}
 
           <button type="button" onClick={addAccent} className={subtleButtonCls}>

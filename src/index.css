@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Inter', 'Vazirmatn', system-ui, sans-serif;
+  --font-sans: 'Inter', 'Vazirmatn Variable', 'Vazirmatn', system-ui, sans-serif;
   --color-surface: #0f0f13;
   --color-panel: #18181f;
   --color-border: rgba(255,255,255,0.08);
@@ -40,7 +40,7 @@
     margin: 0;
     background: #0f0f13;
     color: #e8e8f0;
-    font-family: 'Inter', 'Vazirmatn', system-ui, sans-serif;
+    font-family: 'Inter', 'Vazirmatn Variable', 'Vazirmatn', system-ui, sans-serif;
     overflow: hidden;
     /* Hints the OS/browser to theme native controls (select popups, checkboxes,
        scrollbars) dark instead of defaulting to a light popup on a dark app. */
@@ -59,7 +59,7 @@
      strings like "iPhone 16 Pro" stay consistent). */
   :root[lang='ps'] body,
   :root[lang='fa'] body {
-    font-family: 'Vazirmatn', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+    font-family: 'Vazirmatn Variable', 'Vazirmatn', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
   }
 
   /* Anything the user genuinely reads or edits stays selectable. */
@@ -449,3 +449,107 @@
   .pd-editing-context section { min-height: 38px; }
   .pd-editing-context section[aria-label='Editing locale'] { margin-inline-start: 0; padding-inline-start: 0; max-width: 100%; width: 100%; border: 0; }
 }
+
+:root {
+  --pd-c-0f0f13: #0f0f13;
+  --pd-c-111118: #111118;
+  --pd-c-18181f: #18181f;
+  --pd-c-131318: #131318;
+  --pd-c-15151b: #15151b;
+  --pd-c-1e1e28: #1e1e28;
+  --pd-c-e8e8f0: #e8e8f0;
+  --pd-c-f0eff8: #f0eff8;
+  --pd-c-d8d8e2: #d8d8e2;
+  --pd-c-a0a0b0: #a0a0b0;
+  --pd-c-6b6b7a: #6b6b7a;
+  --pd-c-777786: #777786;
+  --pd-c-4a4a5a: #4a4a5a;
+  --pd-c-525260: #525260;
+  --pd-c-7c6ef6: #7c6ef6;
+  --pd-text: #e8e8f0;
+  --pd-panel: #18181f;
+  --pd-workspace: #111118;
+}
+:root[data-theme="light"] {
+  --pd-c-0f0f13: #f3f4f7;
+  --pd-c-111118: #e4e7ed;
+  --pd-c-18181f: #ffffff;
+  --pd-c-131318: #f1f3f7;
+  --pd-c-15151b: #f7f8fb;
+  --pd-c-1e1e28: #edf0f6;
+  --pd-c-e8e8f0: #222735;
+  --pd-c-f0eff8: #171d2c;
+  --pd-c-d8d8e2: #303747;
+  --pd-c-a0a0b0: #586175;
+  --pd-c-6b6b7a: #657087;
+  --pd-c-777786: #59657b;
+  --pd-c-4a4a5a: #69758a;
+  --pd-c-525260: #687387;
+  --pd-c-7c6ef6: #6550dc;
+  --pd-text: #222735;
+  --pd-panel: #ffffff;
+  --pd-workspace: #e4e7ed;
+  --pd-field-bg: #f3f4f7;
+  --pd-field-border: #ced4df;
+  --pd-field-border-hover: #a3afc3;
+  --pd-track: #cdd3e0;
+  --pd-scroll-thumb: #b4bece;
+  --pd-scroll-thumb-hover: #8a98b0;
+}
+body { background: var(--pd-workspace); color: var(--pd-text); color-scheme: inherit; }
+.pd-app { background: var(--pd-workspace); }
+.pd-theme-control { max-width: 100px; padding: 6px 22px 6px 8px; font-size: 11px; border: 1px solid var(--pd-field-border); border-radius: 7px; }
+.pd-workspace-tools { display: flex; flex-direction: column; align-items: center; flex: 0 0 52px; background: var(--pd-panel); border-inline-end: 1px solid var(--pd-field-border); padding: 10px 4px; gap: 5px; }
+.pd-workspace-tools button { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 8px; color: var(--pd-text); transition: background 150ms, transform 150ms; }
+.pd-workspace-tools button span { display: none; }
+.pd-workspace-tools button:hover { background: #7c6ef625; }
+.pd-workspace-tools button:active { transform: scale(.94); }
+.pd-workspace-tools button:disabled { opacity: .3; }
+.pd-tool-divider { width: 26px; height: 1px; margin: 5px 0; background: var(--pd-field-border); }
+.pd-sidebar { border-inline-end: 1px solid var(--pd-field-border); }
+.pd-mobile-header { display: none; }
+.pd-mobile-text-editor { position: fixed; inset: 0; z-index: 10000; background: var(--pd-panel); color: var(--pd-text); overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
+.pd-mobile-text-editor header { display: flex; align-items: center; justify-content: space-between; }
+.pd-mobile-text-editor header button { padding: 12px 22px; border-radius: 24px; background: #7c6ef6; color: white; }
+.pd-mobile-text-editor p { font-size: 13px; opacity: .7; }
+.pd-mobile-text-editor [contenteditable] { padding: 18px; min-height: 160px; }
+@media (min-width: 1024px) {
+  .pd-toolbar { min-height: 56px; }
+  .pd-editor > main { margin: 0 1px; }
+  .pd-sidebar > aside { background: var(--pd-panel); }
+}
+@media (max-width: 1023px) {
+  .pd-mobile-header { display: flex; align-items: center; gap: 6px; min-height: 58px; padding: 6px 10px; background: var(--pd-panel); border-bottom: 1px solid var(--pd-field-border); }
+  .pd-mobile-header strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+  .pd-mobile-header button { min-width: 42px; min-height: 44px; display: grid; place-items: center; border-radius: 12px; }
+  .pd-mobile-header button:disabled { opacity: .3; }
+  .pd-toolbar { display: none; }
+  .pd-toolbar.pd-toolbar-expanded { display: flex; max-height: 35dvh; background: var(--pd-panel); }
+  .pd-editor { flex-direction: column; }
+  .pd-workspace-tools { order: 2; flex: 0 0 68px; flex-direction: row; justify-content: space-around; gap: 2px; padding: 4px 6px; border-top: 1px solid var(--pd-field-border); border-inline-end: 0; overflow-x: auto; }
+  .pd-workspace-tools button { flex: 1; min-width: 45px; height: 56px; flex-direction: column; gap: 5px; }
+  .pd-workspace-tools button span { display: block; font-size: 10px; white-space: nowrap; }
+  .pd-tool-divider { display: none; }
+  .pd-sidebar-open { inset-block-start: auto; inset-block-end: 68px; inset-inline: 0; width: 100%; height: min(64dvh, calc(100% - 68px)); border-radius: 22px 22px 0 0; background: var(--pd-panel); box-shadow: 0 -12px 45px #0005; animation: pd-sheet-in 180ms ease-out; }
+  .pd-panel-close { position: absolute; inset-inline-end: 8px; top: 3px; z-index: 2; border-radius: 50%; background: var(--pd-panel); }
+  .pd-sidebar > aside { padding-top: 38px; background: var(--pd-panel); border-radius: inherit; }
+  .pd-mobile-nav { order: 4; background: var(--pd-panel); }
+  .pd-mobile-nav button { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 60px; justify-content: center; font-size: 11px; }
+  .pd-slides { background: var(--pd-panel); }
+  .pd-slide-thumbnails { min-height: 42px; max-height: 54px; }
+  .pd-editing-context { max-height: 44px; overflow: auto; }
+  .pd-modal-panel button, .pd-sidebar button { touch-action: manipulation; }
+}
+@media (max-height: 500px) and (max-width: 1023px) {
+  .pd-mobile-header { min-height: 46px; padding-block: 0; }
+  .pd-workspace-tools { flex-basis: 46px; }
+  .pd-workspace-tools button { height: 40px; flex-direction: row; }
+  .pd-mobile-nav button { min-height: 40px; flex-direction: row; }
+  .pd-sidebar-open { inset-block-end: 46px; height: 80%; }
+}
+@keyframes pd-sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+
+:root[data-theme='light'] .pd-sidebar { --pd-field-border: #d4d9e2; }
+:root[data-theme='light'] .pd-sidebar button { color: var(--pd-text); }
+.pd-mobile-text-editor > div:last-child { background: var(--pd-field-bg) !important; outline-color: var(--pd-accent-soft) !important; border-radius: 14px !important; }

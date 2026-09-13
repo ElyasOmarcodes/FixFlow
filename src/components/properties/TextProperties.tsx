@@ -163,9 +163,9 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
   }
 
   const sectionLabelCls =
-    'text-[10px] text-[#4a4a5a] uppercase tracking-wider px-2 py-1 select-none'
+    'text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider px-2 py-1 select-none'
   const itemBaseCls =
-    'w-full text-left px-3 py-1.5 text-sm text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.05)] transition-colors rounded'
+    'w-full text-left px-3 py-1.5 text-sm text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.05)] transition-colors rounded'
   const itemSelectedCls = 'bg-[rgba(124,110,246,0.15)] !text-[#c4b5fd]'
   const itemActiveCls = 'bg-[rgba(255,255,255,0.08)] outline-none'
 
@@ -190,7 +190,7 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
       >
         <span className="truncate">{selectedLabel}</span>
         <svg
-          className={`ml-2 w-3 h-3 flex-shrink-0 text-[#6b6b7a] transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
+          className={`ml-2 w-3 h-3 flex-shrink-0 text-[var(--pd-c-6b6b7a)] transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 12 12"
           stroke="currentColor"
@@ -224,8 +224,8 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
                   onClick={() => { setScriptFilter(f.value); setActiveIdx(-1) }}
                   className={`rounded border px-1 py-1 text-[10px] transition-colors ${
                     scriptFilter === f.value
-                      ? 'border-[#7c6ef6] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-                      : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:text-[#e8e8f0]'
+                      ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
+                      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >
                   {t(f.labelKey)}
@@ -319,7 +319,7 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
                       onMouseEnter={() => preloadFont(f.family)}
                       className={`${itemBaseCls} flex items-baseline justify-between gap-2 ${f.family === value ? itemSelectedCls : ''} ${flatIdx === activeIdx ? itemActiveCls : ''}`}
                     >
-                      <span className="truncate text-xs text-[#a0a0b0]">{f.label}</span>
+                      <span className="truncate text-xs text-[var(--pd-c-a0a0b0)]">{f.label}</span>
                       {/* Preview uses Pashto letters — a Latin sample tells you
                           nothing about a Naskh or Nastaliq face. */}
                       <span
@@ -337,7 +337,7 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
 
             {/* Empty state */}
             {noResults && (
-              <div className="px-3 py-4 text-sm text-[#4a4a5a] text-center">
+              <div className="px-3 py-4 text-sm text-[var(--pd-c-4a4a5a)] text-center">
                 {t('text.fontsNoMatch', { query: search })}
               </div>
             )}
@@ -402,7 +402,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
         {/* Custom font upload */}
         <div className="mt-2 flex items-center gap-2">
           <label
-            className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:text-[#e8e8f0] hover:border-[rgba(255,255,255,0.2)] transition-colors"
+            className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.2)] transition-colors"
             title="Upload a .ttf, .otf, or .woff2 font file"
           >
             + Upload Font
@@ -432,7 +432,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
             />
           </label>
           {customFonts.length > 0 && (
-            <span className="text-xs text-[#6b6b7a]">{customFonts.length} custom</span>
+            <span className="text-xs text-[var(--pd-c-6b6b7a)]">{customFonts.length} custom</span>
           )}
         </div>
 
@@ -479,8 +479,8 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
               onClick={() => upd({ align: item.value })}
               className={`rounded-lg border px-2 py-2 text-xs transition-colors ${
                 layer.align === item.value
-                  ? 'border-[#7c6ef6] bg-[#7c6ef6] text-white'
-                  : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#e8e8f0]'
+                  ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
+                  : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]'
               }`}
             >
               <span className="flex items-center justify-center gap-1.5">
@@ -507,8 +507,8 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
                   onClick={() => upd({ verticalAlign: item.value })}
                   className={`rounded-lg border px-2 py-2 text-xs transition-colors ${
                     (layer.verticalAlign ?? 'top') === item.value
-                      ? 'border-[#7c6ef6] bg-[#7c6ef6] text-white'
-                      : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#e8e8f0]'
+                      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
+                      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >
                   <span className="flex items-center justify-center gap-1.5">

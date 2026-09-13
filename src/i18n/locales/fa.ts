@@ -2,6 +2,34 @@ import type { TranslationKey } from './en'
 
 /** Persian / Dari (فارسی) — right-to-left. */
 export const fa: Record<TranslationKey, string> = {
+  'help.title': 'راهنمای PixelDeck',
+  'help.subtitle': 'طراحی، تنظیم و خروجی، گام به گام.',
+  'help.search': 'جستجوی بخش…',
+  'help.sections': 'بخش\u200cها',
+  'help.choose': 'بخش راهنما را انتخاب کنید',
+  'help.empty': 'بخشی پیدا نشد',
+  'help.previous': 'قبلی',
+  'help.next': 'بعدی',
+  'help.jump': 'برای بازکردن، بخش را انتخاب کنید.',
+  'help.start': 'شروع',
+  'help.design': 'طراحی',
+  'help.adapt': 'تنظیم',
+  'help.deliver': 'خروجی',
+
+  'workspace.theme': 'ظاهر',
+  'workspace.system': 'مطابق سیستم',
+  'workspace.tools': 'ابزارهای طراحی',
+  'workspace.fit': 'اندازهٔ مناسب',
+  'workspace.addText': 'متن',
+  'workspace.image': 'عکس',
+  'workspace.shape': 'شکل',
+  'workspace.duplicate': 'تکثیر',
+  'workspace.delete': 'حذف',
+  'workspace.done': 'تمام',
+  'workspace.editText': 'ویرایش متن',
+  'workspace.textHint': 'متن خود را اینجا بنویسید. برای تغییر ظاهر، واژه\u200cها را انتخاب کنید.',
+  'workspace.more': 'ابزارهای بیشتر',
+
   // ── Generic actions / words reused everywhere ────────────────────────────
   'common.cancel': 'لغو',
   'common.close': 'بستن',

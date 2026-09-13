@@ -50,7 +50,7 @@ export function PromoteLocaleDialog({
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-full border border-[#7c6ef6]/45 bg-[#7c6ef6]/16 px-4 py-2 text-sm font-medium text-[#f3f1ff] transition hover:border-[#7c6ef6]/70 hover:bg-[#7c6ef6]/24"
+            className="rounded-full border border-[var(--pd-c-7c6ef6)]/45 bg-[var(--pd-c-7c6ef6)]/16 px-4 py-2 text-sm font-medium text-[#f3f1ff] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/24"
           >
             Promote to default
           </button>
@@ -59,7 +59,7 @@ export function PromoteLocaleDialog({
     >
       <div className="space-y-5">
         <div className="space-y-2">
-          <div className="inline-flex items-center rounded-full border border-[#7c6ef6]/25 bg-[#7c6ef6]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c4b5fd]">
+          <div className="inline-flex items-center rounded-full border border-[var(--pd-c-7c6ef6)]/25 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c4b5fd]">
             {targetName} · {locale}
           </div>
           <p className="text-sm leading-relaxed text-[#d6d6e2]">
@@ -70,7 +70,7 @@ export function PromoteLocaleDialog({
         <div className="rounded-2xl border border-white/8 bg-[#13131a] p-4">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6b6b7a]">Translation coverage</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--pd-c-6b6b7a)]">Translation coverage</div>
               <div className="mt-1 text-2xl font-semibold text-white">{complete}/{total}</div>
             </div>
             <div className="text-right text-xs text-[#8d8ea0]">
@@ -100,7 +100,7 @@ export function PromoteLocaleDialog({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-white/8 bg-[#111118] px-3 py-3">
+                <div className="rounded-xl border border-white/8 bg-[var(--pd-c-111118)] px-3 py-3">
                   <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d8ea0]">Affected layers</div>
                   <ul className="space-y-2 text-sm text-[#d9d9e6]">
                     {incompleteLabels.map((label) => (

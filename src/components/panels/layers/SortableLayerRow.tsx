@@ -36,7 +36,7 @@ export function SortableLayer({
       onContextMenu={(e) => onContextMenu(e, layer.id)}
       className={`group relative flex items-center gap-1 px-2 py-1.5 border-l-2 transition-colors ${
         isSelected
-          ? 'bg-[rgba(124,110,246,0.15)] border-[#7c6ef6]'
+          ? 'bg-[rgba(124,110,246,0.15)] border-[var(--pd-c-7c6ef6)]'
           : isMultiSelected
             ? 'bg-[rgba(124,110,246,0.06)] border-[rgba(124,110,246,0.4)]'
             : 'border-transparent hover:bg-[rgba(255,255,255,0.04)]'
@@ -46,7 +46,7 @@ export function SortableLayer({
       <button
         {...attributes} {...listeners}
         aria-label={`Drag ${layer.name}`}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: '#6b6b7a' }}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: 'var(--pd-c-6b6b7a)' }}
         className="w-4 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
         onClick={(e) => e.stopPropagation()}
       ><Icon name="grip" size={12} /></button>
@@ -77,7 +77,7 @@ export function SortableLayer({
       <button
         aria-label={`Open ${layer.name} layer menu`}
         onClick={(e) => { e.stopPropagation(); onMenuOpen(e, layer.id) }}
-        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100 text-[#6b6b7a] hover:text-[#e8e8f0]"
+        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]"
       ><Icon name="more-vertical" size={13} /></button>
     </div>
   )
@@ -115,7 +115,7 @@ export function SortableChild({ child, groupId, isSelected, onSelect, onRename }
       <button
         {...attributes} {...listeners}
         aria-label={`Drag ${child.name}`}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: '#6b6b7a' }}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: 'var(--pd-c-6b6b7a)' }}
         className="w-3 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover/child:opacity-100 shrink-0 ml-0.5 rounded hover:bg-[rgba(255,255,255,0.08)]"
         onClick={(e) => e.stopPropagation()}
       ><Icon name="grip" size={12} /></button>
@@ -177,7 +177,7 @@ export function SortableGroup({
       onContextMenu={(e) => onContextMenu(e, layer.id)}
       className={`relative border-l-2 transition-colors ${
         isSelected
-          ? 'bg-[rgba(124,110,246,0.15)] border-[#7c6ef6]'
+          ? 'bg-[rgba(124,110,246,0.15)] border-[var(--pd-c-7c6ef6)]'
           : isMultiSelected
             ? 'bg-[rgba(124,110,246,0.06)] border-[rgba(124,110,246,0.4)]'
             : 'bg-[rgba(124,110,246,0.06)] border-[rgba(124,110,246,0.28)] hover:bg-[rgba(124,110,246,0.1)]'
@@ -234,7 +234,7 @@ export function SortableGroup({
         <button
           aria-label={`Open ${layer.name} layer menu`}
           onClick={(e) => { e.stopPropagation(); onMenuOpen(e, layer.id) }}
-          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100 text-[#8a84b6] hover:text-[#e8e8f0]"
+          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100 text-[#8a84b6] hover:text-[var(--pd-c-e8e8f0)]"
         ><Icon name="more-vertical" size={13} /></button>
       </div>
 
@@ -271,8 +271,8 @@ export function SortableGroup({
 export function DragPreview({ label, icon }: { label: string; icon: IconName }) {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg shadow-2xl border text-xs"
-      style={{ background: '#1e1e2a', borderColor: 'rgba(124,110,246,0.4)', color: '#e8e8f0', pointerEvents: 'none', minWidth: 120 }}>
-      <span style={{ color: '#7c6ef6' }}><Icon name={icon} size={13} /></span>
+      style={{ background: '#1e1e2a', borderColor: 'rgba(124,110,246,0.4)', color: 'var(--pd-c-e8e8f0)', pointerEvents: 'none', minWidth: 120 }}>
+      <span style={{ color: 'var(--pd-c-7c6ef6)' }}><Icon name={icon} size={13} /></span>
       <span className="truncate">{label}</span>
     </div>
   )

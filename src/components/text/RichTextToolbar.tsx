@@ -13,8 +13,8 @@ const resumeTemporal = () => useEditorStore.temporal.getState().resume()
 const toolbarBtnCls = (active: boolean) =>
   `h-7 min-w-7 px-1.5 flex items-center justify-center rounded border text-xs transition-colors ${
     active
-      ? 'border-[#7c6ef6] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-      : 'border-[rgba(255,255,255,0.1)] text-[#a0a0b0] hover:text-[#e8e8f0] hover:border-[rgba(255,255,255,0.22)]'
+      ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
+      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-a0a0b0)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.22)]'
   }`
 
 /** B / I / U / S / fill / clear toolbar for the rich text editors (panel + canvas). */
@@ -94,11 +94,11 @@ export function RichTextToolbar({
       </div>
 
       <div className="mt-2 flex items-center gap-2">
-        <label className="text-[10px] text-[#6b6b7a] uppercase tracking-wider">Weight</label>
+        <label className="text-[10px] text-[var(--pd-c-6b6b7a)] uppercase tracking-wider">Weight</label>
         <select
           value={rangeStyle.fontWeight === 'mixed' ? '' : rangeStyle.fontWeight}
           onChange={(e) => api.applyPatch({ fontWeight: Number(e.target.value) })}
-          className="h-7 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#0f0f13] px-2 text-xs text-[#e8e8f0]"
+          className="h-7 rounded-md border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-2 text-xs text-[var(--pd-c-e8e8f0)]"
         >
           {rangeStyle.fontWeight === 'mixed' && <option value="">Mixed</option>}
           {weights.map((w) => (
@@ -119,7 +119,7 @@ export function RichTextToolbar({
           <button
             type="button"
             onClick={() => api.applyPatch({ fill: null })}
-            className="mt-2 flex items-center gap-1 text-[10px] text-[#6b6b7a] hover:text-[#e8e8f0] transition-colors"
+            className="mt-2 flex items-center gap-1 text-[10px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-colors"
           >
             <Icon name="rotate-ccw" size={11} />
             Use layer fill

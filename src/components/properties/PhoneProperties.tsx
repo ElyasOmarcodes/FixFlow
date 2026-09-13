@@ -36,14 +36,14 @@ function LocaleScreenshotRow({
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] text-[#6b6b7a] uppercase w-8 shrink-0 font-mono">{locale}</span>
+      <span className="text-[10px] text-[var(--pd-c-6b6b7a)] uppercase w-8 shrink-0 font-mono">{locale}</span>
       {previewSrc ? (
         <>
           <img src={previewSrc} alt={locale} className="h-8 w-5 rounded object-cover border border-[rgba(255,255,255,0.12)] shrink-0" />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex-1 text-left text-[10px] text-[#7c6ef6] hover:text-[#9d90f8] transition-colors"
+            className="flex-1 text-left text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors"
           >
             Change
           </button>
@@ -60,7 +60,7 @@ function LocaleScreenshotRow({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex-1 text-left text-[10px] text-[#6b6b7a] hover:text-[#e8e8f0] border border-dashed border-[rgba(255,255,255,0.1)] rounded px-2 py-1 transition-colors hover:border-[rgba(124,110,246,0.4)]"
+          className="flex-1 text-left text-[10px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] border border-dashed border-[rgba(255,255,255,0.1)] rounded px-2 py-1 transition-colors hover:border-[rgba(124,110,246,0.4)]"
         >
           + Upload for {locale}
         </button>
@@ -173,7 +173,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
                   key={preset.label}
                   type="button"
                   onClick={() => upd(preset.patch)}
-                  className="flex flex-col items-center gap-0.5 rounded border border-[rgba(255,255,255,0.1)] px-1 py-1.5 text-[10px] text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.04)] transition-colors leading-tight text-center"
+                  className="flex flex-col items-center gap-0.5 rounded border border-[rgba(255,255,255,0.1)] px-1 py-1.5 text-[10px] text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.04)] transition-colors leading-tight text-center"
                 >
                   {preset.icon && <Icon name={preset.icon} size={12} />}
                   {preset.label}
@@ -248,9 +248,9 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
       <div className={panelSectionCls}>
         <div className="mb-1 flex items-center justify-between">
           <label className={labelCls + ' !mb-0'}>{t('phone.scale')}</label>
-          <span className="text-xs text-[#e8e8f0]">{layer.scale.toFixed(2)}×</span>
+          <span className="text-xs text-[var(--pd-c-e8e8f0)]">{layer.scale.toFixed(2)}×</span>
         </div>
-        <input type="range" min={0.5} max={4} step={0.05} value={layer.scale} onChange={(e) => upd({ scale: Number(e.target.value) })} onMouseDown={pauseTemporal} onMouseUp={resumeTemporal} className="w-full accent-[#7c6ef6]" />
+        <input type="range" min={0.5} max={4} step={0.05} value={layer.scale} onChange={(e) => upd({ scale: Number(e.target.value) })} onMouseDown={pauseTemporal} onMouseUp={resumeTemporal} className="w-full accent-[var(--pd-c-7c6ef6)]" />
       </div>
 
       <div className={panelSectionCls}>
@@ -260,16 +260,16 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
           variant="dropzone"
           accept="image/*"
           ariaLabel="Upload screenshot"
-          className="rounded-xl border border-dashed border-[rgba(255,255,255,0.14)] bg-[#0f0f13] p-4 text-center transition-colors hover:border-[rgba(124,110,246,0.55)] cursor-pointer"
+          className="rounded-xl border border-dashed border-[rgba(255,255,255,0.14)] bg-[var(--pd-c-0f0f13)] p-4 text-center transition-colors hover:border-[rgba(124,110,246,0.55)] cursor-pointer"
           onFiles={async (files) => {
             const file = files[0]
             if (!file) return
             await handleScreenshotFile(file)
           }}
         >
-          {previewSrc ? <img src={previewSrc} alt="Screenshot" className="mx-auto max-h-24 rounded-lg object-contain" /> : <span className="text-xs text-[#6b6b7a]">{t('phone.screenshotDropzone')}</span>}
+          {previewSrc ? <img src={previewSrc} alt="Screenshot" className="mx-auto max-h-24 rounded-lg object-contain" /> : <span className="text-xs text-[var(--pd-c-6b6b7a)]">{t('phone.screenshotDropzone')}</span>}
         </FileUploadButton>
-        {screenshotLabel && <p className="mt-2 truncate text-[10px] text-[#6b6b7a]">{screenshotLabel}</p>}
+        {screenshotLabel && <p className="mt-2 truncate text-[10px] text-[var(--pd-c-6b6b7a)]">{screenshotLabel}</p>}
       </div>
 
       <div className={panelSectionCls}>

@@ -132,7 +132,7 @@ function SortableGroupItem({
             }}
             onClick={(e) => e.stopPropagation()}
             style={{ width: Math.max(stripWidth, 52), height: 14, fontSize: 9, boxSizing: 'border-box' }}
-            className="px-1 rounded border border-[#7c6ef6] bg-[#0f0f13] text-[#e8e8f0] focus:outline-none"
+            className="px-1 rounded border border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-0f0f13)] text-[var(--pd-c-e8e8f0)] focus:outline-none"
           />
         ) : (
           <span
@@ -365,7 +365,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
   return (
     <footer
       className="pd-slides h-20 flex items-center gap-3 px-3 shrink-0 border-t"
-      style={{ background: '#18181f', borderColor }}
+      style={{ background: 'var(--pd-c-18181f)', borderColor }}
     >
       {/* Width follows the responsive LayersPanel width, less this footer's 12px inset. */}
       <details open={!compact || slideOptionsOpen} className="pd-slide-options flex w-[196px] shrink-0 flex-col gap-1.5 border-r border-[rgba(255,255,255,0.06)] pr-3 min-[1440px]:w-[212px]">
@@ -378,8 +378,8 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
                 onClick={() => updateSlideGroup(activeGroup.id, { numSlides: value })}
                 className={`text-[11px] px-2 py-1 rounded border transition-colors ${
                   activeGroup.numSlides === value
-                    ? 'bg-[#7c6ef6] border-[#7c6ef6] text-white'
-                    : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:text-[#e8e8f0] hover:border-[rgba(255,255,255,0.15)]'
+                    ? 'bg-[var(--pd-c-7c6ef6)] border-[var(--pd-c-7c6ef6)] text-white'
+                    : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.15)]'
                 }`}
               >
                 {suffix ?? t(labelKey)}
@@ -390,14 +390,14 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
         {/* Always rendered (even with no pano groups) so this column's height never
             shifts the numSlides buttons when switching between Single/Pano/Strip. */}
         <label
-          className={`flex items-center gap-1.5 text-[10px] ${hasPano ? 'text-[#6b6b7a]' : 'text-[#4a4a57]'}`}
+          className={`flex items-center gap-1.5 text-[10px] ${hasPano ? 'text-[var(--pd-c-6b6b7a)]' : 'text-[#4a4a57]'}`}
         >
           <input
             type="checkbox"
             checked={hasPano && panoSettings.compensate}
             disabled={!hasPano}
             onChange={(e) => updatePanoSettings({ compensate: e.target.checked })}
-            className="h-3 w-3 accent-[#7c6ef6] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="h-3 w-3 accent-[var(--pd-c-7c6ef6)] disabled:opacity-40 disabled:cursor-not-allowed"
             title="When enabled, export/preview skip this gap between slides"
           />
           <span>{t('slides.compensate')}</span>
@@ -409,7 +409,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
             value={panoSettings.gapPx}
             disabled={!hasPano}
             onChange={(e) => updatePanoSettings({ gapPx: parseInt(e.target.value, 10) || 0 })}
-            className="w-12 rounded border border-[rgba(255,255,255,0.1)] bg-[#0f0f13] px-1 py-0.5 text-right text-[#e8e8f0] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-12 rounded border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-right text-[var(--pd-c-e8e8f0)] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
             title="Store preview gap shown in editor and preview"
           />
           <span>px</span>
@@ -452,7 +452,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
           onClick={addSlideGroup}
           title={t('slides.addGroup')}
           aria-label={t('slides.addGroup')}
-          className="shrink-0 w-8 h-8 flex items-center justify-center text-[#6b6b7a] hover:text-[#e8e8f0] rounded border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] transition-colors ml-1"
+          className="shrink-0 w-8 h-8 flex items-center justify-center text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] rounded border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] transition-colors ml-1"
         >
           <Icon name="plus" size={15} strokeWidth={2.2} />
         </button>
@@ -461,7 +461,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
       <div className="flex items-center gap-2 shrink-0 border-l border-[rgba(255,255,255,0.06)] pl-3">
         <button
           onClick={onOpenPreview}
-          className="text-xs text-[#e8e8f0] px-3 py-2 rounded border border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+          className="text-xs text-[var(--pd-c-e8e8f0)] px-3 py-2 rounded border border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
         >
           {t('slides.preview')}
         </button>
@@ -469,7 +469,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
         <button
           onClick={() => setExportOpen(true)}
           disabled={exportableFormats.length === 0}
-          className="text-xs text-white px-3 py-2 rounded bg-[#7c6ef6] hover:bg-[#6c5ed6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="text-xs text-white px-3 py-2 rounded bg-[var(--pd-c-7c6ef6)] hover:bg-[#6c5ed6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {t('common.export')}
         </button>
@@ -484,7 +484,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
-            background: '#18181f',
+            background: 'var(--pd-c-18181f)',
             borderColor: 'rgba(255,255,255,0.08)',
             minWidth: 140,
           }}
@@ -497,7 +497,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
             <button
               key={action}
               className="w-full text-left px-3 py-2 text-xs hover:bg-[rgba(255,255,255,0.06)] transition-colors"
-              style={{ color: '#e8e8f0' }}
+              style={{ color: 'var(--pd-c-e8e8f0)' }}
               onClick={() => handleMenuAction(action, contextMenu.groupId)}
             >
               {label}

@@ -7,6 +7,34 @@
  * through a locale file top to bottom.
  */
 export const en = {
+  'help.title': 'PixelDeck user guide',
+  'help.subtitle': 'Design, adapt and export, step by step.',
+  'help.search': 'Find a section…',
+  'help.sections': 'Sections',
+  'help.choose': 'Choose help section',
+  'help.empty': 'No matching sections',
+  'help.previous': 'Previous',
+  'help.next': 'Next',
+  'help.jump': 'Select a section to open it.',
+  'help.start': 'Getting started',
+  'help.design': 'Design',
+  'help.adapt': 'Adapt',
+  'help.deliver': 'Deliver',
+
+  'workspace.theme': 'Appearance',
+  'workspace.system': 'System',
+  'workspace.tools': 'Design tools',
+  'workspace.fit': 'Fit canvas',
+  'workspace.addText': 'Text',
+  'workspace.image': 'Photo',
+  'workspace.shape': 'Shape',
+  'workspace.duplicate': 'Duplicate',
+  'workspace.delete': 'Delete',
+  'workspace.done': 'Done',
+  'workspace.editText': 'Edit text',
+  'workspace.textHint': 'Write your text here. Select words to style them.',
+  'workspace.more': 'More tools',
+
   // ── Generic actions / words reused everywhere ────────────────────────────
   'common.cancel': 'Cancel',
   'common.close': 'Close',

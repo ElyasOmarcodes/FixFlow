@@ -67,11 +67,12 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - run: npm run test:responsive
+      - run: npm run test:editor
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: responsive-screenshots
-          path: test-results/responsive/
+          path: test-results/
 
   # ── Desktop: Windows / macOS / Linux ────────────────────────────────────────
   desktop:

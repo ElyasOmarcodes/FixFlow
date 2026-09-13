@@ -29,10 +29,10 @@ export function BulkTranslateBar({
   if (nonDefaultLocales.length === 0) return null
 
   return (
-    <section className="border-b border-white/6 bg-[#111118]/70 px-8 py-3 backdrop-blur-xl shrink-0">
+    <section className="border-b border-white/6 bg-[var(--pd-c-111118)]/70 px-8 py-3 backdrop-blur-xl shrink-0">
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#6b6b7a]">Bulk AI translate:</span>
+          <span className="text-xs text-[var(--pd-c-6b6b7a)]">Bulk AI translate:</span>
           <span className="text-xs text-[#9d90f8]">{bulkEligibleCount} cells</span>
         </div>
 
@@ -41,7 +41,7 @@ export function BulkTranslateBar({
             type="checkbox"
             checked={overwriteExisting}
             onChange={(e) => setOverwriteExisting(e.target.checked)}
-            className="accent-[#7c6ef6] w-3 h-3"
+            className="accent-[var(--pd-c-7c6ef6)] w-3 h-3"
           />
           <span className="text-xs text-[#8f90a3]">Overwrite existing</span>
         </label>
@@ -52,11 +52,11 @@ export function BulkTranslateBar({
           disabled={!hasApiKey || isBulkRunning || bulkEligibleCount === 0}
           className={`rounded-lg border px-4 py-1.5 text-xs font-medium transition ${
             !hasApiKey
-              ? 'border-white/8 text-[#4a4a5a] cursor-not-allowed'
+              ? 'border-white/8 text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
               : isBulkRunning
                 ? 'border-[rgba(124,110,246,0.3)] text-[#9d90f8] cursor-wait'
                 : bulkEligibleCount === 0
-                  ? 'border-white/8 text-[#4a4a5a] cursor-not-allowed'
+                  ? 'border-white/8 text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
                   : 'border-[rgba(124,110,246,0.5)] bg-[rgba(124,110,246,0.12)] text-[#c5befd] hover:bg-[rgba(124,110,246,0.22)] hover:text-white'
           }`}
           title={!hasApiKey ? 'Configure an AI API key in AI Settings' : undefined}

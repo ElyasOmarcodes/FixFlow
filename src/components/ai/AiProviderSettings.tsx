@@ -7,9 +7,9 @@ import type { AiModel, AiProvider } from '@/ai/providers'
 import { Icon } from '@/components/ui/Icon'
 
 const inputCls =
-  'bg-[#0f0f13] border border-[rgba(255,255,255,0.1)] rounded px-3 py-2 text-sm text-[#e8e8f0] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
+  'bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-3 py-2 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
 const monoInputCls = `${inputCls} font-mono`
-const labelCls = 'text-[11px] text-[#6b6b7a] mb-1 block uppercase tracking-[0.08em]'
+const labelCls = 'text-[11px] text-[var(--pd-c-6b6b7a)] mb-1 block uppercase tracking-[0.08em]'
 
 export function AiProviderSettings() {
   const {
@@ -65,7 +65,7 @@ export function AiProviderSettings() {
   const activeModelError = isCurrentModelResult ? modelError : null
   const activeModel = selectedModels[provider] || getDefaultModel(provider)
   const filteredModels = useMemo(
-    () => searchModels(visibleModels, modelSearch).slice(0, 80),
+    () => searchModels(visibleModels, modelSearch),
     [visibleModels, modelSearch],
   )
   const modelStatus = !hasActiveKey
@@ -109,6 +109,13 @@ export function AiProviderSettings() {
       try {
         const nextModels = await listModels(provider, activeKey, provider === 'custom' ? customBaseUrl.trim() : undefined)
         if (cancelled) return
+        if (provider === 'google') {
+          const current = useApiKeysStore.getState().selectedModels.google
+          if (!nextModels.some((model) => model.id === current)) {
+            const preferred = nextModels.find((model) => /flash/.test(model.id) && !/image|audio|tts|live/.test(model.id)) ?? nextModels[0]
+            useApiKeysStore.getState().setModel('google', preferred.id)
+          }
+        }
         setModels(nextModels)
         setModelResultSignature(modelSignature)
       } catch (error) {
@@ -143,8 +150,8 @@ export function AiProviderSettings() {
               }}
               className={`rounded-lg border px-2 py-2 text-xs transition-colors text-left ${
                 provider === item.id
-                  ? 'border-[#7c6ef6] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-                  : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)]'
+                  ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
+                  : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]'
               }`}
             >
               <span className="block font-medium">{item.shortLabel}</span>
@@ -165,7 +172,7 @@ export function AiProviderSettings() {
             className={monoInputCls}
             autoComplete="off"
           />
-          <p className="mt-1 text-[11px] text-[#4a4a5a] leading-relaxed">
+          <p className="mt-1 text-[11px] text-[var(--pd-c-4a4a5a)] leading-relaxed">
             Must implement the OpenAI Chat Completions API (`POST {'{baseUrl}'}/chat/completions`).
           </p>
         </div>
@@ -182,9 +189,9 @@ export function AiProviderSettings() {
           autoComplete="off"
         />
         {activeProvider.keyUrl && (
-          <p className="mt-1 text-[11px] text-[#4a4a5a] leading-relaxed">
+          <p className="mt-1 text-[11px] text-[var(--pd-c-4a4a5a)] leading-relaxed">
             Get your key from{' '}
-            <a href={activeProvider.keyUrl} target="_blank" rel="noreferrer" className="text-[#7c6ef6] hover:underline">
+            <a href={activeProvider.keyUrl} target="_blank" rel="noreferrer" className="text-[var(--pd-c-7c6ef6)] hover:underline">
               {activeProvider.keyUrl.replace(/^https?:\/\//, '')}
             </a>
           </p>
@@ -196,8 +203,8 @@ export function AiProviderSettings() {
         <button
           type="button"
           onClick={() => void runConnectionTest()}
-          disabled={!hasActiveKey || visibleTestState === 'testing'}
-          className="rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)] disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={!hasActiveKey || !activeModel || visibleTestState === 'testing'}
+          className="rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {visibleTestState === 'testing' ? 'Testing…' : 'Test Connection'}
         </button>
@@ -215,7 +222,7 @@ export function AiProviderSettings() {
             <button
               type="button"
               onClick={() => void runConnectionTest()}
-              className="mt-3 rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)]"
+              className="mt-3 rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]"
             >
               Retry
             </button>
@@ -226,10 +233,10 @@ export function AiProviderSettings() {
       <div className="mb-4 rounded-xl border border-[rgba(255,255,255,0.08)] p-3 bg-[rgba(255,255,255,0.02)]">
         <div className="flex items-center justify-between gap-3 mb-2">
           <label className={labelCls + ' !mb-0'}>Model</label>
-          <span className="text-[10px] text-[#6b6b7a]">{modelStatus}</span>
+          <span className="text-[10px] text-[var(--pd-c-6b6b7a)]">{modelStatus}</span>
         </div>
         {!hasActiveKey ? (
-          <p className="rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-4 text-xs text-[#6b6b7a] text-center">
+          <p className="rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
             Add an API key to connect to {activeProvider.label}. PixelDeck will load the model list from the provider after the connection is available.
           </p>
         ) : (
@@ -243,7 +250,7 @@ export function AiProviderSettings() {
               autoComplete="off"
             />
             {loadingModels ? (
-              <p className="rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-4 text-xs text-[#6b6b7a] text-center">
+              <p className="rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
                 Connecting to {activeProvider.label} and loading models…
               </p>
             ) : activeModelError ? (
@@ -255,7 +262,7 @@ export function AiProviderSettings() {
                 <button
                   type="button"
                   onClick={() => setModelLoadNonce((value) => value + 1)}
-                  className="mt-3 rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)]"
+                  className="mt-3 rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]"
                 >
                   Retry connection
                 </button>
@@ -282,11 +289,11 @@ export function AiProviderSettings() {
                       }`}
                     >
                       <span className="block text-xs font-medium">{model.name}</span>
-                      <span className="block text-[11px] font-mono text-[#6b6b7a]">{model.id}</span>
-                      {model.description && <span className="block text-[10px] text-[#4a4a5a] line-clamp-2 mt-0.5">{model.description}</span>}
+                      <span className="block text-[11px] font-mono text-[var(--pd-c-6b6b7a)]">{model.id}</span>
+                      {model.description && <span className="block text-[10px] text-[var(--pd-c-4a4a5a)] line-clamp-2 mt-0.5">{model.description}</span>}
                     </button>
                   )) : (
-                    <p className="px-3 py-4 text-xs text-[#6b6b7a] text-center">The provider returned no models matching this search.</p>
+                    <p className="px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">The provider returned no models matching this search.</p>
                   )}
                 </div>
               </>

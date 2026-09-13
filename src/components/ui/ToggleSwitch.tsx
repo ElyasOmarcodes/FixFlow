@@ -25,12 +25,12 @@ export function ToggleSwitch({
   disabled,
   className = 'relative h-5 w-9 rounded-full transition-colors',
   knobClassName = 'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform',
-  checkedClassName = 'bg-[#7c6ef6]',
+  checkedClassName = 'bg-[var(--pd-c-7c6ef6)]',
   uncheckedClassName = 'bg-[rgba(255,255,255,0.12)]',
   checkedKnobClassName = 'translate-x-[18px]',
   uncheckedKnobClassName = 'translate-x-0',
   variant = 'switch',
-  checkboxClassName = 'accent-[#7c6ef6]',
+  checkboxClassName = 'accent-[var(--pd-c-7c6ef6)]',
   checkboxProps,
 }: ToggleSwitchProps) {
   if (variant === 'checkbox') {

@@ -4,6 +4,7 @@ import { buildOpenAiCompatibleHeaders } from '@/ai/headers'
 import type { AiModel, AiProvider } from '@/ai/providers'
 
 interface RemoteModel {
+  supportedGenerationMethods?: string[]
   id?: string
   name?: string
   display_name?: string
@@ -19,6 +20,7 @@ export async function listModels(provider: AiProvider, apiKey: string, baseUrlOv
   const config = getProviderConfig(provider)
   const key = apiKey.trim()
   if (!key) throw new Error('Add an API key before loading models.')
+  if (provider === 'google') return listGoogleModels(key)
   const customBaseUrl = baseUrlOverride?.trim()
   if (provider === 'custom' && !customBaseUrl) throw new Error('No custom API base URL configured.')
   const modelsUrl = provider === 'custom' ? `${customBaseUrl!.replace(/\/+$/, '')}/models` : config.modelsUrl
@@ -57,12 +59,7 @@ const FALLBACK_MODELS: Partial<Record<AiProvider, AiModel[]>> = {
     { id: 'gpt-4o', name: 'gpt-4o' },
     { id: 'gpt-image-1', name: 'gpt-image-1' },
   ],
-  google: [
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
-    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
-    { id: 'gemini-2.5-flash-image', name: 'Gemini 2.5 Flash Image' },
-  ],
+
 }
 
 async function readErrorMessage(res: Response): Promise<string> {
@@ -113,4 +110,37 @@ export function searchModels(models: AiModel[], query: string): AiModel[] {
       model.name.toLowerCase().includes(normalized) ||
       model.description?.toLowerCase().includes(normalized),
   )
+}
+
+/** Discover the current catalogue; never claim stale fallback IDs are active. */
+async function listGoogleModels(key: string): Promise<AiModel[]> {
+  const models: AiModel[] = []
+  const seen = new Set<string>()
+  let token = ''
+  do {
+    const url = new URL('https://generativelanguage.googleapis.com/v1beta/models')
+    url.searchParams.set('pageSize', '1000')
+    if (token) url.searchParams.set('pageToken', token)
+    let response: Response
+    try {
+      response = await fetch(url.toString(), {
+        headers: { 'x-goog-api-key': key },
+        signal: AbortSignal.timeout(20000),
+      })
+    } catch (error) {
+      throw formatAiNetworkError('google', 'load models', error)
+    }
+    if (!response.ok) throw new Error(await readErrorMessage(response))
+    const data = await response.json() as { models?: RemoteModel[]; nextPageToken?: string }
+    for (const model of data.models ?? []) {
+      if (!model.supportedGenerationMethods?.includes('generateContent')) continue
+      const normalized = normalizeModel(model)
+      if (normalized) models.push(normalized)
+    }
+    token = data.nextPageToken ?? ''
+    if (token && seen.has(token)) throw new Error('The provider repeated a model page. Please retry.')
+    seen.add(token)
+  } while (token)
+  if (!models.length) throw new Error('Google returned no models supporting content generation for this key.')
+  return sortModels(dedupeModels(models))
 }

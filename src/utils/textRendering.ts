@@ -1,3 +1,4 @@
+import { textDirection } from './textDirection'
 import type { TextLayer, TextMark, FillValue } from '@/types'
 import { createCanvasGradient } from '@/utils/gradients'
 import { segmentMarks } from '@/utils/richText'
@@ -29,7 +30,7 @@ interface LayoutLine {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildFontString(weight: number, italic: boolean, fontSize: number, fontFamily: string): string {
-  return `${italic ? 'italic ' : ''}${weight} ${fontSize}px "${fontFamily}"`
+  return `${italic ? 'italic ' : ''}${weight} ${fontSize}px "${fontFamily}", "Vazirmatn Variable"`
 }
 
 /**
@@ -282,6 +283,8 @@ export function wrapFragmentLines<T extends { text: string }>(
  */
 export function renderSpansToCanvas(layer: TextLayer): HTMLCanvasElement {
   const { fontSize, fontFamily, letterSpacing, lineHeight, align } = layer
+  const rtl = textDirection(layer.text) === 'rtl'
+  const spacing = rtl ? 0 : letterSpacing
   const canvasWidth = Math.max(1, layer.width ?? DEFAULT_TEXT_WIDTH)
   const lineHeightPx = fontSize * lineHeight
 
@@ -294,7 +297,7 @@ export function renderSpansToCanvas(layer: TextLayer): HTMLCanvasElement {
   })
   const measureFrag = (text: string, frag: ResolvedFragment) => {
     const font = buildFontString(frag.weight, frag.italic, fontSize, fontFamily)
-    return measureWidth(font, text, letterSpacing, measureText)
+    return measureWidth(font, text, spacing, measureText)
   }
 
   // ── Resolve lines and word-wrap them to the box width ─────────────────────
@@ -304,7 +307,7 @@ export function renderSpansToCanvas(layer: TextLayer): HTMLCanvasElement {
     let x = 0
     const fragments: PositionedFragment[] = lineFragments.map((frag) => {
       const font = buildFontString(frag.weight, frag.italic, fontSize, fontFamily)
-      const w = measureWidth(font, frag.text, letterSpacing, measureText)
+      const w = measureWidth(font, frag.text, spacing, measureText)
       const positioned: PositionedFragment = { ...frag, x, width: w }
       x += w
       return positioned
@@ -320,6 +323,8 @@ export function renderSpansToCanvas(layer: TextLayer): HTMLCanvasElement {
   canvas.height = Math.max(1, totalHeight)
   const ctx = canvas.getContext('2d')!
   ctx.textBaseline = 'alphabetic'
+  ctx.direction = rtl ? 'rtl' : 'ltr'
+  ctx.textAlign = rtl ? 'right' : 'left'
 
   // Vertical alignment inside an explicit-height box (top = no offset).
   // When content is taller than the box it stays top-anchored and clips.
@@ -339,15 +344,15 @@ export function renderSpansToCanvas(layer: TextLayer): HTMLCanvasElement {
     else if (align === 'right') lineStartX = canvasWidth - line.totalWidth
 
     line.fragments.forEach((frag) => {
-      const fragX = lineStartX + frag.x
+      const fragX = lineStartX + (rtl ? line.totalWidth - frag.x - frag.width : frag.x)
       const fragY = yOffset + lineIndex * lineHeightPx
 
       ctx.font = buildFontString(frag.weight, frag.italic, fontSize, fontFamily)
 
       ctx.fillStyle = createCanvasGradient(ctx, frag.fill, fragX, fragY, frag.width, lineHeightPx)
 
-      if (letterSpacing === 0) {
-        ctx.fillText(frag.text, fragX, baseline)
+      if (spacing === 0) {
+        ctx.fillText(frag.text, rtl ? fragX + frag.width : fragX, baseline)
       } else {
         let xPos = fragX
         for (const char of frag.text) {

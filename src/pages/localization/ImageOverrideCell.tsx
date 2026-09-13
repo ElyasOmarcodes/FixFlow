@@ -58,7 +58,7 @@ export function ImageOverrideCell({
                 <button type="button" onClick={onUpload} className="text-[10px] text-[#9d90f8] hover:text-white transition">
                   Change
                 </button>
-                <span className="text-[10px] text-[#6b6b7a]">Base image</span>
+                <span className="text-[10px] text-[var(--pd-c-6b6b7a)]">Base image</span>
               </div>
             </div>
           </div>
@@ -71,7 +71,7 @@ export function ImageOverrideCell({
             >
               + Upload
             </button>
-            <span className="text-[10px] text-[#6b6b7a]">Base image</span>
+            <span className="text-[10px] text-[var(--pd-c-6b6b7a)]">Base image</span>
           </div>
         )}
       </div>

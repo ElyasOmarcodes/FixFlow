@@ -158,7 +158,7 @@ function Dot({
         >
           <button
             type="button"
-            className="w-full text-left px-3 py-1.5 text-[11px] text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-left px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
             onClick={() => {
               onReset()
               setMenuOpen(false)
@@ -214,7 +214,7 @@ function FormatOverrideDot({
         >
           <button
             type="button"
-            className="w-full text-left px-3 py-1.5 text-[11px] text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-left px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
             onClick={() => {
               onResetToAuto()
               setMenuOpen(false)
@@ -224,7 +224,7 @@ function FormatOverrideDot({
           </button>
           <button
             type="button"
-            className="w-full text-left px-3 py-1.5 text-[11px] text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-left px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
             onClick={() => {
               onUseAsShared()
               setMenuOpen(false)

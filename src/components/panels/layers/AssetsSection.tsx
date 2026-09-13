@@ -74,7 +74,7 @@ function Chevron({ open }: { open: boolean }) {
       width="10"
       height="10"
       fill="none"
-      className={`shrink-0 text-[#6b6b7a] transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
+      className={`shrink-0 text-[var(--pd-c-6b6b7a)] transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
       aria-hidden="true"
     >
       <path d="M4 2.5 L8 6 L4 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -212,7 +212,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
         key={asset.filename}
         draggable
         onDragStart={(event) => handleAssetDragStart(event, asset.filename)}
-        className="group overflow-hidden rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#111118] transition-colors hover:border-[rgba(124,110,246,0.45)]"
+        className="group overflow-hidden rounded-lg border border-[rgba(255,255,255,0.08)] bg-[var(--pd-c-111118)] transition-colors hover:border-[rgba(124,110,246,0.45)]"
         title={`${asset.filename} — drag to canvas or click to use`}
       >
         <button
@@ -300,7 +300,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
               width="11"
               height="11"
               fill="currentColor"
-              className="shrink-0 text-[#7c6ef6]/70"
+              className="shrink-0 text-[var(--pd-c-7c6ef6)]/70"
               aria-hidden="true"
             >
               <path d="M1 3a1 1 0 0 1 1-1h2.382a1 1 0 0 1 .894.553L5.618 3H10a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3Z" />
@@ -334,7 +334,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
             type="button"
             aria-label={assetsCollapsed ? t('layers.assetsShow') : t('layers.assetsHide')}
             onClick={() => setAssetsCollapsed((value) => !value)}
-            className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b6b7a] hover:text-[#e8e8f0]"
+            className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]"
             title={assetsCollapsed ? t('layers.assetsShow') : t('layers.assetsHide')}
           >
             <Icon name={assetsCollapsed ? 'chevron-right' : 'chevron-down'} size={12} />
@@ -361,7 +361,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
                 type="button"
                 aria-label="Import screenshot files"
                 onClick={() => screenshotsInputRef.current?.click()}
-                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[#b0b0c4] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[#e8e8f0]"
+                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[#b0b0c4] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[var(--pd-c-e8e8f0)]"
                 title="Import screenshot files into the asset library"
               >
                 {t('layers.importFiles')}
@@ -370,7 +370,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
                 type="button"
                 aria-label="Import screenshot folder"
                 onClick={handleImportScreenshotFolder}
-                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[#b0b0c4] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[#e8e8f0]"
+                className="rounded-lg border border-[rgba(255,255,255,0.08)] px-2 py-1.5 text-[10px] text-[#b0b0c4] transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.12)] hover:text-[var(--pd-c-e8e8f0)]"
                 title="Import a screenshots folder when the browser supports it; falls back to file import"
               >
                 {t('layers.importFolder')}
@@ -385,7 +385,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
                 {renderGroups(false, false)}
               </div>
             ) : (
-              <p className="mt-3 rounded-lg border border-dashed border-[rgba(255,255,255,0.08)] px-2 py-3 text-center text-[10px] leading-4 text-[#6b6b7a]">
+              <p className="mt-3 rounded-lg border border-dashed border-[rgba(255,255,255,0.08)] px-2 py-3 text-center text-[10px] leading-4 text-[var(--pd-c-6b6b7a)]">
                 {t('layers.assetsEmpty')}
               </p>
             )}
@@ -396,18 +396,18 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
       {assetsModalOpen && createPortal(
         <div className="pointer-events-none fixed inset-0 z-[1000]">
           <div
-            className="pointer-events-auto absolute bottom-24 left-60 top-14 flex w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#18181f]/96 shadow-2xl backdrop-blur-xl"
+            className="pointer-events-auto absolute bottom-24 left-60 top-14 flex w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[var(--pd-c-18181f)]/96 shadow-2xl backdrop-blur-xl"
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/8 px-4 py-3">
               <div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7c6ef6]">Asset Browser</div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--pd-c-7c6ef6)]">Asset Browser</div>
                 <div className="mt-1 text-xs leading-5 text-[#9b9bad]">Drag to the visible canvas, or click to use with the current selection.</div>
               </div>
               <button
                 type="button"
                 aria-label="Close asset browser"
                 onClick={() => setAssetsModalOpen(false)}
-                className="shrink-0 rounded-full border border-white/10 px-2.5 py-1 text-xs text-[#d7d7e3] hover:border-[#7c6ef6]/50 hover:bg-[#7c6ef6]/10 hover:text-white"
+                className="shrink-0 rounded-full border border-white/10 px-2.5 py-1 text-xs text-[#d7d7e3] hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white"
               >
                 ×
               </button>

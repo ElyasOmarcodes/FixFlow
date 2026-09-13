@@ -50,8 +50,8 @@ export const AI_PROVIDERS: AiProviderConfig[] = [
     placeholder: 'AIza…',
     keyUrl: 'https://aistudio.google.com/app/apikey',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    modelsUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/models',
-    defaultModel: 'gemini-2.0-flash',
+    modelsUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+    defaultModel: '',
   },
   {
     id: 'custom',

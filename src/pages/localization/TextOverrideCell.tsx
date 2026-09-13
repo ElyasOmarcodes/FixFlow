@@ -76,7 +76,7 @@ export function TextOverrideCell({
   if (!isDefaultLocale && (cellStatus === 'translating' || cellStatus === 'queued')) {
     return (
       <div className="min-h-[80px] rounded-xl border border-[rgba(124,110,246,0.3)] bg-[rgba(124,110,246,0.06)] px-4 py-3 flex items-center justify-center gap-2 mb-3">
-        <span className="text-[#7c6ef6] animate-spin text-sm">⟳</span>
+        <span className="text-[var(--pd-c-7c6ef6)] animate-spin text-sm">⟳</span>
         <span className="text-xs text-[#9d90f8]">{cellStatus === 'queued' ? 'Queued…' : 'Translating…'}</span>
       </div>
     )
@@ -112,14 +112,14 @@ export function TextOverrideCell({
           background: isActiveColumn ? 'rgba(124,110,246,0.06)' : 'rgba(255,255,255,0.015)',
         }}
       >
-        <div className="mb-2 text-xs leading-5 text-[#6b6b7a]">
+        <div className="mb-2 text-xs leading-5 text-[var(--pd-c-6b6b7a)]">
           Inherits: {truncate(row.defaultText ?? '', 60)}
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={() => setLocaleContent(row.slideGroupId, row.layerId, locale, { text: '' })}
-            className="rounded-lg border border-[rgba(255,255,255,0.12)] px-2.5 py-1 text-xs text-[#a0a0b0] hover:border-[rgba(255,255,255,0.22)] hover:text-white transition"
+            className="rounded-lg border border-[rgba(255,255,255,0.12)] px-2.5 py-1 text-xs text-[var(--pd-c-a0a0b0)] hover:border-[rgba(255,255,255,0.22)] hover:text-white transition"
           >
             + Manual
           </button>
@@ -191,9 +191,9 @@ export function TextOverrideCell({
 
         {/* Backdrop plate: the row above sits on the real slide background (by design),
             but these controls are UI chrome, not part of the contrast test — keep them legible. */}
-        <div className="mt-2 flex items-center justify-between rounded-md bg-[#18181f]/70 px-1.5 py-1 backdrop-blur-sm">
+        <div className="mt-2 flex items-center justify-between rounded-md bg-[var(--pd-c-18181f)]/70 px-1.5 py-1 backdrop-blur-sm">
           {isDefaultLocale ? (
-            <span className="text-[10px] text-[#6b6b7a]">Base content</span>
+            <span className="text-[10px] text-[var(--pd-c-6b6b7a)]">Base content</span>
           ) : mode === 'auto' && (
             <button
               type="button"

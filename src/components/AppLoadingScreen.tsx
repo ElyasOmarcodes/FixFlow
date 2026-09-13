@@ -23,7 +23,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
       role="status"
       aria-live="polite"
       aria-label="Loading PixelDeck"
-      className={`fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-[#0f0f13] transition-opacity duration-200 ease-out ${
+      className={`fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-[var(--pd-c-0f0f13)] transition-opacity duration-200 ease-out ${
         visible ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
     >
@@ -74,7 +74,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
             <rect x="19.5" y="12" width="6" height="1.5" rx="0.75" fill="white" fillOpacity="0.35" />
             <rect x="19.5" y="16" width="8" height="8" rx="1.5" fill="white" fillOpacity="0.15" />
           </svg>
-          <span className="text-[24px] font-semibold tracking-[-0.045em] text-[#f0eff8]">
+          <span className="text-[24px] font-semibold tracking-[-0.045em] text-[var(--pd-c-f0eff8)]">
             Pixel<span className="text-[#9b8fff]">Deck</span>
           </span>
         </div>

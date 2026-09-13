@@ -271,7 +271,7 @@ export function LayersPanel() {
 
   // ── Insert toolbar ───────────────────────────────────────────────────────────
 
-  const panelBg = '#18181f'
+  const panelBg = 'var(--pd-panel)'
   const borderColor = 'rgba(255,255,255,0.06)'
   const handleInsertToolClick = (key: string) => {
     if (key === 'phone') addPhone()
@@ -300,13 +300,13 @@ export function LayersPanel() {
       {/* Insert toolbar */}
       <div className="px-3 pt-3 pb-2 shrink-0 border-b" style={{ borderColor }}>
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b6b7a]">{t('layers.insert')}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pd-c-6b6b7a)]">{t('layers.insert')}</span>
         </div>
 
         {selectedLayerIds.length > 0 && (
           <div className="mb-2 flex items-center justify-between rounded-md bg-[rgba(124,110,246,0.12)] border border-[rgba(124,110,246,0.3)] px-2 py-1">
             <span className="text-[10px] text-[#a89cf6]">{t('layers.selected', { count: selectedLayerIds.length })}</span>
-            <button onClick={() => clearMultiSelection()} className="text-[10px] text-[#a89cf6] hover:text-[#e8e8f0] transition-colors">{t('layers.clearSelection')}</button>
+            <button onClick={() => clearMultiSelection()} className="text-[10px] text-[#a89cf6] hover:text-[var(--pd-c-e8e8f0)] transition-colors">{t('layers.clearSelection')}</button>
           </div>
         )}
 
@@ -319,7 +319,7 @@ export function LayersPanel() {
               style={{ borderColor: 'rgba(255,255,255,0.08)' }}
               title={`Add ${tool.label}`}
             >
-              <span className="flex h-6 items-center justify-center text-[#e8e8f0]"><Icon name={tool.icon} size={17} /></span>
+              <span className="flex h-6 items-center justify-center text-[var(--pd-c-e8e8f0)]"><Icon name={tool.icon} size={17} /></span>
               <span className="text-[10px] leading-none text-[#b0b0c4]">{tool.label}</span>
             </button>
           ))}
@@ -336,14 +336,14 @@ export function LayersPanel() {
 
         <div className="mt-3 h-px w-full bg-[rgba(255,255,255,0.06)]" />
         <div className="pt-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b6b7a]">{t('layers.title')}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pd-c-6b6b7a)]">{t('layers.title')}</span>
         </div>
       </div>
 
       {/* Layer list */}
       <div className="flex-1 overflow-y-auto">
         {layers.length === 0 && (
-          <p className="text-xs text-[#6b6b7a] px-3 py-4 text-center">{t('layers.empty')}</p>
+          <p className="text-xs text-[var(--pd-c-6b6b7a)] px-3 py-4 text-center">{t('layers.empty')}</p>
         )}
 
         <DndContext
@@ -408,7 +408,7 @@ export function LayersPanel() {
           <div
             className={`relative flex items-center gap-1 px-2 py-1.5 border-l-2 transition-colors ${
               selection?.layerId === backgroundLayer.id
-                ? 'bg-[rgba(124,110,246,0.15)] border-[#7c6ef6]'
+                ? 'bg-[rgba(124,110,246,0.15)] border-[var(--pd-c-7c6ef6)]'
                 : 'border-transparent hover:bg-[rgba(255,255,255,0.04)]'
             }`}
             onClick={() => select(backgroundLayer.id)}

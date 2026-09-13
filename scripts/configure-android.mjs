@@ -19,4 +19,7 @@ const manifestPath = `${base}/AndroidManifest.xml`
 let manifest = await readFile(manifestPath, 'utf8')
 manifest = manifest.replace(/ android:usesCleartextTraffic="[^"]*"/g, '')
 manifest = manifest.replace('<application', '<application android:usesCleartextTraffic="false"')
+if (!manifest.includes('android.permission.INTERNET')) {
+  manifest = manifest.replace('<application', '<uses-permission android:name="android.permission.INTERNET" /><application')
+}
 await writeFile(manifestPath, manifest)

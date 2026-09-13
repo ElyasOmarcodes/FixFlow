@@ -9,8 +9,8 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { Icon } from '@/components/ui/Icon'
 
 const inputCls =
-  'bg-[#0f0f13] border border-[rgba(255,255,255,0.1)] rounded px-2 py-1 text-sm text-[#e8e8f0] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
-const labelCls = 'text-[11px] text-[#6b6b7a] mb-1 block uppercase tracking-[0.08em]'
+  'bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
+const labelCls = 'text-[11px] text-[var(--pd-c-6b6b7a)] mb-1 block uppercase tracking-[0.08em]'
 const rowCls = 'flex gap-2 mb-3'
 const fieldCls = 'flex-1 min-w-0'
 
@@ -173,7 +173,7 @@ export function ColorField({
             onClick={() => onChange(toBrandToken(bc.id))}
             className={`w-5 h-5 rounded-full border-2 transition-all ${
               activeBrand?.id === bc.id
-                ? 'border-[#7c6ef6] scale-110'
+                ? 'border-[var(--pd-c-7c6ef6)] scale-110'
                 : 'border-[rgba(255,255,255,0.2)] hover:border-[rgba(255,255,255,0.5)]'
             }`}
             style={{ background: bc.value }}
@@ -184,7 +184,7 @@ export function ColorField({
             type="button"
             title="Clear brand binding"
             onClick={() => onChange(safeValue)}
-            className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.4)] text-[#9d90f8] hover:text-white hover:border-[#7c6ef6] transition-colors"
+            className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.4)] text-[#9d90f8] hover:text-white hover:border-[var(--pd-c-7c6ef6)] transition-colors"
           >
             <Icon name="close" size={10} strokeWidth={2.4} /> {activeBrand.name}
           </button>
@@ -258,7 +258,7 @@ const GRADIENT_PRESETS: Array<{ label: string; fill: LinearGradient }> = [
 const SOLID_PRESETS: Array<{ label: string; color: string }> = [
   // Neutrals
   { label: 'Black',       color: '#000000' },
-  { label: 'Near Black',  color: '#0f0f13' },
+  { label: 'Near Black',  color: 'var(--pd-c-0f0f13)' },
   { label: 'Dark Gray',   color: '#1c1c2e' },
   { label: 'Gray',        color: '#6b7280' },
   { label: 'Light Gray',  color: '#d1d5db' },
@@ -288,7 +288,7 @@ function AddBrandColorButton({ currentColor }: { currentColor: string }) {
         type="button"
         title="Save as brand color"
         onClick={() => { setAdding(true); setName('') }}
-        className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-dashed border-[rgba(255,255,255,0.2)] text-[#6b6b7a] hover:text-[#e8e8f0] hover:border-[rgba(255,255,255,0.4)] transition-colors"
+        className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-dashed border-[rgba(255,255,255,0.2)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.4)] transition-colors"
       >
         <Icon name="plus" size={10} strokeWidth={2.4} /> Brand
       </button>
@@ -310,14 +310,14 @@ function AddBrandColorButton({ currentColor }: { currentColor: string }) {
           e.stopPropagation()
         }}
         placeholder="Name…"
-        className="w-20 rounded border border-[rgba(124,110,246,0.5)] bg-[#0f0f13] px-1.5 py-0.5 text-[10px] text-[#e8e8f0] outline-none"
+        className="w-20 rounded border border-[rgba(124,110,246,0.5)] bg-[var(--pd-c-0f0f13)] px-1.5 py-0.5 text-[10px] text-[var(--pd-c-e8e8f0)] outline-none"
       />
       <button
         type="button"
         onClick={() => { if (name.trim()) { addBrandColor(name.trim(), currentColor); setAdding(false) } }}
         disabled={!name.trim()}
         aria-label="Save brand color"
-        className="flex items-center px-1.5 py-1 rounded bg-[#7c6ef6] text-white disabled:opacity-40"
+        className="flex items-center px-1.5 py-1 rounded bg-[var(--pd-c-7c6ef6)] text-white disabled:opacity-40"
       >
         <Icon name="check" size={11} strokeWidth={2.6} />
       </button>
@@ -325,7 +325,7 @@ function AddBrandColorButton({ currentColor }: { currentColor: string }) {
         type="button"
         onClick={() => setAdding(false)}
         aria-label="Cancel"
-        className="flex items-center text-[#6b6b7a] hover:text-[#e8e8f0]"
+        className="flex items-center text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]"
       >
         <Icon name="close" size={12} strokeWidth={2.2} />
       </button>
@@ -444,8 +444,8 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
         onChange={switchMode}
         className="grid grid-cols-3 gap-1 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#121219] p-1"
         optionClassName="rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors"
-        activeClassName="bg-[#7c6ef6] text-white shadow-[0_8px_24px_rgba(124,110,246,0.35)]"
-        inactiveClassName="text-[#6b6b7a] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#e8e8f0]"
+        activeClassName="bg-[var(--pd-c-7c6ef6)] text-white shadow-[0_8px_24px_rgba(124,110,246,0.35)]"
+        inactiveClassName="text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]"
       />
 
       {/* ── Swatches tray (all modes) ── */}
@@ -469,7 +469,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                         title={bc.name}
                         onClick={() => onChange(toBrandToken(bc.id))}
                         className={`w-5 h-5 rounded-full border-2 transition-all ${
-                          isActive ? 'border-[#7c6ef6] scale-110' : 'border-[rgba(255,255,255,0.2)] hover:border-[rgba(255,255,255,0.5)]'
+                          isActive ? 'border-[var(--pd-c-7c6ef6)] scale-110' : 'border-[rgba(255,255,255,0.2)] hover:border-[rgba(255,255,255,0.5)]'
                         }`}
                         style={{ background: resolveBrandColor(bc.value, brandColors) }}
                       />
@@ -519,7 +519,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 if (typeof fill === 'string') return
                 updateProject({ savedGradients: [...savedGradients, fill] })
               }}
-              className="text-[10px] text-[#7c6ef6] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
+              className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
             >
               + Save
             </button>
@@ -540,7 +540,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
           {/* Saved gradients (non-string only — strings live in Swatches tray) */}
           {savedGradients.filter((g) => typeof g !== 'string').length > 0 && (
             <div className="mt-2">
-              <span className="text-[10px] text-[#4a4a5a] uppercase tracking-wider">Custom</span>
+              <span className="text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider">Custom</span>
             </div>
           )}
           {savedGradients.filter((g) => typeof g !== 'string').length > 0 && (
@@ -602,7 +602,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 if (savedGradients.includes(fill)) return
                 updateProject({ savedGradients: [...savedGradients, fill] })
               }}
-              className="text-[10px] text-[#7c6ef6] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
+              className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
             >
               + Save color
             </button>
@@ -611,11 +611,11 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
       ) : gradient && selectedStop ? (
         <>
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-[#6b6b7a] uppercase tracking-[0.08em]">Stops</span>
+            <span className="text-[11px] text-[var(--pd-c-6b6b7a)] uppercase tracking-[0.08em]">Stops</span>
             <button
               type="button"
               onClick={addStop}
-              className="text-[11px] text-[#7c6ef6] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
+              className="text-[11px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
             >
               + Add stop
             </button>
@@ -692,7 +692,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
               <div>
                 <div className="mb-1 flex items-center justify-between">
                   <label className={labelCls + ' !mb-0'}>Position</label>
-                  <span className="text-xs text-[#e8e8f0]">{Math.round(selectedStop.offset * 100)}%</span>
+                  <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(selectedStop.offset * 100)}%</span>
                 </div>
                 <input
                   type="range"
@@ -705,7 +705,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                   }}
                   onMouseDown={onInteractionStart}
                   onMouseUp={onInteractionEnd}
-                  className="w-full accent-[#7c6ef6]"
+                  className="w-full accent-[var(--pd-c-7c6ef6)]"
                 />
               </div>
             )}
@@ -729,13 +729,13 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
             <div>
               <div className="mb-1 flex items-center justify-between">
                 <label className={labelCls + ' !mb-0'}>Angle</label>
-                <span className="text-xs text-[#e8e8f0]">{Math.round(gradient.angle)}°</span>
+                <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.angle)}°</span>
               </div>
               <input
                 type="range" min={0} max={360} value={gradient.angle}
                 onChange={(e) => commitGradient({ ...gradient, angle: Number(e.target.value) })}
                 onMouseDown={onInteractionStart} onMouseUp={onInteractionEnd}
-                className="w-full accent-[#7c6ef6]"
+                className="w-full accent-[var(--pd-c-7c6ef6)]"
               />
             </div>
           )}
@@ -746,33 +746,33 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 <div className={fieldCls}>
                   <div className="mb-1 flex items-center justify-between">
                     <label className={labelCls + ' !mb-0'}>Center X</label>
-                    <span className="text-xs text-[#e8e8f0]">{Math.round(gradient.cx * 100)}%</span>
+                    <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.cx * 100)}%</span>
                   </div>
                   <input type="range" min={0} max={100} value={Math.round(gradient.cx * 100)}
                     onChange={(e) => commitGradient({ ...gradient, cx: Number(e.target.value) / 100 })}
                     onMouseDown={onInteractionStart} onMouseUp={onInteractionEnd}
-                    className="w-full accent-[#7c6ef6]" />
+                    className="w-full accent-[var(--pd-c-7c6ef6)]" />
                 </div>
                 <div className={fieldCls}>
                   <div className="mb-1 flex items-center justify-between">
                     <label className={labelCls + ' !mb-0'}>Center Y</label>
-                    <span className="text-xs text-[#e8e8f0]">{Math.round(gradient.cy * 100)}%</span>
+                    <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.cy * 100)}%</span>
                   </div>
                   <input type="range" min={0} max={100} value={Math.round(gradient.cy * 100)}
                     onChange={(e) => commitGradient({ ...gradient, cy: Number(e.target.value) / 100 })}
                     onMouseDown={onInteractionStart} onMouseUp={onInteractionEnd}
-                    className="w-full accent-[#7c6ef6]" />
+                    className="w-full accent-[var(--pd-c-7c6ef6)]" />
                 </div>
               </div>
               <div>
                 <div className="mb-1 flex items-center justify-between">
                   <label className={labelCls + ' !mb-0'}>Radius</label>
-                  <span className="text-xs text-[#e8e8f0]">{Math.round(gradient.radius * 100)}%</span>
+                  <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.radius * 100)}%</span>
                 </div>
                 <input type="range" min={0} max={200} value={Math.round(gradient.radius * 100)}
                   onChange={(e) => commitGradient({ ...gradient, radius: Number(e.target.value) / 100 })}
                   onMouseDown={onInteractionStart} onMouseUp={onInteractionEnd}
-                  className="w-full accent-[#7c6ef6]" />
+                  className="w-full accent-[var(--pd-c-7c6ef6)]" />
               </div>
             </div>
           )}
@@ -823,10 +823,10 @@ export function SliderField({
     <div className={`mb-3 ${className}`}>
       <div className="mb-1 flex items-center justify-between">
         <div className="flex items-center">
-          <label className="text-[11px] text-[#6b6b7a] uppercase tracking-[0.08em]">{label}</label>
+          <label className="text-[11px] text-[var(--pd-c-6b6b7a)] uppercase tracking-[0.08em]">{label}</label>
           {labelAddon}
         </div>
-        <span className="text-xs text-[#e8e8f0]">{display}{unit}</span>
+        <span className="text-xs text-[var(--pd-c-e8e8f0)]">{display}{unit}</span>
       </div>
       <div className="flex items-center gap-2">
         <input
@@ -838,7 +838,7 @@ export function SliderField({
           onChange={(e) => onChange(Number(e.target.value))}
           onMouseDown={onInteractionStart}
           onMouseUp={onInteractionEnd}
-          className="flex-1 min-w-0 accent-[#7c6ef6]"
+          className="flex-1 min-w-0 accent-[var(--pd-c-7c6ef6)]"
         />
         <input
           type="number"
@@ -848,7 +848,7 @@ export function SliderField({
             const v = Number(e.target.value)
             if (!isNaN(v)) onChange(v)
           }}
-          className="w-14 shrink-0 bg-[#0f0f13] border border-[rgba(255,255,255,0.1)] rounded px-1.5 py-1 text-xs text-[#e8e8f0] text-right focus:outline-none focus:border-[rgba(124,110,246,0.5)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-14 shrink-0 bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-1.5 py-1 text-xs text-[var(--pd-c-e8e8f0)] text-right focus:outline-none focus:border-[rgba(124,110,246,0.5)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
     </div>

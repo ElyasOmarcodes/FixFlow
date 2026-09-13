@@ -113,7 +113,7 @@ function AlignmentSection({
     }
   }
 
-  const btnCls = 'flex items-center justify-center rounded border border-[rgba(255,255,255,0.1)] p-1.5 text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[#e8e8f0] hover:bg-[rgba(255,255,255,0.04)] transition-colors'
+  const btnCls = 'flex items-center justify-center rounded border border-[rgba(255,255,255,0.1)] p-1.5 text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.04)] transition-colors'
 
   // SVG icons for alignment axes
   const icons: Record<AlignAxis, React.ReactNode> = {
@@ -236,7 +236,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
                 onClick={() => upd({ visible: !layer.visible })}
                 className={`h-[30px] w-[30px] flex items-center justify-center rounded border text-sm transition-colors ${
                   layer.visible
-                    ? 'border-[rgba(255,255,255,0.12)] text-[#e8e8f0]'
+                    ? 'border-[rgba(255,255,255,0.12)] text-[var(--pd-c-e8e8f0)]'
                     : 'border-[rgba(255,255,255,0.06)] text-[#3a3a4a]'
                 } hover:border-[rgba(255,255,255,0.22)]`}
               >
@@ -248,8 +248,8 @@ function LayoutTab({ layer }: { layer: Layer }) {
                 onClick={() => upd({ locked: !layer.locked })}
                 className={`h-[30px] w-[30px] flex items-center justify-center rounded border text-xs transition-colors ${
                   layer.locked
-                    ? 'border-[#7c6ef6] text-[#7c6ef6] bg-[rgba(124,110,246,0.1)]'
-                    : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a]'
+                    ? 'border-[var(--pd-c-7c6ef6)] text-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.1)]'
+                    : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)]'
                 } hover:border-[rgba(255,255,255,0.22)]`}
               >
                 <Icon name={layer.locked ? 'lock' : 'unlock'} size={13} />
@@ -275,7 +275,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
                   onClick={() => setLayerFormatVisibility(layer.id, fmtId, isVisible ? false : undefined)}
                   className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
                     isVisible
-                      ? 'border-[rgba(255,255,255,0.15)] text-[#e8e8f0] bg-[rgba(255,255,255,0.06)]'
+                      ? 'border-[rgba(255,255,255,0.15)] text-[var(--pd-c-e8e8f0)] bg-[rgba(255,255,255,0.06)]'
                       : 'border-[rgba(255,255,255,0.06)] text-[#555665] line-through'
                   }`}
                 >
@@ -284,7 +284,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
               )
             })}
           </div>
-          <p className="mt-1.5 text-[10px] text-[#6b6b7a]">Click to hide/show this layer in a format</p>
+          <p className="mt-1.5 text-[10px] text-[var(--pd-c-6b6b7a)]">Click to hide/show this layer in a format</p>
         </div>
       )}
 
@@ -312,8 +312,8 @@ function LayoutTab({ layer }: { layer: Layer }) {
                       onClick={() => upd({ height: undefined } as Partial<Layer>)}
                       className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
                         (layer as TextLayer).height == null
-                          ? 'border-[#7c6ef6] text-[#9d90f8] bg-[rgba(124,110,246,0.12)] cursor-default'
-                          : 'border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:text-[#e8e8f0]'
+                          ? 'border-[var(--pd-c-7c6ef6)] text-[#9d90f8] bg-[rgba(124,110,246,0.12)] cursor-default'
+                          : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                       }`}
                     >
                       <span className="flex items-center gap-1">
@@ -407,8 +407,8 @@ function StyleTab({ layer }: { layer: Layer }) {
 function ContentTab({ layer }: { layer: Layer }) {
   if (layer.type === 'background') return (
     <div className={panelSectionCls}>
-      <p className="text-sm text-[#e8e8f0]">Background</p>
-      <p className="mt-1 text-xs text-[#6b6b7a]">The background layer is always at the bottom. Edit its fill, presets, and accent bubbles in the Style tab.</p>
+      <p className="text-sm text-[var(--pd-c-e8e8f0)]">Background</p>
+      <p className="mt-1 text-xs text-[var(--pd-c-6b6b7a)]">The background layer is always at the bottom. Edit its fill, presets, and accent bubbles in the Style tab.</p>
     </div>
   )
   if (layer.type === 'phone') return <PhoneProperties layer={layer as PhoneLayer} />
@@ -418,7 +418,7 @@ function ContentTab({ layer }: { layer: Layer }) {
   if (layer.type === 'brand') return <BrandProperties layer={layer as BrandLayer} />
   if (layer.type === 'shape') return <ShapeProperties layer={layer as ShapeLayer} />
   if (layer.type === 'group') return <GroupProperties layer={layer as GroupLayer} />
-  return <div className={panelSectionCls}><p className="text-xs text-[#6b6b7a]">Unknown layer type</p></div>
+  return <div className={panelSectionCls}><p className="text-xs text-[var(--pd-c-6b6b7a)]">Unknown layer type</p></div>
 }
 
 // ─── PropertiesPanel shell ────────────────────────────────────────────────────
@@ -543,17 +543,17 @@ export function PropertiesPanel() {
   const borderColor = 'rgba(255,255,255,0.06)'
 
   return (
-    <aside data-properties-panel className="h-full w-64 shrink-0 flex flex-col overflow-hidden min-[1440px]:w-72" style={{ background: '#18181f', borderLeft: `1px solid ${borderColor}` }}>
+    <aside data-properties-panel className="h-full w-64 shrink-0 flex flex-col overflow-hidden min-[1440px]:w-72" style={{ background: 'var(--pd-c-18181f)', borderLeft: `1px solid ${borderColor}` }}>
       <div className="shrink-0 border-b px-3 py-2" style={{ borderColor }}>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6b6b7a]">{t('props.title')}</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--pd-c-6b6b7a)]">{t('props.title')}</span>
           {selectedLayer && (
             <div className="flex gap-1">
               <button
                 type="button"
                 title="Copy style (Ctrl+Alt+C)"
                 onClick={() => copyLayerStyle(selectedLayer!.id)}
-                className="text-[10px] px-2 py-1 rounded border border-[rgba(255,255,255,0.1)] text-[#6b6b7a] hover:text-[#e8e8f0] hover:border-[rgba(255,255,255,0.2)] transition-colors"
+                className="text-[10px] px-2 py-1 rounded border border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.2)] transition-colors"
               >
                 {t('props.copyStyle')}
               </button>
@@ -571,7 +571,7 @@ export function PropertiesPanel() {
                   disabled={styleClipboard.layerType !== selectedLayer.type}
                   className={`text-[10px] px-2 py-1 rounded border transition-colors ${
                     styleClipboard.layerType === selectedLayer.type
-                      ? 'border-[rgba(124,110,246,0.4)] text-[#9d90f8] hover:text-white hover:border-[#7c6ef6] hover:bg-[rgba(124,110,246,0.15)]'
+                      ? 'border-[rgba(124,110,246,0.4)] text-[#9d90f8] hover:text-white hover:border-[var(--pd-c-7c6ef6)] hover:bg-[rgba(124,110,246,0.15)]'
                       : 'border-[rgba(255,255,255,0.06)] text-[#3a3a4a] cursor-not-allowed'
                   }`}
                 >
@@ -593,7 +593,7 @@ export function PropertiesPanel() {
                 key={value}
                 type="button"
                 onClick={() => setActiveTab(value)}
-                className={`h-7 border-b-2 text-[11px] font-medium transition-colors ${activeTab === value ? 'border-[#7c6ef6] text-white' : 'border-transparent text-[#6b6b7a] hover:text-[#e8e8f0]'}`}
+                className={`h-7 border-b-2 text-[11px] font-medium transition-colors ${activeTab === value ? 'border-[var(--pd-c-7c6ef6)] text-white' : 'border-transparent text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'}`}
               >
                 {label}
               </button>
@@ -669,7 +669,7 @@ export function PropertiesPanel() {
 
             {isBackgroundSelected ? (
               <div className={panelSectionCls}>
-                <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#6b6b7a]">Background</div>
+                <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--pd-c-6b6b7a)]">Background</div>
                 <BackgroundProperties layer={selectedLayer as BackgroundLayer} />
               </div>
             ) : (

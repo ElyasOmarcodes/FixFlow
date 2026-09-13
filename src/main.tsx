@@ -1,3 +1,4 @@
+import '@fontsource-variable/vazirmatn'
 import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -33,6 +34,8 @@ const ExportApp = lazy(() =>
 )
 
 async function mount(): Promise<void> {
+  // Bundled Arabic-script face: deterministic shaping even on first offline launch.
+  await document.fonts.load('400 16px "Vazirmatn Variable"', 'پښتو فارسی').catch(() => {})
   if (!isExportMode) {
     let bootstrapTimer: ReturnType<typeof setTimeout> | undefined
     try {

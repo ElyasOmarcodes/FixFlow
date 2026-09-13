@@ -59,7 +59,7 @@ function LanguageCombobox({
             if (e.key === 'Enter' && filtered.length === 0 && customCodeValid) handleSelect(customCodeValid)
           }}
           placeholder="Search language or type code…"
-          className="w-full rounded-lg border border-white/10 bg-[#0f0f13] px-3 py-2 text-sm text-white outline-none placeholder:text-[#6b6b7a] focus:border-[#7c6ef6]"
+          className="w-full rounded-lg border border-white/10 bg-[var(--pd-c-0f0f13)] px-3 py-2 text-sm text-white outline-none placeholder:text-[var(--pd-c-6b6b7a)] focus:border-[var(--pd-c-7c6ef6)]"
         />
       </div>
       <div className="max-h-56 overflow-y-auto py-1">
@@ -74,14 +74,14 @@ function LanguageCombobox({
               onClick={() => handleSelect(lang.code)}
               className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm transition ${
                 disabled
-                  ? 'cursor-default text-[#4a4a5a]'
+                  ? 'cursor-default text-[var(--pd-c-4a4a5a)]'
                   : already
-                    ? 'text-[#d9d9e6] hover:bg-[#7c6ef6]/10 hover:text-white'
+                    ? 'text-[#d9d9e6] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white'
                   : 'text-[#d9d9e6] hover:bg-white/6 hover:text-white'
               }`}
             >
               <span>{lang.name}</span>
-              <span className={`text-xs font-mono ${disabled ? 'text-[#3a3a4a]' : already ? 'text-[#9d90f8]' : 'text-[#6b6b7a]'}`}>
+              <span className={`text-xs font-mono ${disabled ? 'text-[#3a3a4a]' : already ? 'text-[#9d90f8]' : 'text-[var(--pd-c-6b6b7a)]'}`}>
                 <span className="flex items-center gap-1">{already && <Icon name="check" size={10} strokeWidth={2.4} />}{lang.code}</span>
               </span>
             </button>
@@ -91,14 +91,14 @@ function LanguageCombobox({
           <button
             type="button"
             onClick={() => handleSelect(customCodeValid)}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#9d90f8] hover:bg-[#7c6ef6]/10 hover:text-white transition"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#9d90f8] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white transition"
           >
-            <span className="text-[#7c6ef6]"><Icon name="plus" size={12} strokeWidth={2.4} /></span>
+            <span className="text-[var(--pd-c-7c6ef6)]"><Icon name="plus" size={12} strokeWidth={2.4} /></span>
             Use custom code: <span className="font-mono">{customCodeValid}</span>
           </button>
         )}
         {filtered.length === 0 && !customCodeValid && (
-          <div className="px-3 py-4 text-center text-xs text-[#6b6b7a]">
+          <div className="px-3 py-4 text-center text-xs text-[var(--pd-c-6b6b7a)]">
             No languages found. Type a valid locale code (e.g. <span className="font-mono">xx</span> or <span className="font-mono">xx-yy</span>).
           </div>
         )}
@@ -107,7 +107,7 @@ function LanguageCombobox({
         <button
           type="button"
           onClick={onCancel}
-          className="w-full rounded-lg px-3 py-1.5 text-xs text-[#6b6b7a] hover:text-white transition"
+          className="w-full rounded-lg px-3 py-1.5 text-xs text-[var(--pd-c-6b6b7a)] hover:text-white transition"
         >
           Cancel
         </button>
@@ -186,7 +186,7 @@ export function LanguagePopover({
           onCancel={onCancel}
         />
         {note && (
-          <div className="mt-2 w-72 rounded-xl border border-white/8 bg-[#111118] px-3 py-2 text-[10px] leading-relaxed text-[#7f8094] shadow-xl">
+          <div className="mt-2 w-72 rounded-xl border border-white/8 bg-[var(--pd-c-111118)] px-3 py-2 text-[10px] leading-relaxed text-[#7f8094] shadow-xl">
             {note}
           </div>
         )}

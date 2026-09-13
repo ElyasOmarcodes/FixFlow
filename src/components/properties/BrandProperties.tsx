@@ -28,7 +28,7 @@ export function BrandProperties({ layer }: { layer: BrandLayer }) {
       <div className={panelSectionCls}>
         <label className={labelCls}>Logo</label>
         <div className="flex items-center gap-3">
-          {layer.logoDataUrl && <img src={layer.logoDataUrl} alt="Logo" className="h-10 w-10 rounded-lg object-contain bg-[#0f0f13]" />}
+          {layer.logoDataUrl && <img src={layer.logoDataUrl} alt="Logo" className="h-10 w-10 rounded-lg object-contain bg-[var(--pd-c-0f0f13)]" />}
           <FileUploadButton
             accept="image/*"
             className={subtleButtonCls}

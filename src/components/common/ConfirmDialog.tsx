@@ -70,10 +70,10 @@ export function ConfirmDialog({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 id="confirm-dialog-title" style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 600, color: '#e8e8f0' }}>
+        <h3 id="confirm-dialog-title" style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 600, color: 'var(--pd-c-e8e8f0)' }}>
           {title}
         </h3>
-        <p id="confirm-dialog-message" style={{ margin: '0 0 20px', fontSize: 13, color: '#a0a0b0', lineHeight: 1.5 }}>
+        <p id="confirm-dialog-message" style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--pd-c-a0a0b0)', lineHeight: 1.5 }}>
           {message}
         </p>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
@@ -85,7 +85,7 @@ export function ConfirmDialog({
               background: 'none',
               border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: 6,
-              color: '#a0a0b0',
+              color: 'var(--pd-c-a0a0b0)',
               cursor: 'pointer',
               fontSize: 12,
               fontWeight: 600,

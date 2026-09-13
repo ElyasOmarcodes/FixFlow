@@ -1,3 +1,4 @@
+import { textDirection } from '@/utils/textDirection'
 import { useEffect, useRef, useMemo } from 'react'
 import { Text, Image as KonvaImage } from 'react-konva'
 import type Konva from 'konva'
@@ -178,7 +179,7 @@ export function TextNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
   })
 
   // ── Double-click → in-canvas WYSIWYG editor (overlay mounted by StageCanvas)
-  const handleDblClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleDblClick = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     if (layer.locked) return
     const { activeLocale, project, startTextEdit } = useEditorStore.getState()
     if (activeLocale !== project.settings.defaultLocale) return
@@ -213,6 +214,7 @@ export function TextNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
         {...shadowProps}
         {...richInteractionProps}
         onDblClick={handleDblClick}
+        onDblTap={handleDblClick}
         onTransformStart={() => {
           const node = imageRef.current
           if (!node) return
@@ -278,10 +280,11 @@ export function TextNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
       offsetX={(layer.width ?? DEFAULT_TEXT_WIDTH) / 2}
       offsetY={estimateTextHeight() / 2}
       text={layer.text}
-      fontFamily={layer.fontFamily}
+      fontFamily={`${layer.fontFamily}, Vazirmatn Variable`}
       fontSize={layer.fontSize}
       fontStyle={fontStyle}
-      letterSpacing={layer.letterSpacing}
+      direction={textDirection(layer.text)}
+      letterSpacing={textDirection(layer.text) === 'rtl' ? 0 : layer.letterSpacing}
       lineHeight={layer.lineHeight}
       align={layer.align}
       width={layer.width}
@@ -333,6 +336,7 @@ export function TextNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
       // layer.x/y are the box top-left; the handler persists node position minus offset.
       onTransformEnd={handlePlainTransformEnd}
       onDblClick={handleDblClick}
+        onDblTap={handleDblClick}
     />
   )
 }

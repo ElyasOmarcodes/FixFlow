@@ -73,7 +73,7 @@ export function SlideGroupSection({
 
   return (
     <section
-      className="overflow-hidden rounded-[24px] border border-white/8 bg-[#18181f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
+      className="overflow-hidden rounded-[24px] border border-white/8 bg-[var(--pd-c-18181f)] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
     >
       {/* Section header */}
       <button
@@ -110,7 +110,7 @@ export function SlideGroupSection({
               className="grid gap-3 pr-6 pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#78798b]"
               style={{ gridTemplateColumns }}
             >
-              <div className="py-2 pl-4 pr-3 sticky left-0 z-10 bg-[#18181f]">Layer</div>
+              <div className="py-2 pl-4 pr-3 sticky left-0 z-10 bg-[var(--pd-c-18181f)]">Layer</div>
               {locales.map((locale) => (
                 <div
                   key={locale}
@@ -121,7 +121,7 @@ export function SlideGroupSection({
                 >
                   <span>{getLanguageName(locale)}</span>
                   <span className="font-mono text-[10px] opacity-60">{locale}</span>
-                  {locale === defaultLocale && <span className="text-[9px] text-[#6b6b7a]">(default)</span>}
+                  {locale === defaultLocale && <span className="text-[9px] text-[var(--pd-c-6b6b7a)]">(default)</span>}
                 </div>
               ))}
             </div>
@@ -143,7 +143,7 @@ export function SlideGroupSection({
                       <div className="flex min-h-[80px] flex-1 flex-col justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 mb-3">
                         <div className="flex items-start gap-3" style={{ paddingLeft: row.depth * 16 }}>
                           <div
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-[#111118] text-sm font-semibold mt-0.5"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-[var(--pd-c-111118)] text-sm font-semibold mt-0.5"
                             style={{ color: row.layerType === 'text' ? '#c9c3ff' : '#d9d9e6' }}
                           >
                             <Icon name={row.layerType === 'text' ? 'text' : row.layerType === 'phone' ? 'phone' : 'image'} size={15} />
@@ -158,7 +158,7 @@ export function SlideGroupSection({
                               {row.layerName}
                             </button>
                             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                              <span className="text-[10px] uppercase tracking-[0.14em] text-[#6b6b7a]">{row.layerType}</span>
+                              <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--pd-c-6b6b7a)]">{row.layerType}</span>
                               {platformBadge && (
                                 <span
                                   className="text-[9px] px-1.5 py-0.5 rounded border font-medium"

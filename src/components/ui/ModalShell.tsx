@@ -45,8 +45,8 @@ export function ModalShell({
   bodyClassName,
   footerClassName,
   backdropStyle = { background: 'rgba(0,0,0,0.65)' },
-  panelStyle = { background: '#18181f', borderColor: 'rgba(255,255,255,0.1)' },
-  closeButtonClassName = 'absolute top-4 right-4 z-10 text-[#6b6b7a] hover:text-[#e8e8f0] transition-colors text-lg w-7 h-7 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)]',
+  panelStyle = { background: 'var(--pd-c-18181f)', borderColor: 'rgba(255,255,255,0.1)' },
+  closeButtonClassName = 'absolute top-4 right-4 z-10 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-colors text-lg w-7 h-7 flex items-center justify-center rounded hover:bg-[rgba(255,255,255,0.06)]',
   closeButtonStyle,
   closeLabel = 'Close modal',
   closeGlyph = <Icon name="close" size={15} />,
@@ -83,7 +83,7 @@ export function ModalShell({
       >
         {header ?? (title !== undefined && (
           <div className={headerClassName}>
-            <h2 className="text-base font-semibold text-[#e8e8f0]">{title}</h2>
+            <h2 className="text-base font-semibold text-[var(--pd-c-e8e8f0)]">{title}</h2>
           </div>
         ))}
         {showCloseButton && (

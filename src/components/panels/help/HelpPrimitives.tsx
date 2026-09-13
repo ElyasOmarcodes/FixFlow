@@ -25,7 +25,7 @@ export function ShortcutTable({ rows }: { rows: ShortcutRow[] }) {
         <tbody>
           {rows.map((row, index) => (
             <tr key={index} className={index % 2 === 0 ? 'bg-[rgba(255,255,255,0.022)]' : 'bg-transparent'}>
-              <td className="w-[46%] border-r border-[rgba(255,255,255,0.045)] px-3 py-2.5 text-[#777786] sm:w-[42%]">
+              <td className="w-[46%] border-r border-[rgba(255,255,255,0.045)] px-3 py-2.5 text-[var(--pd-c-777786)] sm:w-[42%]">
                 <span className="flex flex-wrap items-center gap-1">{row.keys}</span>
               </td>
               <td className="px-3 py-2.5 text-[#b6b6c3]">{row.desc}</td>

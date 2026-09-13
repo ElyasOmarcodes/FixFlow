@@ -109,7 +109,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 6,
-    color: '#e8e8f0',
+    color: 'var(--pd-c-e8e8f0)',
     fontSize: 12,
     padding: '6px 10px',
     outline: 'none',
@@ -125,7 +125,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
       backdropClassName="fixed inset-0 z-[200] flex items-center justify-center"
       backdropStyle={{ background: 'rgba(0,0,0,0.6)' }}
       panelClassName=""
-      panelStyle={{ width: 680, maxHeight: '80vh', background: '#18181f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.6)', overflow: 'hidden' }}
+      panelStyle={{ width: 680, maxHeight: '80vh', background: 'var(--pd-c-18181f)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.6)', overflow: 'hidden' }}
       showCloseButton={false}
       header={<div
           style={{
@@ -145,7 +145,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               flex: 1,
               fontSize: 14,
               fontWeight: 600,
-              color: '#e8e8f0',
+              color: 'var(--pd-c-e8e8f0)',
               letterSpacing: '-0.01em',
             }}
           >
@@ -162,7 +162,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: 6,
-                color: '#a0a0b0',
+                color: 'var(--pd-c-a0a0b0)',
                 cursor: 'pointer',
                 fontSize: 12,
                 fontWeight: 500,
@@ -238,7 +238,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#6b6b7a',
+                color: 'var(--pd-c-6b6b7a)',
                 cursor: 'pointer',
                 fontSize: 18,
                 lineHeight: 1,
@@ -254,7 +254,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
           </div>
         </div>}
       footerClassName=""
-      footer={<div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: '#4a4a5a', textAlign: 'center', flexShrink: 0 }}>Add templates to <code style={{ background: 'rgba(255,255,255,0.04)', padding: '1px 4px', borderRadius: 3 }}>public/templates/</code> to include them in the gallery</div>}
+      footer={<div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: 'var(--pd-c-4a4a5a)', textAlign: 'center', flexShrink: 0 }}>Add templates to <code style={{ background: 'rgba(255,255,255,0.04)', padding: '1px 4px', borderRadius: 3 }}>public/templates/</code> to include them in the gallery</div>}
     >
 
         {/* ── Export panel (inline collapsible) ──────────────── */}
@@ -272,7 +272,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               style={{
                 margin: '0 0 14px',
                 fontSize: 12,
-                color: '#6b6b7a',
+                color: 'var(--pd-c-6b6b7a)',
                 lineHeight: 1.5,
               }}
             >
@@ -283,7 +283,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                   padding: '1px 5px',
                   borderRadius: 3,
                   fontSize: 11,
-                  color: '#a0a0b0',
+                  color: 'var(--pd-c-a0a0b0)',
                 }}
               >
                 .template.json
@@ -424,7 +424,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
           )}
 
           {loading && (
-            <p style={{ textAlign: 'center', color: '#6b6b7a', fontSize: 13, marginTop: 32 }}>
+            <p style={{ textAlign: 'center', color: 'var(--pd-c-6b6b7a)', fontSize: 13, marginTop: 32 }}>
               Loading templates…
             </p>
           )}
@@ -439,12 +439,12 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               style={{
                 textAlign: 'center',
                 padding: '48px 20px',
-                color: '#6b6b7a',
+                color: 'var(--pd-c-6b6b7a)',
                 fontSize: 13,
               }}
             >
               <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center', color: '#4d4d60' }}><Icon name="template" size={34} strokeWidth={1.4} /></div>
-              <p style={{ margin: '0 0 6px', color: '#a0a0b0', fontWeight: 500 }}>
+              <p style={{ margin: '0 0 6px', color: 'var(--pd-c-a0a0b0)', fontWeight: 500 }}>
                 No bundled templates yet
               </p>
               <p style={{ margin: 0, fontSize: 11 }}>
@@ -529,7 +529,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                         )}
                         <div
                           style={{
-                            color: '#e8e8f0',
+                            color: 'var(--pd-c-e8e8f0)',
                             fontSize: 13,
                             fontWeight: 700,
                             textAlign: 'center',
@@ -548,12 +548,12 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                           }}
                         >
                           {entry.slides != null && (
-                            <div style={{ color: '#6b6b7a', fontSize: 10 }}>
+                            <div style={{ color: 'var(--pd-c-6b6b7a)', fontSize: 10 }}>
                               {entry.slides} {entry.slides === 1 ? 'slide' : 'slides'}
                             </div>
                           )}
                           {entry.previewSize && (
-                            <div style={{ color: '#4a4a5a', fontSize: 9, fontFamily: 'monospace' }}>
+                            <div style={{ color: 'var(--pd-c-4a4a5a)', fontSize: 9, fontFamily: 'monospace' }}>
                               {entry.previewSize}
                             </div>
                           )}
@@ -568,7 +568,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                       style={{
                         fontSize: 13,
                         fontWeight: 600,
-                        color: '#e8e8f0',
+                        color: 'var(--pd-c-e8e8f0)',
                         marginBottom: 3,
                       }}
                     >
@@ -578,7 +578,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                       <div
                         style={{
                           fontSize: 11,
-                          color: '#6b6b7a',
+                          color: 'var(--pd-c-6b6b7a)',
                           marginBottom: 8,
                           lineHeight: 1.4,
                         }}
@@ -591,7 +591,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                       onClick={() => handleGalleryApply(entry)}
                       style={{
                         width: '100%',
-                        background: '#7c6ef6',
+                        background: 'var(--pd-c-7c6ef6)',
                         border: 'none',
                         borderRadius: 5,
                         color: '#fff',

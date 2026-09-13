@@ -4,7 +4,7 @@ import { useBrandColors } from '@/hooks/useBrandColors'
 import type { BrandColor } from '@/types'
 import { Icon } from '@/components/ui/Icon'
 
-const inputCls = 'bg-[#0f0f13] border border-[rgba(255,255,255,0.1)] rounded px-2 py-1 text-sm text-[#e8e8f0] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
+const inputCls = 'bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
 
 interface BrandColorListProps {
   /** If true, shows a compact layout suitable for popovers/toolbars */
@@ -35,14 +35,14 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
       {/* Header with Add button */}
       <div className="flex items-center justify-between mb-2">
         {!compact && (
-          <span className={`text-xs font-semibold uppercase tracking-wider text-[#6b6b7a]`}>
+          <span className={`text-xs font-semibold uppercase tracking-wider text-[var(--pd-c-6b6b7a)]`}>
             Brand Colors
           </span>
         )}
         <button
           type="button"
           onClick={() => { setAdding((v) => !v); setEditingId(null) }}
-          className={`flex items-center gap-1 text-xs text-[#7c6ef6] hover:text-[#9d90f8] transition-colors ${compact ? '' : 'ml-auto'}`}
+          className={`flex items-center gap-1 text-xs text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors ${compact ? '' : 'ml-auto'}`}
         >
           <Icon name={adding ? 'close' : 'plus'} size={12} strokeWidth={2.2} />
           {adding ? '' : 'Add'}
@@ -51,7 +51,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
 
       {/* Add form */}
       {adding && (
-        <div className="mb-3 space-y-2 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[#0f0f13] p-2">
+        <div className="mb-3 space-y-2 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-0f0f13)] p-2">
           <input
             type="text"
             value={newName}
@@ -78,7 +78,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
           <button
             type="button"
             onClick={handleAdd}
-            className="w-full text-xs text-[#7c6ef6] border border-[rgba(124,110,246,0.4)] rounded py-1.5 hover:bg-[rgba(124,110,246,0.15)] transition-colors"
+            className="w-full text-xs text-[var(--pd-c-7c6ef6)] border border-[rgba(124,110,246,0.4)] rounded py-1.5 hover:bg-[rgba(124,110,246,0.15)] transition-colors"
           >
             Add Color
           </button>
@@ -87,7 +87,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
 
       {/* Empty state */}
       {brandColors.length === 0 && !adding && (
-        <p className="text-xs text-[#4a4a5a] py-1">
+        <p className="text-xs text-[var(--pd-c-4a4a5a)] py-1">
           No colors yet. Use the Add button to create your first brand color.
         </p>
       )}
@@ -104,19 +104,19 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
                 className="w-5 h-5 rounded-full border border-[rgba(255,255,255,0.2)] shrink-0"
                 style={{ background: bc.value }}
               />
-              <span className="text-xs text-[#e8e8f0] flex-1 truncate">{bc.name}</span>
-              <span className="text-[10px] text-[#4a4a5a] font-mono">{bc.value.toUpperCase()}</span>
+              <span className="text-xs text-[var(--pd-c-e8e8f0)] flex-1 truncate">{bc.name}</span>
+              <span className="text-[10px] text-[var(--pd-c-4a4a5a)] font-mono">{bc.value.toUpperCase()}</span>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); removeBrandColor(bc.id) }}
-                className="text-xs text-[#4a4a5a] hover:text-[#f87171] transition-colors shrink-0 ml-1"
+                className="text-xs text-[var(--pd-c-4a4a5a)] hover:text-[#f87171] transition-colors shrink-0 ml-1"
                 aria-label={`Delete brand color ${bc.name}`}
               >
                 <Icon name="close" size={12} strokeWidth={2.2} />
               </button>
             </div>
             {editingId === bc.id && (
-              <div className="mb-1 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[#0f0f13] p-2 space-y-2">
+              <div className="mb-1 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-0f0f13)] p-2 space-y-2">
                 <input
                   type="text"
                   value={bc.name}

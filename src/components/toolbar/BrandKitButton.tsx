@@ -81,11 +81,11 @@ export function BrandKitButton() {
       {open && (
         <div
           ref={popoverRef}
-          className="absolute top-full left-0 mt-1 z-50 w-72 rounded-xl border border-[rgba(255,255,255,0.1)] bg-[#18181f] shadow-2xl p-3"
+          className="absolute top-full left-0 mt-1 z-50 w-72 rounded-xl border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-18181f)] shadow-2xl p-3"
           style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}
         >
           <div className="mb-2">
-            <p className="text-[11px] text-[#4a4a5a] leading-relaxed">
+            <p className="text-[11px] text-[var(--pd-c-4a4a5a)] leading-relaxed">
               Reusable colors for this project. Apply them in any color field — edit one here and every layer updates automatically.
             </p>
           </div>

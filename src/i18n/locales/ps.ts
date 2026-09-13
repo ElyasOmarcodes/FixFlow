@@ -2,6 +2,34 @@ import type { TranslationKey } from './en'
 
 /** Pashto (پښتو) — right-to-left. */
 export const ps: Record<TranslationKey, string> = {
+  'help.title': 'د PixelDeck لارښود',
+  'help.subtitle': 'ډیزاین، برابرول او اکسپورټ، ګام په ګام.',
+  'help.search': 'برخه ولټوئ…',
+  'help.sections': 'برخې',
+  'help.choose': 'د لارښود برخه وټاکئ',
+  'help.empty': 'برخه ونه موندل شوه',
+  'help.previous': 'مخکینی',
+  'help.next': 'راتلونکی',
+  'help.jump': 'د پرانیستلو لپاره برخه وټاکئ.',
+  'help.start': 'پیل',
+  'help.design': 'ډیزاین',
+  'help.adapt': 'برابرول',
+  'help.deliver': 'خوندي کول',
+
+  'workspace.theme': 'بڼه',
+  'workspace.system': 'د سیستم په شان',
+  'workspace.tools': 'د ډیزاین وسایل',
+  'workspace.fit': 'کینوس برابرول',
+  'workspace.addText': 'متن',
+  'workspace.image': 'انځور',
+  'workspace.shape': 'شکل',
+  'workspace.duplicate': 'کاپي',
+  'workspace.delete': 'ړنګول',
+  'workspace.done': 'بشپړ',
+  'workspace.editText': 'متن بدلول',
+  'workspace.textHint': 'خپل متن دلته ولیکئ. د بڼې بدلولو لپاره کلمې وټاکئ.',
+  'workspace.more': 'نور وسایل',
+
   // ── Generic actions / words reused everywhere ────────────────────────────
   'common.cancel': 'لغوه',
   'common.close': 'بندول',
