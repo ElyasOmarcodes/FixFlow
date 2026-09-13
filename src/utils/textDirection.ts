@@ -7,3 +7,8 @@ export function textDirection(text: string): 'rtl' | 'ltr' {
   }
   return 'ltr'
 }
+
+/** Arabic joining must survive even inside an English-led mixed paragraph. */
+export function hasJoiningScript(text: string): boolean {
+  return /\p{Script=Arabic}/u.test(text)
+}

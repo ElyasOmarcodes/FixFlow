@@ -1,4 +1,4 @@
-import { textDirection } from './textDirection'
+import { hasJoiningScript, textDirection } from './textDirection'
 import type { TextLayer, TextMark, FillValue } from '@/types'
 import { createCanvasGradient } from '@/utils/gradients'
 import { segmentMarks } from '@/utils/richText'
@@ -284,7 +284,7 @@ export function wrapFragmentLines<T extends { text: string }>(
 export function renderSpansToCanvas(layer: TextLayer): HTMLCanvasElement {
   const { fontSize, fontFamily, letterSpacing, lineHeight, align } = layer
   const rtl = textDirection(layer.text) === 'rtl'
-  const spacing = rtl ? 0 : letterSpacing
+  const spacing = hasJoiningScript(layer.text) ? 0 : letterSpacing
   const canvasWidth = Math.max(1, layer.width ?? DEFAULT_TEXT_WIDTH)
   const lineHeightPx = fontSize * lineHeight
 

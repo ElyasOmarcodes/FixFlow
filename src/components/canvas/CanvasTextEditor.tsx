@@ -1,5 +1,5 @@
 import { useT } from '@/i18n'
-import { textDirection } from '@/utils/textDirection'
+import { hasJoiningScript, textDirection } from '@/utils/textDirection'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type Konva from 'konva'
@@ -269,7 +269,7 @@ function CanvasTextEditorBox({
             fontWeight: layer.fontWeight,
             fontStyle: layer.italic ? 'italic' : 'normal',
             lineHeight: String(layer.lineHeight),
-            letterSpacing: textDirection(layer.text) === 'rtl' ? 0 : `${layer.letterSpacing * (mobile ? 24 / layer.fontSize : scale)}px`,
+            letterSpacing: hasJoiningScript(layer.text) ? 0 : `${layer.letterSpacing * (mobile ? 24 / layer.fontSize : scale)}px`,
             textAlign: layer.align,
             textDecoration:
               [layer.underline ? 'underline' : '', layer.strikethrough ? 'line-through' : '']

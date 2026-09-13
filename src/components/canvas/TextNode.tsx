@@ -1,4 +1,4 @@
-import { textDirection } from '@/utils/textDirection'
+import { hasJoiningScript, textDirection } from '@/utils/textDirection'
 import { useEffect, useRef, useMemo } from 'react'
 import { Text, Image as KonvaImage } from 'react-konva'
 import type Konva from 'konva'
@@ -284,7 +284,7 @@ export function TextNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
       fontSize={layer.fontSize}
       fontStyle={fontStyle}
       direction={textDirection(layer.text)}
-      letterSpacing={textDirection(layer.text) === 'rtl' ? 0 : layer.letterSpacing}
+      letterSpacing={hasJoiningScript(layer.text) ? 0 : layer.letterSpacing}
       lineHeight={layer.lineHeight}
       align={layer.align}
       width={layer.width}
