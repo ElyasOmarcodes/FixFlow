@@ -625,3 +625,12 @@ button { touch-action: manipulation; }
 .pd-layer-footer > button { height: 58px; align-content: center; gap: 5px; padding: 4px 2px; }
 .pd-layer-footer > button span { font-size: 10px; line-height: 1.2; max-width: 100%; }
 .pd-settings-content input[type=range] { min-width: 0; }
+/* Keep small settings descriptions readable on handheld screens in both themes. */
+@media (max-width: 1023px) {
+  .pd-settings { --pd-c-6b6b7a: #a5a5b5; --pd-c-4a4a5a: #a5a5b5; }
+  :root[data-theme='light'] .pd-settings { --pd-c-6b6b7a: #536078; --pd-c-4a4a5a: #536078; }
+  .pd-settings-content p, .pd-settings-content label { font-size: 13px; line-height: 1.7; letter-spacing: normal; }
+  .pd-settings-content h3 { font-size: 16px; }
+  .pd-settings-content input:not([type=checkbox]):not([type=range]), .pd-settings-content select { font-size: 16px; }
+  .pd-layer-list .text-xs { font-size: 13px; }
+}
