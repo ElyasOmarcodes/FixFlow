@@ -2,7 +2,10 @@ import { Capacitor, registerPlugin } from '@capacitor/core'
 import { isTauri } from '@tauri-apps/api/core'
 
 const NativeFile = registerPlugin<{
-  save(options: { filename: string; mimeType: string; data: string }): Promise<{ cancelled: boolean }>
+  begin(): Promise<{ session: string }>
+  append(options: { session: string; data: string }): Promise<void>
+  finish(options: { session: string; filename: string; mimeType: string }): Promise<{ cancelled: boolean }>
+  cancel(options: { session: string }): Promise<void>
 }>('PixelDeckFile')
 
 export function isNativeApp(): boolean {
@@ -26,14 +29,25 @@ export async function saveFile(blob: Blob, filename: string): Promise<void> {
     return
   }
   if (Capacitor.getPlatform() === 'android') {
-    const data = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(String(reader.result).split(',')[1])
-      reader.onerror = () => reject(reader.error)
-      reader.readAsDataURL(blob)
-    })
-    const result = await NativeFile.save({ filename, mimeType: blob.type || 'application/octet-stream', data })
-    if (result.cancelled) throw new DOMException('Save cancelled', 'AbortError')
+    const { session } = await NativeFile.begin()
+    try {
+      // Bound bridge messages and decoding memory, even for large ZIP archives.
+      const chunkSize = 128 * 1024
+      for (let offset = 0; offset < blob.size; offset += chunkSize) {
+        const data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(String(reader.result).split(',')[1])
+          reader.onerror = () => reject(reader.error)
+          reader.readAsDataURL(blob.slice(offset, offset + chunkSize))
+        })
+        await NativeFile.append({ session, data })
+      }
+      const result = await NativeFile.finish({ session, filename, mimeType: blob.type || 'application/octet-stream' })
+      if (result.cancelled) throw new DOMException('Save cancelled', 'AbortError')
+    } catch (error) {
+      await NativeFile.cancel({ session }).catch(() => undefined)
+      throw error
+    }
     return
   }
   const url = URL.createObjectURL(blob)

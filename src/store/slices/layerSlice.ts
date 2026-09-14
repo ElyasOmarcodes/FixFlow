@@ -179,10 +179,13 @@ export const createLayerSlice = (
   duplicateLayer: (layerId) => {
     const group = getActiveGroup(get)
     if (!group) return
-    const src = group.layers.find((l) => l.id === layerId)
-    if (!src) return
+    const parent = group.layers.find((l) => l.type === 'group' && l.children.some((child) => child.id === layerId)) as GroupLayer | undefined
+    const src = parent?.children.find((child) => child.id === layerId) ?? group.layers.find((l) => l.id === layerId)
+    if (!src || src.type === 'background') return
     const clone: Layer = { ...JSON.parse(JSON.stringify(src)), id: newId(), x: src.x + 20, y: src.y + 20 }
-    get().addLayer(clone)
+    if (clone.type === 'group') clone.children = clone.children.map((child) => ({ ...child, id: newId() }))
+    if (parent) get().addToGroup(parent.id, clone)
+    else get().addLayer(clone)
   },
 
   moveLayerUp: (layerId) => {

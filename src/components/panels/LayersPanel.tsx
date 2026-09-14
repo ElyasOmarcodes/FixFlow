@@ -71,6 +71,9 @@ export function LayersPanel() {
   const activeGroup = project.slideGroups.find((g) => g.id === activeSlideGroupId)
   const layers = activeGroup?.layers ?? []
 
+  const [insertOpen, setInsertOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'layers' | 'assets'>('layers')
+  const [selecting, setSelecting] = useState(false)
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null)
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
@@ -102,22 +105,18 @@ export function LayersPanel() {
   )
 
   useEffect(() => {
+    if (!insertOpen) return
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setInsertOpen(false) }
+    window.addEventListener('keydown', close)
+    return () => window.removeEventListener('keydown', close)
+  }, [insertOpen])
+
+  useEffect(() => {
     if (!contextMenu) return
     const close = () => setContextMenu(null)
     window.addEventListener('click', close)
     return () => window.removeEventListener('click', close)
   }, [contextMenu])
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Delete' && e.key !== 'Backspace') return
-      const tag = (document.activeElement as HTMLElement)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return
-      if (selection?.layerId) removeLayer(selection.layerId)
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selection, removeLayer])
 
   const handleContextMenu = (e: React.MouseEvent, layerId: string) => {
     const layer = layers.find((l) => l.id === layerId)
@@ -274,8 +273,13 @@ export function LayersPanel() {
   const panelBg = 'var(--pd-panel)'
   const borderColor = 'rgba(255,255,255,0.06)'
   const handleInsertToolClick = (key: string) => {
+    setInsertOpen(false)
     if (key === 'phone') addPhone()
-    else if (key === 'text') addText()
+    else if (key === 'text') {
+      addText()
+      const state = useEditorStore.getState()
+      if (state.selection?.layerId) state.startTextEdit(state.selection.layerId)
+    }
     else if (key === 'shape') addShape()
     else if (key === 'emoji') addEmoji()
     else if (key === 'chip') addChipGroup()
@@ -294,54 +298,26 @@ export function LayersPanel() {
 
   return (
     <aside
-      className="h-full w-52 shrink-0 flex flex-col overflow-hidden min-[1440px]:w-56"
+      className="pd-layer-panel h-full w-64 shrink-0 flex flex-col overflow-hidden min-[1440px]:w-72"
       style={{ background: panelBg, borderRight: `1px solid ${borderColor}` }}
     >
-      {/* Insert toolbar */}
-      <div className="px-3 pt-3 pb-2 shrink-0 border-b" style={{ borderColor }}>
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pd-c-6b6b7a)]">{t('layers.insert')}</span>
+      <header className="pd-layer-header">
+        <div role="tablist" aria-label={t('layers.title')}>
+          <button role="tab" aria-selected={activeTab === 'layers'} onClick={() => setActiveTab('layers')}>{t('layers.title')}</button>
+          <button role="tab" aria-selected={activeTab === 'assets'} onClick={() => setActiveTab('assets')}>{t('layerUi.assets')}</button>
         </div>
-
-        {selectedLayerIds.length > 0 && (
-          <div className="mb-2 flex items-center justify-between rounded-md bg-[rgba(124,110,246,0.12)] border border-[rgba(124,110,246,0.3)] px-2 py-1">
-            <span className="text-[10px] text-[#a89cf6]">{t('layers.selected', { count: selectedLayerIds.length })}</span>
-            <button onClick={() => clearMultiSelection()} className="text-[10px] text-[#a89cf6] hover:text-[var(--pd-c-e8e8f0)] transition-colors">{t('layers.clearSelection')}</button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-4 gap-2">
-          {insertTools.map((tool) => (
-            <button
-              key={tool.key}
-              onClick={() => handleInsertToolClick(tool.key)}
-              className="flex flex-col items-center gap-1.5 rounded-xl border px-1 py-2 text-center transition-colors hover:border-[rgba(124,110,246,0.35)] hover:bg-[rgba(124,110,246,0.15)]"
-              style={{ borderColor: 'rgba(255,255,255,0.08)' }}
-              title={`Add ${tool.label}`}
-            >
-              <span className="flex h-6 items-center justify-center text-[var(--pd-c-e8e8f0)]"><Icon name={tool.icon} size={17} /></span>
-              <span className="text-[10px] leading-none text-[var(--pd-c-b0b0c4)]">{tool.label}</span>
-            </button>
-          ))}
+        <div className="pd-layer-selection">
+          <button aria-pressed={selecting} onClick={() => { setSelecting(!selecting); clearMultiSelection() }}><Icon name="check" size={16} />{t('layerUi.select')}</button>
+          {selecting && <button onClick={() => setMultiSelection(contentLayers.map((layer) => layer.id))}>{t('layerUi.all')}</button>}
+          <span>{selectedLayerIds.length > 0 ? t('layers.selected', { count: selectedLayerIds.length }) : `${contentLayers.length}`}</span>
         </div>
-
-        <div className="mt-3 h-px w-full bg-[rgba(255,255,255,0.06)]" />
-
-        <AssetsSection
-          imageInputRef={imageInputRef}
-          selectedLayer={selectedLayer}
-          addImage={addImage}
-          updateLayer={updateLayer}
-        />
-
-        <div className="mt-3 h-px w-full bg-[rgba(255,255,255,0.06)]" />
-        <div className="pt-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pd-c-6b6b7a)]">{t('layers.title')}</span>
-        </div>
+      </header>
+      <div className="pd-layer-assets" hidden={activeTab !== 'assets'}>
+        <AssetsSection imageInputRef={imageInputRef} selectedLayer={selectedLayer} addImage={addImage} updateLayer={updateLayer} />
       </div>
 
       {/* Layer list */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="pd-layer-list flex-1 min-h-0 overflow-y-auto" hidden={activeTab !== 'layers'}>
         {layers.length === 0 && (
           <p className="text-xs text-[var(--pd-c-6b6b7a)] px-3 py-4 text-center">{t('layers.empty')}</p>
         )}
@@ -364,7 +340,7 @@ export function LayersPanel() {
                   isEditingThisGroup={editingGroupId === layer.id}
                   selectedChildId={editingGroupId === layer.id ? (selection?.layerId ?? null) : null}
                   onToggleCollapse={() => toggleGroupCollapse(layer.id)}
-                  onSelect={select}
+                  onSelect={selecting ? handleCtrlSelect : select}
                   onCtrlSelect={handleCtrlSelect}
                   onContextMenu={handleContextMenu}
                   onVisibilityToggle={setLayerVisibility}
@@ -384,7 +360,7 @@ export function LayersPanel() {
                   layer={layer}
                   isSelected={selection?.layerId === layer.id}
                   isMultiSelected={selectedLayerIds.includes(layer.id)}
-                  onSelect={select}
+                  onSelect={selecting ? handleCtrlSelect : select}
                   onCtrlSelect={handleCtrlSelect}
                   onContextMenu={handleContextMenu}
                   onVisibilityToggle={setLayerVisibility}
@@ -428,6 +404,17 @@ export function LayersPanel() {
           </div>
         )}
       </div>
+
+      <footer className="pd-layer-footer">
+        {insertOpen && <div className="pd-layer-insert" role="menu" aria-label={t('layerUi.new')}>
+          {insertTools.map((tool) => <button key={tool.key} role="menuitem" onClick={() => handleInsertToolClick(tool.key)}><Icon name={tool.icon} size={20} /><span>{tool.label}</span></button>)}
+        </div>}
+        <button aria-label={t('layerUi.new')} title={t('layerUi.new')} aria-expanded={insertOpen} onClick={() => setInsertOpen(!insertOpen)}><Icon name="plus" size={20} /><span>{t('layerUi.new')}</span></button>
+        <button aria-label={t('layerUi.group')} title={t('layerUi.group')} disabled={selectedLayerIds.length < 2} onClick={() => { useEditorStore.getState().createGroup(selectedLayerIds); setSelecting(false) }}><Icon name="group" size={20} /><span>{t('layerUi.groupShort')}</span></button>
+        <button aria-label={t(editingGroupId ? 'layerUi.extract' : 'layerUi.ungroup')} title={t(editingGroupId ? 'layerUi.extract' : 'layerUi.ungroup')} disabled={selectedLayer?.type !== 'group' && !editingGroupId} onClick={() => { if (editingGroupId && selectedLayer) moveChildToTopLevel(editingGroupId, selectedLayer.id, null); else if (selectedLayer) dissolveGroup(selectedLayer.id) }}><Icon name="ungroup" size={20} /><span>{t(editingGroupId ? 'layerUi.extract' : 'layerUi.ungroup')}</span></button>
+        <button aria-label={t('workspace.duplicate')} title={t('workspace.duplicate')} disabled={!selectedLayerIds.length && (!selectedLayer || selectedLayer.type === 'background')} onClick={() => { for (const id of selectedLayerIds.length ? selectedLayerIds : [selectedLayer!.id]) duplicateLayer(id) }}><Icon name="copy" size={20} /><span>{t('workspace.duplicate')}</span></button>
+        <button aria-label={t('workspace.delete')} title={t('workspace.delete')} disabled={!selectedLayer && !selectedLayerIds.length || selectedLayer?.type === 'background'} onClick={() => { for (const id of selectedLayerIds.length ? selectedLayerIds : [selectedLayer!.id]) removeLayer(id); clearMultiSelection() }}><Icon name="trash" size={20} /><span>{t('workspace.delete')}</span></button>
+      </footer>
 
       {/* Context menu */}
       {contextMenu && (

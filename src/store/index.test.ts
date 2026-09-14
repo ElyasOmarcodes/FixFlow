@@ -785,3 +785,20 @@ describe('importTemplateAsNewProject', () => {
     expect(useAssetStore.getState().assets[phone.screenshotPath!]?.dataUrl).toBe(dataUrl)
   })
 })
+
+it('duplicates grouped children inside their group and gives every cloned layer a new ID', () => {
+  const store = useEditorStore.getState()
+  store.addText()
+  store.addShape()
+  store.createGroup(getActiveGroup().layers.filter((layer) => layer.type !== 'background').map((layer) => layer.id))
+  const group = getActiveGroup().layers.find((layer) => layer.type === 'group') as GroupLayer
+  store.duplicateLayer(group.children[0].id)
+  const updated = getActiveGroup().layers.find((layer) => layer.id === group.id) as GroupLayer
+  expect(updated.children).toHaveLength(3)
+  expect(new Set(updated.children.map((child) => child.id)).size).toBe(3)
+  store.duplicateLayer(group.id)
+  const groups = getActiveGroup().layers.filter((layer) => layer.type === 'group') as GroupLayer[]
+  expect(groups).toHaveLength(2)
+  const allIds = groups.flatMap((item) => [item.id, ...item.children.map((child) => child.id)])
+  expect(new Set(allIds).size).toBe(allIds.length)
+})

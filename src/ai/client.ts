@@ -1,3 +1,4 @@
+import { aiFetch } from './http'
 import { buildOpenAiCompatibleHeaders } from '@/ai/headers'
 import { getDefaultModel, getProviderConfig } from '@/ai/providers'
 import type { AiProvider } from '@/ai/providers'
@@ -212,7 +213,7 @@ async function requestJsonWithRetry(
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
     try {
-      const response = await fetch(url, { ...init, signal: controller.signal })
+      const response = await aiFetch(url, { ...init, signal: controller.signal })
       if (response.ok) {
         try {
           return await response.json()
@@ -254,6 +255,7 @@ export async function chat(options: AiChatOptions): Promise<string> {
   const baseUrl = resolveBaseUrl(options.provider, options.baseUrl)
   if (!baseUrl) throw new Error('No custom API base URL configured. Open AI Settings in the toolbar.')
   const model = options.model?.trim() || getDefaultModel(options.provider)
+  if (options.provider === 'google') return chatWithGemini(options, apiKey, model)
   return chatWithOpenAiCompatible(
     baseUrl,
     apiKey,
@@ -273,6 +275,7 @@ export async function editImage(options: AiImageEditOptions): Promise<string> {
   if (!baseUrl) throw new Error('No custom API base URL configured. Open AI Settings in the toolbar.')
   const model = options.model?.trim() || getDefaultModel(options.provider)
 
+  if (options.provider === 'google') return editImageWithGemini(options, apiKey, model)
   if (options.provider === 'openai') {
     return editImageWithOpenAi(baseUrl, apiKey, model, options.prompt, options.imageDataUrl, options)
   }
@@ -294,7 +297,7 @@ function resolveBaseUrl(provider: AiProvider, baseUrlOverride?: string): string 
 
 export function supportsImageEditing(provider: AiProvider, model: string): boolean {
   if (provider === 'openai') return model.toLowerCase().startsWith('gpt-image')
-  if (provider === 'google') return false
+  if (provider === 'google') return model.toLowerCase().includes('image')
   // OpenRouter and custom providers are optimistic; runtime decides.
   return true
 }
@@ -429,4 +432,56 @@ async function editImageWithOpenAiCompatibleImageChat(
     }),
   }, { ...requestSettings, retryOnTransportErrors: false }, `${getProviderConfig(provider).shortLabel} image API error`)
   return extractImageOrThrowModelError(dataJson)
+}
+
+async function chatWithGemini(options: AiChatOptions, apiKey: string, model: string): Promise<string> {
+  if (!model) throw new Error('Load the Gemini model list and select a model in AI Settings first.')
+  const parts = (content: AiChatMessage['content']) => typeof content === 'string'
+    ? [{ text: content }]
+    : content.map((part) => part.type === 'text' ? { text: part.text } : { inlineData: (() => {
+      const image = splitDataUrl(part.dataUrl)
+      return { mimeType: image.mediaType, data: image.data }
+    })() })
+  const system = options.messages.filter((message) => message.role === 'system').flatMap((message) => parts(message.content))
+  const body = {
+    ...(system.length ? { systemInstruction: { parts: system } } : {}),
+    contents: options.messages.filter((message) => message.role !== 'system').map((message) => ({
+      role: message.role === 'assistant' ? 'model' : 'user', parts: parts(message.content),
+    })),
+    generationConfig: {
+      ...(options.maxTokens ? { maxOutputTokens: Math.max(options.maxTokens, 2048) } : {}),
+      ...(options.forceJsonMode ? { responseMimeType: 'application/json' } : {}),
+    },
+  }
+  const data = await requestJsonWithRetry('google', 'generate content',
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model.replace(/^models\//, ''))}:generateContent`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey }, body: JSON.stringify(body),
+    }, options, 'Gemini API error') as {
+      candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[]
+      promptFeedback?: { blockReason?: string }
+    }
+  const candidate = data.candidates?.[0]
+  const text = candidate?.content?.parts?.filter((part) => !part.thought).map((part) => part.text ?? '').join('').trim()
+  if (!text) throw new AiClientError('parse', `Gemini returned no text (${data.promptFeedback?.blockReason ?? candidate?.finishReason ?? 'empty response'}). Try a text model or a different prompt.`)
+  if (candidate?.finishReason === 'MAX_TOKENS') throw new AiClientError('parse', 'Gemini output was truncated. Translate fewer layers at once or select another model.')
+  return text
+}
+
+
+async function editImageWithGemini(options: AiImageEditOptions, apiKey: string, model: string): Promise<string> {
+  if (!model) throw new Error('Select a Gemini image model in AI Settings first.')
+  const image = splitDataUrl(options.imageDataUrl)
+  const data = await requestJsonWithRetry('google', 'edit image',
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model.replace(/^models\//, ''))}:generateContent`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: options.prompt }, { inlineData: { mimeType: image.mediaType, data: image.data } }] }],
+        generationConfig: { responseModalities: ['TEXT', 'IMAGE'] },
+      }),
+    }, { ...options, retryOnTransportErrors: false }, 'Gemini image API error') as {
+      candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string }; thought?: boolean }[] } }[]
+    }
+  const result = data.candidates?.[0]?.content?.parts?.find((part) => !part.thought && part.inlineData?.mimeType?.startsWith('image/') && part.inlineData.data)?.inlineData
+  if (!result?.data) throw new Error('Gemini returned no image. Select an image-generation model from the model list and try again.')
+  return `data:${result.mimeType};base64,${result.data}`
 }

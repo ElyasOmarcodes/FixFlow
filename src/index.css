@@ -574,3 +574,54 @@ body { background: var(--pd-workspace); color: var(--pd-text); color-scheme: inh
   --pd-c-9b8fff: #6550dc;
   --pd-c-484858: #73819a;
 }
+/* Layer management occupies the panel; creation is a single footer action. */
+.pd-layer-header { flex-shrink: 0; padding: 12px; border-bottom: 1px solid var(--pd-field-border); }
+.pd-layer-header [role=tablist] { display: flex; gap: 4px; padding: 3px; background: var(--pd-field-bg); border-radius: 10px; }
+.pd-layer-header [role=tab] { flex: 1; padding: 9px; font-size: 13px; border-radius: 8px; }
+.pd-layer-header [aria-selected=true] { background: var(--pd-panel); box-shadow: 0 1px 4px #0002; color: var(--pd-c-7c6ef6); }
+.pd-layer-selection { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; }
+.pd-layer-selection button { display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 6px; }
+.pd-layer-selection button[aria-pressed=true] { background: #7c6ef626; }
+.pd-layer-selection span { margin-inline-start: auto; color: var(--pd-c-6b6b7a); }
+.pd-layer-assets { min-height: 0; overflow-y: auto; flex: 1; padding: 12px; }
+.pd-layer-assets[hidden], .pd-layer-list[hidden] { display: none; }
+.pd-layer-list { padding: 6px 0; }
+.pd-layer-list > div { min-height: 44px; }
+.pd-layer-footer { position: relative; display: flex; flex-shrink: 0; gap: 4px; padding: 8px; border-top: 1px solid var(--pd-field-border); background: var(--pd-panel); }
+.pd-layer-footer > button { flex: 1; height: 42px; display: grid; place-items: center; border-radius: 8px; }
+.pd-layer-footer > button:first-of-type { background: #7c6ef6; color: white; }
+.pd-layer-footer button:disabled { opacity: .3; }
+.pd-layer-insert { position: absolute; inset-inline: 8px; bottom: calc(100% + 6px); display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; padding: 10px; border: 1px solid var(--pd-field-border); border-radius: 14px; background: var(--pd-panel); box-shadow: 0 8px 32px #0004; z-index: 90; }
+.pd-layer-insert button { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; font-size: 13px; text-align: start; }
+.pd-layer-insert button:hover { background: #7c6ef622; }
+button { touch-action: manipulation; }
+@media (pointer: coarse) {
+  button:not(:disabled):active { background-color: #7c6ef624; }
+  .pd-layer-list button { min-width: 36px; }
+}
+@media (max-width: 1023px) {
+  .pd-sidebar-open { inset: 0; width: 100%; height: 100%; max-height: 100%; border-radius: 16px 16px 0 0; }
+  .pd-sidebar > aside { padding-top: 42px; }
+  .pd-layer-list { overscroll-behavior: contain; }
+  .pd-settings.pd-modal-panel { width: 100%; max-width: 100%; margin: 0; height: 100dvh; max-height: 100dvh; border-radius: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  .pd-settings-body { flex-direction: column; }
+  .pd-settings-tabs { display: flex; width: 100%; padding: 8px 12px; gap: 8px; overflow-x: auto; overflow-y: hidden; background: var(--pd-field-bg) !important; border: 0; border-bottom: 1px solid var(--pd-field-border); }
+  .pd-settings-tabs > div { display: contents; }
+  .pd-settings-tabs p { display: none; }
+  .pd-settings-tabs button { flex: 0 0 auto; width: auto; white-space: nowrap; padding: 12px; min-height: 46px; }
+  .pd-settings-content { width: 100%; padding: 18px; }
+  .pd-settings > :last-child a { display: none; }
+  .pd-settings-content input, .pd-settings-content select { max-width: 100%; }
+  .pd-settings .pd-modal-panel { max-width: 100%; }
+}
+
+.pd-layer-context button { min-height: 42px; text-align: start; }
+.pd-layer-list > div, .pd-layer-list .group { min-height: 42px; }
+@media (pointer: coarse) {
+  .pd-layer-list button { min-width: 36px; min-height: 40px; }
+  .pd-layer-list .opacity-0 { opacity: 1; }
+  .pd-layer-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+}
+.pd-layer-footer > button { height: 58px; align-content: center; gap: 5px; padding: 4px 2px; }
+.pd-layer-footer > button span { font-size: 10px; line-height: 1.2; max-width: 100%; }
+.pd-settings-content input[type=range] { min-width: 0; }

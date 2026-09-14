@@ -46,7 +46,7 @@ export const AI_PROVIDERS: AiProviderConfig[] = [
     id: 'google',
     label: 'Google Gemini',
     shortLabel: 'Gemini',
-    description: "Direct BYOK using Gemini's OpenAI-compatible endpoint.",
+    description: "Direct BYOK using the native Gemini API.",
     placeholder: 'AIza…',
     keyUrl: 'https://aistudio.google.com/app/apikey',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',

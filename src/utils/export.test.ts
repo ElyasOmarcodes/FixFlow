@@ -128,3 +128,24 @@ describe('exportGroupImages', () => {
     expect(onImageCaptured).toHaveBeenCalledWith(1, 1)
   })
 })
+
+it('encodes into a Blob and releases the temporary canvas backing store', async () => {
+  const canvas = { width: 1000, height: 2000, toBlob: (callback: BlobCallback) => callback(new Blob(['png'], { type: 'image/png' })) }
+  const stage = { ...makeFakeStage(), toCanvas: vi.fn(() => canvas) } as unknown as Konva.Stage
+  const urls: string[] = []
+  const url = await exportSlide(stage, 0, makeGroup(), 0, (value) => urls.push(value))
+  expect(url.startsWith('blob:')).toBe(true)
+  expect(await (await fetch(url)).text()).toBe('png')
+  expect(canvas.width).toBe(0)
+  expect(canvas.height).toBe(0)
+  expect(stage.toDataURL).not.toHaveBeenCalled()
+  urls.forEach((value) => URL.revokeObjectURL(value))
+})
+
+it('releases the temporary canvas when PNG encoding fails', async () => {
+  const canvas = { width: 1000, height: 2000, toBlob: (callback: BlobCallback) => callback(null) }
+  const stage = { ...makeFakeStage(), toCanvas: vi.fn(() => canvas) } as unknown as Konva.Stage
+  await expect(exportSlide(stage, 0, makeGroup(), 0, vi.fn())).rejects.toThrow('Could not encode')
+  expect(canvas.width).toBe(0)
+  expect(canvas.height).toBe(0)
+})

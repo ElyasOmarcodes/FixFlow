@@ -29,6 +29,7 @@ export interface ProjectImageExportOptions {
   panoMode?: PanoExportMode
   panoCompensate?: boolean
   panoCompensationPx?: number
+  onBlobUrl?: (url: string) => void
   signal?: AbortSignal
   onProgress?: (progress: {
     completed: number
@@ -115,7 +116,7 @@ export async function exportProjectImages(
           groupName: batch.group.name,
           phase: 'rendering',
         })
-      }, options.signal)
+      }, options.signal, options.onBlobUrl)
       for (const image of images) {
         const target = buildExportFileTarget({
           formatId: batch.formatId,
@@ -142,24 +143,27 @@ export async function exportProjectImages(
     if (options.signal?.aborted) throw new ExportCancelledError()
     return results
   } finally {
-    if (originalLocale !== undefined) useEditorStore.getState().setActiveLocale(originalLocale)
-    if (originalFormat !== undefined) useEditorStore.getState().setActiveCanvasFormat(originalFormat)
-    useEditorStore.getState().setPanoRenderOverride(null)
-    if (originalGroupId !== undefined && useEditorStore.getState().activeSlideGroupId !== originalGroupId) {
-      useEditorStore.getState().setActiveSlideGroup(originalGroupId)
+    try {
+      if (originalLocale !== undefined) useEditorStore.getState().setActiveLocale(originalLocale)
+      if (originalFormat !== undefined) useEditorStore.getState().setActiveCanvasFormat(originalFormat)
+      useEditorStore.getState().setPanoRenderOverride(null)
+      if (originalGroupId !== undefined && useEditorStore.getState().activeSlideGroupId !== originalGroupId) {
+        useEditorStore.getState().setActiveSlideGroup(originalGroupId)
+      }
+      await waitForStageCaptureReady(stage)
+      if (lastBatch) {
+        options.onProgress?.({
+          completed,
+          total,
+          formatId: lastBatch.formatId,
+          formatLabel: lastBatch.formatLabel,
+          locale: lastBatch.locale,
+          groupName: lastBatch.group.name,
+          phase: 'restoring',
+        })
+      }
+    } finally {
+      release()
     }
-    await waitForStageCaptureReady(stage)
-    if (lastBatch) {
-      options.onProgress?.({
-        completed,
-        total,
-        formatId: lastBatch.formatId,
-        formatLabel: lastBatch.formatLabel,
-        locale: lastBatch.locale,
-        groupName: lastBatch.group.name,
-        phase: 'restoring',
-      })
-    }
-    release()
   }
 }

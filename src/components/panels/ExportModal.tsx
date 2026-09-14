@@ -162,6 +162,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
 
     const controller = new AbortController()
     abortControllerRef.current = controller
+    const blobUrls: string[] = []
     try {
       setIsExporting(true)
       setExportProgress(null)
@@ -176,6 +177,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
         ? await window.showDirectoryPicker({ mode: 'readwrite' }) : null
 
       const results = await exportProjectImages(stageRef.current, {
+        onBlobUrl: (url) => blobUrls.push(url),
         formatIds: selectedExportFormats,
         locales: selectedExportLocales.length ? selectedExportLocales : [project.settings.defaultLocale ?? 'en'],
         scope: exportScope,
@@ -228,6 +230,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
         setExportError(`Export failed: ${err instanceof Error ? err.message : String(err)}`)
       }
     } finally {
+      blobUrls.forEach((url) => URL.revokeObjectURL(url))
       setIsExporting(false)
       setExportProgress(null)
       setIsCancelling(false)

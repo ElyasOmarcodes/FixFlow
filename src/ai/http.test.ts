@@ -1,0 +1,31 @@
+import { beforeEach, afterEach, expect, it, vi } from 'vitest'
+const mocks = vi.hoisted(() => ({ platform: vi.fn(), request: vi.fn() }))
+vi.mock('@capacitor/core', () => ({ Capacitor: { getPlatform: mocks.platform }, CapacitorHttp: { request: mocks.request } }))
+import { aiFetch } from './http'
+beforeEach(() => { vi.resetAllMocks() })
+afterEach(() => { vi.unstubAllGlobals() })
+it('uses Android native HTTP with the selected key and JSON payload', async () => {
+  mocks.platform.mockReturnValue('android')
+  mocks.request.mockResolvedValue({ status: 200, data: { models: [] }, headers: {} })
+  const fetch = vi.fn()
+  vi.stubGlobal('fetch', fetch)
+  const response = await aiFetch('https://generativelanguage.googleapis.com/v1beta/models', { method: 'POST', headers: { 'x-goog-api-key': 'test-key' }, body: '{"contents":[]}' })
+  expect(await response.json()).toEqual({ models: [] })
+  expect(mocks.request).toHaveBeenCalledWith(expect.objectContaining({ headers: { 'x-goog-api-key': 'test-key' }, data: { contents: [] } }))
+  expect(fetch).not.toHaveBeenCalled()
+})
+it('preserves provider errors for quota and invalid key feedback', async () => {
+  mocks.platform.mockReturnValue('android')
+  mocks.request.mockResolvedValue({ status: 429, data: { error: { message: 'Quota exceeded' } }, headers: {} })
+  const response = await aiFetch('https://example.com/models')
+  expect(response.status).toBe(429)
+  expect(response.ok).toBe(false)
+  expect(await response.text()).toContain('Quota exceeded')
+})
+it('does not start an already aborted native request', async () => {
+  mocks.platform.mockReturnValue('android')
+  const controller = new AbortController()
+  controller.abort()
+  await expect(aiFetch('https://example.com', { signal: controller.signal })).rejects.toMatchObject({ name: 'AbortError' })
+  expect(mocks.request).not.toHaveBeenCalled()
+})

@@ -17,6 +17,7 @@ import type { CSSProperties, ReactElement } from 'react'
  */
 
 const ICONS = {
+  ungroup: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><path d="M14 3h7v7M3 14v7h7" /></>,
   // ── Chrome / navigation ──────────────────────────────────────────────────
   close: <path d="M18 6 6 18M6 6l12 12" />,
   check: <path d="M20 6 9 17l-5-5" />,

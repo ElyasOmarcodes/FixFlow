@@ -151,11 +151,14 @@ describe('chat', () => {
     })
   })
 
-  it('uses the Google OpenAI-compatible chat endpoint', async () => {
-    const fetchMock = makeOpenAiFetchMock()
+  it('uses Gemini native messages, system instructions and structured output', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: 'ok' }] }, finishReason: 'STOP' }] })))
     vi.stubGlobal('fetch', fetchMock)
-    await chat({ provider: 'google', apiKey: 'AIza-test', messages: [{ role: 'user', content: 'hi' }] })
-    expect(fetchMock.mock.calls[0][0]).toBe('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions')
+    await expect(chat({ provider: 'google', model: 'gemini-test', apiKey: 'AIza-test', forceJsonMode: true, messages: [{ role: 'system', content: 'Translate' }, { role: 'user', content: 'hi' }] })).resolves.toBe('ok')
+    expect(fetchMock.mock.calls[0][0]).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-test:generateContent')
+    const request = fetchMock.mock.calls[0][1]
+    expect(request.headers['x-goog-api-key']).toBe('AIza-test')
+    expect(JSON.parse(request.body)).toMatchObject({ systemInstruction: { parts: [{ text: 'Translate' }] }, contents: [{ role: 'user', parts: [{ text: 'hi' }] }], generationConfig: { responseMimeType: 'application/json' } })
   })
 
   it('requires an API key and a custom base URL', async () => {
@@ -169,7 +172,8 @@ describe('image editing support detection', () => {
     expect(supportsImageEditing('openai', 'gpt-image-1')).toBe(true)
     expect(supportsImageEditing('openai', 'gpt-4o-mini')).toBe(false)
     expect(supportsImageEditing('openrouter', 'some-text-model')).toBe(true)
-    expect(supportsImageEditing('google', 'gemini-2.5-flash-image')).toBe(false)
+    expect(supportsImageEditing('google', 'gemini-2.5-flash-image')).toBe(true)
+    expect(supportsImageEditing('google', 'gemini-text')).toBe(false)
     expect(supportsImageEditing('custom', 'anything')).toBe(true)
   })
 })
@@ -253,4 +257,12 @@ describe('editImage', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
     vi.useRealTimers()
   })
+})
+
+
+it('edits images with Gemini and decodes native PNG responses', async () => {
+  const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'image/png', data: 'aW1hZ2U=' } }] } }] })))
+  vi.stubGlobal('fetch', fetchMock)
+  await expect(editImage({ provider: 'google', model: 'gemini-test-image', apiKey: 'test', prompt: 'Restore', imageDataUrl: 'data:image/png;base64,aW5wdXQ=' })).resolves.toBe('data:image/png;base64,aW1hZ2U=')
+  expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({ generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } })
 })

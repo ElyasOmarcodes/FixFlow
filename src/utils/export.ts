@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import { saveFile } from './saveFile'
 import type Konva from 'konva'
 import type { SlideGroup } from '@/types'
@@ -31,6 +32,24 @@ export interface ExportedImage {
   dataUrl: string
 }
 
+type CaptureOptions = { x: number; y: number; width: number; height: number; pixelRatio: number; mimeType: string }
+async function captureImage(stage: Konva.Stage, options: CaptureOptions, onBlobUrl?: (url: string) => void): Promise<string> {
+  if (!onBlobUrl) return withIdentityTransform(stage, () => stage.toDataURL(options))
+  if (Capacitor.getPlatform() === 'android' && (options.width * options.height > 16_000_000 || Math.max(options.width, options.height) > 8192)) {
+    throw new Error('This image is too large to export safely on this device. Choose split slides or a smaller canvas format.')
+  }
+  const canvas = withIdentityTransform(stage, () => stage.toCanvas(options))
+  try {
+    const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error('Could not encode the exported image')), 'image/png'))
+    const url = URL.createObjectURL(blob)
+    onBlobUrl(url)
+    return url
+  } finally {
+    canvas.width = 0
+    canvas.height = 0
+  }
+}
+
 /**
  * Export a single slide from the Konva stage as a PNG data URL.
  * The stage must be at full resolution (no zoom scaling).
@@ -40,18 +59,17 @@ export async function exportSlide(
   slideIndex: number,
   group: SlideGroup,
   panoCompensationPx = 0,
+  onBlobUrl?: (url: string) => void,
 ): Promise<string> {
   const { slideWidth, slideHeight } = group
-  return withIdentityTransform(stage, () =>
-    stage.toDataURL({
-      x: getPanoSlideX(group, slideIndex, panoCompensationPx),
-      y: 0,
-      width: slideWidth,
-      height: slideHeight,
-      pixelRatio: 1,
-      mimeType: 'image/png',
-    }),
-  )
+  return captureImage(stage, {
+    x: getPanoSlideX(group, slideIndex, panoCompensationPx),
+    y: 0,
+    width: slideWidth,
+    height: slideHeight,
+    pixelRatio: 1,
+    mimeType: 'image/png',
+  }, onBlobUrl)
 }
 
 /**
@@ -63,12 +81,13 @@ export async function exportAllSlides(
   panoCompensationPx = 0,
   onImageCaptured?: (index: number, total: number) => void,
   signal?: AbortSignal,
+  onBlobUrl?: (url: string) => void,
 ): Promise<ExportedImage[]> {
   const results: ExportedImage[] = []
   for (let i = 0; i < group.numSlides; i++) {
     if (signal?.aborted) break
     const name = group.slideNames[i] ?? `slide-${i + 1}`
-    const dataUrl = await exportSlide(stage, i, group, panoCompensationPx)
+    const dataUrl = await exportSlide(stage, i, group, panoCompensationPx, onBlobUrl)
     results.push({ name, dataUrl })
     onImageCaptured?.(i + 1, group.numSlides)
   }
@@ -79,17 +98,16 @@ export async function exportWholeGroup(
   stage: Konva.Stage,
   group: SlideGroup,
   panoCompensationPx = 0,
+  onBlobUrl?: (url: string) => void,
 ): Promise<string> {
-  return withIdentityTransform(stage, () =>
-    stage.toDataURL({
-      x: 0,
-      y: 0,
-      width: getPanoTotalWidth(group, panoCompensationPx),
-      height: group.slideHeight,
-      pixelRatio: 1,
-      mimeType: 'image/png',
-    }),
-  )
+  return captureImage(stage, {
+    x: 0,
+    y: 0,
+    width: getPanoTotalWidth(group, panoCompensationPx),
+    height: group.slideHeight,
+    pixelRatio: 1,
+    mimeType: 'image/png',
+  }, onBlobUrl)
 }
 
 export async function exportGroupImages(
@@ -99,14 +117,15 @@ export async function exportGroupImages(
   panoCompensationPx = 0,
   onImageCaptured?: (index: number, total: number) => void,
   signal?: AbortSignal,
+  onBlobUrl?: (url: string) => void,
 ): Promise<ExportedImage[]> {
   if (panoMode === 'whole' && group.numSlides > 1) {
     if (signal?.aborted) return []
-    const dataUrl = await exportWholeGroup(stage, group, panoCompensationPx)
+    const dataUrl = await exportWholeGroup(stage, group, panoCompensationPx, onBlobUrl)
     onImageCaptured?.(1, 1)
     return [{ name: group.name || 'pano', dataUrl }]
   }
-  return exportAllSlides(stage, group, panoMode === 'split' ? panoCompensationPx : 0, onImageCaptured, signal)
+  return exportAllSlides(stage, group, panoMode === 'split' ? panoCompensationPx : 0, onImageCaptured, signal, onBlobUrl)
 }
 
 /** Save PNG, JSON or another URL through the current platform's file picker. */

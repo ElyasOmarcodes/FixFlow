@@ -1,4 +1,3 @@
-import { WorkspaceTools } from '@/components/toolbar/WorkspaceTools'
 import { Capacitor } from '@capacitor/core'
 import { App as NativeApp } from '@capacitor/app'
 import { useT } from '@/i18n'
@@ -286,7 +285,6 @@ export default function App() {
           className="pd-editor flex min-w-0 min-h-0 flex-1 overflow-hidden"
           style={view === 'localization' ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
         >
-          <WorkspaceTools onProperties={() => setMobilePanel('properties')} />
           {/* Layers panel — always visible */}
           <div id="mobile-layers" className={`pd-sidebar pd-layers ${mobilePanel === 'layers' ? 'pd-sidebar-open' : ''}`}>
             <button className="pd-panel-close" onClick={() => setMobilePanel(null)} aria-label={t('common.close')}><Icon name="close" size={18} /></button>

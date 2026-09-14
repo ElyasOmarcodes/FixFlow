@@ -1,3 +1,4 @@
+import { aiFetch } from './http'
 import { getProviderConfig } from '@/ai/providers'
 import { formatAiNetworkError } from '@/ai/errors'
 import { buildOpenAiCompatibleHeaders } from '@/ai/headers'
@@ -28,7 +29,7 @@ export async function listModels(provider: AiProvider, apiKey: string, baseUrlOv
 
   let res: Response
   try {
-    res = await fetch(modelsUrl, {
+    res = await aiFetch(modelsUrl, {
       headers: buildOpenAiCompatibleHeaders(provider, key),
     })
   } catch (error) {
@@ -123,7 +124,7 @@ async function listGoogleModels(key: string): Promise<AiModel[]> {
     if (token) url.searchParams.set('pageToken', token)
     let response: Response
     try {
-      response = await fetch(url.toString(), {
+      response = await aiFetch(url.toString(), {
         headers: { 'x-goog-api-key': key },
         signal: AbortSignal.timeout(20000),
       })

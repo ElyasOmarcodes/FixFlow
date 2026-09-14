@@ -97,18 +97,18 @@ function LanguageSettingsContent() {
 // ─── Brand tab content ────────────────────────────────────────────────────────
 
 function BrandSettingsContent() {
+  const t = useT()
   const brandColors = useBrandColors()
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[var(--pd-c-e8e8f0)] mb-1">Brand Colors</h3>
+      <h3 className="text-sm font-semibold text-[var(--pd-c-e8e8f0)] mb-1">{t('settings.brandTitle')}</h3>
       <p className="text-[12px] text-[var(--pd-c-6b6b7a)] mb-5 leading-relaxed">
-        Reusable colors for this project. Apply them in any color field — edit one here and every
-        layer updates automatically.
+        {t('settings.brandHint')}
       </p>
       <div className="flex items-center justify-between mb-3">
         <span className="text-[11px] text-[var(--pd-c-4a4a5a)] uppercase tracking-[0.1em]">
-          {brandColors.length} {brandColors.length === 1 ? 'color' : 'colors'}
+          {t('settings.colorCount', { count: brandColors.length })}
         </span>
       </div>
       <BrandColorList />
@@ -119,6 +119,7 @@ function BrandSettingsContent() {
 // ─── Pano tab content ─────────────────────────────────────────────────────────
 
 function PanoSettingsContent() {
+  const t = useT()
   const panoSettings = useEditorStore(
     (s) => s.project.settings.pano ?? { gapPx: 24, compensate: false },
   )
@@ -126,17 +127,17 @@ function PanoSettingsContent() {
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[var(--pd-c-e8e8f0)] mb-1">Panorama Settings</h3>
+      <h3 className="text-sm font-semibold text-[var(--pd-c-e8e8f0)] mb-1">{t('settings.panoTitle')}</h3>
       <p className="text-[12px] text-[var(--pd-c-6b6b7a)] mb-5 leading-relaxed">
-        Configure how multi-slide panoramic groups are displayed and exported.
+        {t('settings.panoHint')}
       </p>
 
       <div className="space-y-5">
         {/* Gap input */}
         <div className="rounded-xl border border-[rgba(255,255,255,0.08)] p-4 bg-[rgba(255,255,255,0.02)]">
-          <label className={labelCls}>Store Preview Gap</label>
+          <label className={labelCls}>{t('settings.gapTitle')}</label>
           <p className="text-[11px] text-[var(--pd-c-4a4a5a)] mb-3 leading-relaxed">
-            Gap used when compensation is enabled. Simulates the bezel gap shown in app stores.
+            {t('settings.gapHint')}
           </p>
           <div className="flex items-center gap-3">
             <NumberInput
@@ -175,11 +176,10 @@ function PanoSettingsContent() {
                 htmlFor="pano-compensate"
                 className="text-xs font-medium text-[var(--pd-c-e8e8f0)] cursor-pointer"
               >
-                Compensate on Export
+                {t('settings.compensateTitle')}
               </label>
               <p className="text-[11px] text-[var(--pd-c-4a4a5a)] mt-1 leading-relaxed">
-                When enabled, the gap becomes visible in the canvas/preview and is skipped during export.
-                When disabled, pano slides remain continuous with no gap compensation.
+                {t('settings.compensateHint')}
               </p>
             </div>
           </div>
@@ -188,11 +188,11 @@ function PanoSettingsContent() {
         {/* Status summary */}
         <div className="rounded-lg border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] px-4 py-3">
           <p className="text-[11px] text-[var(--pd-c-6b6b7a)] leading-relaxed">
-            <span className="text-[#c4b5fd]">Current:</span>{' '}
-            {panoSettings.gapPx ?? 24}px gap{' '}
+            <span className="text-[#c4b5fd]">{t('settings.current')}</span>{' '}
+            {panoSettings.gapPx ?? 24}px{' '}
             {panoSettings.compensate
-              ? '— compensation active, gap visible and skipped on export'
-              : '— compensation inactive, continuous pano with no visual gap'}
+              ? t('settings.compensateOn')
+              : t('settings.compensateOff')}
           </p>
         </div>
       </div>
@@ -215,9 +215,9 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       open={open}
       onClose={onClose}
       title={translate('settings.title')}
-      closeLabel="Close settings"
+      closeLabel={translate('common.close')}
       maxWidth="max-w-5xl"
-      panelClassName="relative rounded-2xl border shadow-2xl w-full mx-4 h-[85vh] flex flex-col overflow-hidden"
+      panelClassName="pd-settings relative rounded-2xl border shadow-2xl w-full mx-4 h-[85vh] flex flex-col overflow-hidden"
       footerClassName="shrink-0 px-5 py-2.5 border-t border-[rgba(255,255,255,0.06)] flex items-center gap-3"
       footer={(
         <>
@@ -225,15 +225,15 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
           <span className="text-[#2a2a3a]">·</span>
           <span className="text-[11px] text-[var(--pd-c-4a4a5a)] font-mono select-all" title="Git commit hash">{__GIT_HASH__}</span>
           <span className="flex-1" />
-          <a href="https://github.com/Pr0xS/PixelDeck" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[var(--pd-c-4a4a5a)] hover:text-[var(--pd-c-7c6ef6)] transition-colors">github.com/Pr0xS/PixelDeck</a>
+          <a href="https://github.com/ElyasOmarhs/PixelDeck" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[var(--pd-c-4a4a5a)] hover:text-[var(--pd-c-7c6ef6)] transition-colors">github.com/ElyasOmarhs/PixelDeck</a>
         </>
       )}
     >
         {/* Body: sidebar + content */}
-        <div className="flex flex-1 min-h-0">
+        <div className="pd-settings-body flex flex-1 min-h-0">
           {/* Sidebar */}
           <nav
-            className="w-44 shrink-0 border-r border-[rgba(255,255,255,0.06)] p-3 overflow-y-auto"
+            className="pd-settings-tabs w-44 shrink-0 border-r border-[rgba(255,255,255,0.06)] p-3 overflow-y-auto"
             style={{ background: 'rgba(0,0,0,0.15)' }}
           >
             {sections.map((section) => (
@@ -261,13 +261,12 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
           </nav>
 
           {/* Content area */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="pd-settings-content min-w-0 flex-1 overflow-y-auto p-6">
             {tab === 'ai' && (
               <div>
-                <h3 className="text-sm font-semibold text-[var(--pd-c-e8e8f0)] mb-1">AI Settings</h3>
+                <h3 className="text-sm font-semibold text-[var(--pd-c-e8e8f0)] mb-1">{translate('settings.ai')}</h3>
                 <p className="text-[12px] text-[var(--pd-c-6b6b7a)] mb-5 leading-relaxed">
-                  API keys are stored locally in this browser and sent only to the selected provider.
-                  Consumer subscriptions like ChatGPT Plus or Claude Pro cannot be used as API access.
+                  {translate('settings.aiHint')}
                 </p>
                 <AiProviderSettings />
               </div>
