@@ -39,6 +39,7 @@ export const fa: Record<TranslationKey, string> = {
   'actions.recentGradients': "گرادیان‌های اخیر",
   'formats.earlier': "انتقال قالب به قبل",
   'formats.later': "انتقال قالب به بعد",
+  'formats.reorderHint': 'برای تغییر ترتیب نگه دارید',
   'formats.dpiHint': "فقط تراکم PNG؛ ابعاد پیکسلی تغییر نمی‌کند.",
   'layerUi.assets': 'دارایی\u200cها',
   'layerUi.select': 'انتخاب',

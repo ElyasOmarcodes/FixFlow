@@ -39,6 +39,7 @@ export const ps: Record<TranslationKey, string> = {
   'actions.recentGradients': "وروستي ګرډینټونه",
   'formats.earlier': "قالب مخکې وړل",
   'formats.later': "قالب وروسته وړل",
+  'formats.reorderHint': 'د ترتیب بدلولو لپاره یې ونیسه',
   'formats.dpiHint': "یوازې د PNG کثافت؛ پکسلي اندازه نه بدلېږي.",
   'layerUi.assets': 'انځورونه',
   'layerUi.select': 'ټاکل',

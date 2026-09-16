@@ -44,6 +44,7 @@ export const en = {
   'actions.recentGradients': "Recent gradients",
   'formats.earlier': "Move format earlier",
   'formats.later': "Move format later",
+  'formats.reorderHint': 'hold to reorder',
   'formats.dpiHint': "PNG density only; pixel dimensions stay unchanged.",
   'layerUi.assets': 'Assets',
   'layerUi.select': 'Select',

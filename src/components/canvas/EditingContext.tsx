@@ -1,5 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { useShallow } from 'zustand/react/shallow'
 import { useEditorStore } from '@/store'
 import type { BuiltInFormatId, CanvasFormatId, CustomFormatId } from '@/types'
@@ -195,6 +198,38 @@ function HorizontalScrollAffordance({
   )
 }
 
+/**
+ * One draggable format tab.
+ *
+ * The drag only starts after the pointer has been held still for a moment, so
+ * a plain tap still switches format — the tab has to stay a button first and a
+ * handle second. Tapping and dragging cannot be told apart at the instant
+ * contact is made, and a distance-only threshold would turn every slightly
+ * imprecise tap on a phone into a reorder.
+ */
+function SortableFormatTab({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  return (
+    <div
+      ref={setNodeRef}
+      className="group/tab flex h-full shrink-0 items-center"
+      style={{
+        transform: DndCSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.45 : 1,
+        zIndex: isDragging ? 10 : undefined,
+        // The tab strip scrolls horizontally; without this the browser claims
+        // the gesture for panning and the long press never becomes a drag.
+        touchAction: 'none',
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  )
+}
+
 /** The two editing axes share one piece of persistent editor chrome. */
 export function EditingContextBar() {
   const t = useT()
@@ -349,6 +384,37 @@ export function EditingContextBar() {
     setCustomW('')
     setCustomH('')
   }
+  // A held press starts the drag; a tap still switches format. 8px of slack
+  // covers the finger movement that a "still" press really has.
+  const formatSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { delay: 300, tolerance: 8 } }),
+  )
+
+  /**
+   * Reorder within the family the tabs belong to, then write that back into
+   * the project's flat `activeFormats` list.
+   *
+   * The tab strip shows one family, but `activeFormats` holds every family's
+   * formats interleaved. Reordering the visible subset therefore cannot just
+   * be spliced in: the family's members keep the same *slots* in the flat
+   * list, and only the ids occupying those slots move — so other families
+   * stay exactly where they were.
+   */
+  const handleFormatReorder = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const family = activeFamilyFormats
+    const from = family.indexOf(active.id as CanvasFormatId)
+    const to = family.indexOf(over.id as CanvasFormatId)
+    if (from < 0 || to < 0) return
+    const reordered = arrayMove([...family], from, to)
+    const slots: number[] = []
+    activeFormats.forEach((id, index) => { if (family.includes(id)) slots.push(index) })
+    const next = [...activeFormats]
+    slots.forEach((slot, index) => { next[slot] = reordered[index] })
+    useEditorStore.getState().updateSettings({ activeFormats: next })
+  }
+
   const openFormatMenu = () => {
     const rect = dropdownRef.current?.getBoundingClientRect()
     const menuWidth = Math.min(280, window.innerWidth - 16)
@@ -390,25 +456,25 @@ export function EditingContextBar() {
     const isActive = activeCanvasFormat === formatId
     const count = rawGroup ? countFormatAdjustments(rawGroup, formatId, baseFormat) : 0
     const label = getFormatLabel(formatId, settings.customFormats)
-    return <div key={formatId} className="group/tab flex h-full shrink-0 items-center">
-      <button onClick={() => setActiveCanvasFormat(formatId)} data-tab-key={formatId} className={tabClass(isActive)} title={`${label} format · ${count} layout adjustment${count !== 1 ? 's' : ''}`}>
+    return <SortableFormatTab key={formatId} id={formatId}>
+      <button onClick={() => setActiveCanvasFormat(formatId)} data-tab-key={formatId} className={tabClass(isActive)} title={`${label} format · ${count} layout adjustment${count !== 1 ? 's' : ''} · ${t('formats.reorderHint')}`}>
         {label}{count > 0 && <span className="flex items-center gap-0.5 text-[9px] font-bold text-[#fbbf24]"><Icon name="dot" size={6} />{count}</span>}
       </button>
-      <div className="pointer-events-none -ml-0.5 flex h-full w-4 shrink-0 items-center justify-center opacity-0 transition-opacity group-hover/tab:pointer-events-auto group-hover/tab:opacity-100">
+      <div className="pd-tab-close pointer-events-none -ms-0.5 flex h-full w-4 shrink-0 items-center justify-center opacity-0 transition-opacity group-hover/tab:pointer-events-auto group-hover/tab:opacity-100">
         <button onClick={() => setDeleteTarget(formatId)} className="flex h-4 w-4 items-center justify-center rounded text-xs text-[var(--pd-c-6b6b7a)] transition-colors hover:bg-[rgba(248,113,113,0.1)] hover:text-[#f87171]" title={`Delete ${label} layout`} aria-label={`Delete ${label} layout`}><Icon name="close" size={10} strokeWidth={2.4} /></button>
       </div>
-    </div>
+    </SortableFormatTab>
   }
   const renderCustomTab = (formatId: CustomFormatId) => (
-    <div key={formatId} className="group/tab flex h-full shrink-0 items-center">
-      <button onClick={() => setActiveCanvasFormat(formatId)} data-tab-key={formatId} className={tabClass(activeCanvasFormat === formatId)}>
+    <SortableFormatTab key={formatId} id={formatId}>
+      <button onClick={() => setActiveCanvasFormat(formatId)} data-tab-key={formatId} className={tabClass(activeCanvasFormat === formatId)} title={t('formats.reorderHint')}>
         {getFormatLabel(formatId, settings.customFormats)}
       </button>
-      <button onClick={() => removeCustomFormat(formatId)} className="-ml-2 flex items-center pr-1 text-[var(--pd-c-6b6b7a)] opacity-0 transition-opacity group-hover/tab:opacity-100 hover:text-[#f87171]" title="Remove format" aria-label="Remove format"><Icon name="close" size={10} strokeWidth={2.4} /></button>
-    </div>
+      <button onClick={() => removeCustomFormat(formatId)} className="pd-tab-close -ms-2 flex items-center pe-1 text-[var(--pd-c-6b6b7a)] opacity-0 transition-opacity group-hover/tab:opacity-100 hover:text-[#f87171]" title="Remove format" aria-label="Remove format"><Icon name="close" size={10} strokeWidth={2.4} /></button>
+    </SortableFormatTab>
   )
   const renderFormatAddButton = () => (
-    <div className="relative ml-1 flex h-full shrink-0 items-center" ref={dropdownRef}>
+    <div className="relative ms-1 flex h-full shrink-0 items-center" ref={dropdownRef}>
       <button
         onClick={openFormatMenu}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-sm text-[var(--pd-c-6b6b7a)] transition-colors hover:border-[rgba(245,158,11,0.18)] hover:bg-[rgba(245,158,11,0.07)] hover:text-[#fbbf24]"
@@ -416,8 +482,6 @@ export function EditingContextBar() {
       >
         +
       </button>
-      <button title={t('formats.earlier')} aria-label={t('formats.earlier')} onClick={() => { const order = [...activeFormats]; const index = order.indexOf(activeCanvasFormat); if (index > 0) { [order[index - 1], order[index]] = [order[index], order[index - 1]]; useEditorStore.getState().updateSettings({ activeFormats: order }) } }}><Icon name="chevron-left" size={16} /></button>
-      <button title={t('formats.later')} aria-label={t('formats.later')} onClick={() => { const order = [...activeFormats]; const index = order.indexOf(activeCanvasFormat); if (index >= 0 && index < order.length - 1) { [order[index], order[index + 1]] = [order[index + 1], order[index]]; useEditorStore.getState().updateSettings({ activeFormats: order }) } }}><Icon name="chevron-right" size={16} /></button>
     </div>
   )
   const renderFormatMenuFamilies = (
@@ -535,7 +599,11 @@ export function EditingContextBar() {
             <HorizontalScrollAffordance>
               <div className="relative flex h-full min-w-max items-stretch">
                 {renderBaseTab()}
-                {activeFamilyFormats.map((format) => isCustomFormatId(format) ? renderCustomTab(format) : renderPresetTab(format))}
+                <DndContext sensors={formatSensors} collisionDetection={closestCenter} onDragEnd={handleFormatReorder}>
+                  <SortableContext items={[...activeFamilyFormats]} strategy={horizontalListSortingStrategy}>
+                    {activeFamilyFormats.map((format) => isCustomFormatId(format) ? renderCustomTab(format) : renderPresetTab(format))}
+                  </SortableContext>
+                </DndContext>
                 {renderFormatAddButton()}
                 <SlidingUnderline accentClass="bg-[#f59e0b]" activeKey={activeCanvasFormat} />
               </div>

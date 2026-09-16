@@ -176,6 +176,51 @@ try {
       await page.reload()
       await page.waitForTimeout(2500)
 
+      // ── Format tabs: tap switches, hold reorders ────────────────────────
+      // The tab has to stay a button first and a drag handle second, so both
+      // gestures are exercised: a quick tap must not reorder, and a held press
+      // must not merely select.
+      const formatOrder = () => page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        return useEditorStore.getState().project.settings.activeFormats
+      })
+      const activeFormat = () => page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        return useEditorStore.getState().activeCanvasFormat
+      })
+      const tabKeys = await page.locator('[data-tab-key]').evaluateAll((els) => els.map((el) => el.dataset.tabKey))
+      // [0] is the shared base tab, which is not reorderable.
+      expect(tabKeys.length).toBeGreaterThanOrEqual(3)
+      const firstTab = page.locator(`[data-tab-key="${tabKeys[1]}"]`)
+      const secondTab = page.locator(`[data-tab-key="${tabKeys[2]}"]`)
+
+      const orderBeforeTap = await formatOrder()
+      await firstTab.click()
+      await page.waitForTimeout(250)
+      expect(await activeFormat()).toBe(tabKeys[1])
+      expect(await formatOrder()).toEqual(orderBeforeTap)
+
+      const from = await firstTab.boundingBox()
+      const to = await secondTab.boundingBox()
+      await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2)
+      await page.mouse.down()
+      // Held past the activation delay, then dragged.
+      await page.waitForTimeout(450)
+      await page.mouse.move(to.x + to.width / 2 + 10, to.y + to.height / 2, { steps: 12 })
+      await page.waitForTimeout(200)
+      await page.mouse.up()
+      await page.waitForTimeout(400)
+      const orderAfterDrag = await formatOrder()
+      expect(orderAfterDrag).not.toEqual(orderBeforeTap)
+      expect([...orderAfterDrag].sort()).toEqual([...orderBeforeTap].sort())
+      console.log(`  format tabs: tap selects (${tabKeys[1]}), hold+drag reorders ${JSON.stringify(orderBeforeTap)} -> ${JSON.stringify(orderAfterDrag)}`)
+      // Put the order back so the template checks start from the default.
+      await page.evaluate(async (order) => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        useEditorStore.getState().updateSettings({ activeFormats: order })
+      }, orderBeforeTap)
+      await page.waitForTimeout(200)
+
       // Applying a template must not merge it into whatever is already open —
       // that is what put two designs on one canvas. Driven through the real
       // modal, because the store could always do this; the UI never offered it.
