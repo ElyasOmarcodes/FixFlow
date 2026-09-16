@@ -78,6 +78,7 @@ export const en = {
   'workspace.done': 'Done',
   'workspace.editText': 'Edit text',
   'workspace.textHint': 'Write your text here. Select words to style them.',
+  'workspace.edit': 'Edit',
   'workspace.more': 'More tools',
 
   // ── Generic actions / words reused everywhere ────────────────────────────

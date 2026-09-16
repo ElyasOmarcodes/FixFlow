@@ -73,6 +73,7 @@ export const ps: Record<TranslationKey, string> = {
   'workspace.done': 'بشپړ',
   'workspace.editText': 'متن بدلول',
   'workspace.textHint': 'خپل متن دلته ولیکئ. د بڼې بدلولو لپاره کلمې وټاکئ.',
+  'workspace.edit': 'سمون',
   'workspace.more': 'نور وسایل',
 
   // ── Generic actions / words reused everywhere ────────────────────────────

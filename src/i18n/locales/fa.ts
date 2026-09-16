@@ -73,6 +73,7 @@ export const fa: Record<TranslationKey, string> = {
   'workspace.done': 'تمام',
   'workspace.editText': 'ویرایش متن',
   'workspace.textHint': 'متن خود را اینجا بنویسید. برای تغییر ظاهر، واژه\u200cها را انتخاب کنید.',
+  'workspace.edit': 'ویرایش',
   'workspace.more': 'ابزارهای بیشتر',
 
   // ── Generic actions / words reused everywhere ────────────────────────────

@@ -1110,6 +1110,214 @@
 :root[data-theme='light'] .pd-sidebar { --pd-field-border: #d4d9e2; }
 :root[data-theme='light'] .pd-sidebar button { color: var(--pd-text); }
 
+
+/* ── Mobile "more tools" sheet ─────────────────────────────────────────────
+   A bottom sheet of labelled targets, not a folded-up toolbar. Lives at the
+   document root via a portal so no panel's overflow can clip it. */
+.pd-more-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0,0,0,0.5);
+  animation: pd-fade-in var(--pd-dur-fast) var(--pd-ease-standard) both;
+}
+
+.pd-more-sheet {
+  width: 100%;
+  max-height: min(82dvh, 720px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--pd-radius-sheet) var(--pd-radius-sheet) 0 0;
+  background: var(--pd-panel);
+  box-shadow: var(--pd-shadow-sheet);
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: pd-sheet-in var(--pd-dur-sheet) var(--pd-ease-decel) both;
+  will-change: transform;
+}
+
+/* The grab handle that says "sheet". */
+.pd-more-sheet::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--pd-field-border-hover);
+  opacity: 0.7;
+}
+
+.pd-more-exiting { pointer-events: none; animation: pd-fade-out var(--pd-dur-fast) var(--pd-ease-accel) both; }
+.pd-more-exiting .pd-more-sheet { animation: pd-sheet-out var(--pd-dur-fast) var(--pd-ease-accel) both; }
+
+@keyframes pd-sheet-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+.pd-more-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 14px 10px;
+  border-bottom: 1px solid var(--pd-field-border);
+}
+
+.pd-more-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pd-text);
+  text-align: start;
+  transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-more-title span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-more-title:active { background: var(--pd-hover); }
+.pd-more-title svg { flex-shrink: 0; opacity: 0.5; }
+
+.pd-more-rename {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--pd-accent);
+  border-radius: 10px;
+  background: var(--pd-field-bg);
+  color: var(--pd-text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pd-more-close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--pd-c-a0a0b0);
+  transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-more-close:active { background: var(--pd-hover); }
+
+.pd-more-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 14px 18px;
+}
+
+.pd-more-group { margin-top: 14px; }
+
+.pd-more-group h3 {
+  margin: 0 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pd-c-6b6b7a);
+}
+
+/* Two columns at phone width, four once a tablet has the room. auto-fit keeps
+   the last row from stretching one item across the sheet. */
+.pd-more-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pd-more-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 14px;
+  background: var(--pd-c-0f0f13);
+  color: var(--pd-text);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: start;
+  text-decoration: none;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-more-item span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-more-item svg { flex-shrink: 0; color: var(--pd-c-a0a0b0); }
+.pd-more-item:active:not(:disabled) { transform: scale(0.96); background: var(--pd-accent-wash); }
+.pd-more-item:disabled { opacity: 0.35; }
+
+.pd-more-item-primary {
+  border-color: transparent;
+  background: var(--pd-accent);
+  color: #fff;
+}
+.pd-more-item-primary svg { color: #fff; }
+
+.pd-more-item-active {
+  border-color: var(--pd-accent);
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+.pd-more-item-active svg { color: var(--pd-c-c4b5fd); }
+
+.pd-more-theme { display: flex; }
+.pd-more-theme .pd-theme-control {
+  flex: 1;
+  max-width: none;
+  min-height: 48px;
+  padding: 10px 30px 10px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+}
+[dir='rtl'] .pd-more-theme .pd-theme-control { padding: 10px 14px 10px 30px; }
+
+@media (min-width: 560px) {
+  .pd-more-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 768px) {
+  /* A tablet sheet is centred and bounded rather than edge to edge. */
+  .pd-more-backdrop { align-items: center; justify-content: center; padding: 24px; }
+  .pd-more-sheet {
+    max-width: 620px;
+    border-radius: 20px;
+    animation: pd-pop-in var(--pd-dur-base) var(--pd-ease-decel) both;
+  }
+  .pd-more-sheet::before { display: none; }
+  .pd-more-header { padding-top: 12px; }
+  .pd-more-exiting .pd-more-sheet { animation: pd-pop-out var(--pd-dur-fast) var(--pd-ease-accel) both; }
+}
+
 /* ─── 7. Writing direction ─────────────────────────────────────────────────
    Everything above uses logical properties, so this section only has to
    handle what CSS cannot express logically: transforms, physical gradients
@@ -1194,19 +1402,10 @@
   .pd-mobile-header button:active:not(:disabled) { background: var(--pd-accent-wash); transform: scale(0.9); }
   .pd-mobile-header button:disabled { opacity: 0.3; }
 
-  /* The desktop toolbar collapses into the "more" disclosure. */
+  /* The desktop toolbar is not rendered here at all; the "more" disclosure
+     opens .pd-more-sheet instead. This rule only covers the frame between a
+     resize and React's re-render. */
   .pd-toolbar { display: none; }
-  .pd-toolbar.pd-toolbar-expanded {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding-block: 6px;
-    max-height: 35dvh;
-    overflow: auto;
-    background: var(--pd-panel);
-    animation: pd-rise-in var(--pd-dur-fast) var(--pd-ease-decel) both;
-  }
-  .pd-toolbar > * { flex-shrink: 0; }
 
   .pd-editor { position: relative; flex-direction: column; }
 
@@ -1451,8 +1650,7 @@
    weight that only steals height. A tablet sheet leaves it visible, so these
    stay scoped here. */
 @media (max-width: 767px) {
-  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-mobile-header,
-  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-toolbar { display: none; }
+  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-mobile-header { display: none; }
 }
 
 /* The two editing axes share one bar; below ~600px it has to wrap instead of
@@ -1508,7 +1706,6 @@
    Very little vertical room: trade label height for canvas height. */
 @media (max-height: 500px) and (max-width: 1023px) {
   .pd-mobile-header { min-height: 44px; padding-block: 0; }
-  .pd-toolbar.pd-toolbar-expanded { max-height: 22dvh; }
   .pd-workspace-tools { flex-basis: 46px; }
   .pd-workspace-tools button { height: 40px; flex-direction: row; }
   .pd-mobile-nav button { min-height: 42px; flex-direction: row; padding: 2px; }

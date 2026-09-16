@@ -80,18 +80,42 @@ try {
     if (width < 1024) { await page.locator('#mobile-layers .pd-panel-close').click(); await page.locator('.pd-mobile-header').getByRole('button', { name: 'Undo', exact: true }).click() }
     else await page.getByTitle('Undo (Ctrl+Z)').click()
     await page.screenshot({ path: `test-results/editor/workspace-${width}-system.png` })
-    if (width < 1024) {
+    const openMoreIfCompact = async () => {
+      if (width >= 1024) return
       await page.getByRole('button', { name: 'More tools', exact: true }).click()
+      await expect(page.getByRole('dialog', { name: 'More tools' })).toBeVisible()
+    }
+    await openMoreIfCompact()
+    if (width < 1024) {
+      // The sheet is a grid of labelled targets, not a folded-up toolbar: every
+      // action has to be reachable without horizontal scrolling.
+      const sheet = page.getByRole('dialog', { name: 'More tools' })
+      const overflow = await sheet.evaluate((node) => node.scrollWidth - node.clientWidth)
+      expect(overflow).toBeLessThanOrEqual(1)
+      for (const label of ['Projects', 'Templates', 'Export', 'Undo', 'Redo', 'Settings', 'Help']) {
+        await expect(sheet.getByRole('button', { name: label, exact: true }).or(
+          sheet.getByRole('link', { name: label, exact: true }))).toHaveCount(1)
+      }
+      await page.screenshot({ path: `test-results/editor/more-sheet-${width}.png` })
     }
     await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+    if (width < 1024) {
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('dialog', { name: 'More tools' })).toHaveCount(0)
+    }
     if (width < 1024) await page.locator('.pd-mobile-nav button').first().click()
     await page.locator('.pd-layer-list').getByText('Text', { exact: true }).last().click()
     if (width < 1024) await page.locator('.pd-mobile-nav button').last().click()
     await page.screenshot({ path: `test-results/editor/workspace-${width}-light.png` })
     if (width < 1024) await page.locator('#mobile-properties .pd-panel-close').click()
+    await openMoreIfCompact()
     await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('dark')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+    if (width < 1024) {
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('dialog', { name: 'More tools' })).toHaveCount(0)
+    }
     await page.screenshot({ path: `test-results/editor/workspace-${width}-dark.png` })
     const settingsButton = width < 1024 ? page.locator('.pd-mobile-header').getByRole('button', { name: 'Settings', exact: true }) : page.getByTitle('Open settings', { exact: true })
     await settingsButton.click()
@@ -104,10 +128,16 @@ try {
     }
     await page.screenshot({ path: `test-results/editor/settings-${width}.png` })
     await page.locator('.pd-settings').getByRole('button', { name: 'Close', exact: true }).click()
-    await page.getByTitle('Help & keyboard shortcuts').click()
+    if (width < 1024) {
+      await openMoreIfCompact()
+      await page.getByRole('dialog', { name: 'More tools' }).getByRole('button', { name: 'Help', exact: true }).click()
+    } else {
+      await page.getByTitle('Help & keyboard shortcuts').click()
+    }
     await expect(page.getByRole('dialog', { name: 'PixelDeck user guide' })).toBeVisible()
     await page.screenshot({ path: `test-results/editor/guide-${width}.png` })
-    await page.getByRole('button', { name: 'Close', exact: true }).click()
+    await page.getByRole('dialog', { name: 'PixelDeck user guide' })
+      .getByRole('button', { name: 'Close', exact: true }).click()
     for (const [lang, title, aiTitle] of [
       ['ps', 'د PixelDeck لارښود', 'Gemini او د AI کارول'],
       ['fa', 'راهنمای PixelDeck', 'Gemini و استفاده از AI'],
@@ -123,9 +153,15 @@ try {
         expect(await content.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(2)
         await page.screenshot({ path: `test-results/editor/settings-${lang}-${width}.png` })
         await page.keyboard.press('Escape')
-        await page.locator('.pd-mobile-header button').last().click()
       }
-      await page.locator('.pd-toolbar').getByTitle(lang === 'ps' ? 'مرسته او د کیبورډ لنډ لارې' : 'راهنما و کلیدهای میان‌بر').click()
+      if (width < 1024) {
+        // Help lives in the "more" sheet on compact widths; the desktop toolbar
+        // is not rendered there at all.
+        await page.locator('.pd-mobile-header button').last().click()
+        await page.getByRole('dialog').getByRole('button', { name: lang === 'ps' ? 'مرسته' : 'راهنما', exact: true }).click()
+      } else {
+        await page.locator('.pd-toolbar').getByTitle(lang === 'ps' ? 'مرسته او د کیبورډ لنډ لارې' : 'راهنما و کلیدهای میان‌بر').click()
+      }
       await expect(page.getByRole('dialog', { name: title })).toBeVisible()
       // Help switches navigation at md (768px), independently of the editor shell.
       const chapterSelect = page.getByRole('dialog').locator('select')

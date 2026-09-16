@@ -1,4 +1,6 @@
 import { ThemeControl } from './ThemeControl'
+import { MobileMoreSheet } from './MobileMoreSheet'
+import { useCompactLayout } from '@/hooks/useCompactLayout'
 import { useState, useRef, useEffect, lazy, Suspense } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useEditorStore, useUndoRedo } from '@/store'
@@ -32,6 +34,10 @@ interface ToolbarProps {
 
 export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) {
   const t = useT()
+  // The desktop toolbar is not rendered at all on compact widths — it is not
+  // merely hidden. A hidden copy would duplicate every control in the
+  // accessibility tree and give the sheet's buttons ghost twins.
+  const compact = useCompactLayout()
   const {
     project,
     selectedLayerIds,
@@ -108,7 +114,70 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProjectMeta?.updatedAt])
 
+  // Picking something that opens a surface of its own dismisses the sheet;
+  // toggles and the theme select leave it up, because you may want several.
+  const runAndClose = (action: () => void) => () => { action(); setMoreOpen(false) }
+
   return (<>
+    {/* Lazy-loaded on first open, and outside both layouts so either can open them. */}
+    <Suspense>
+      <ProjectsModal open={projectsOpen} onClose={() => setProjectsOpen(false)} />
+      <TemplatesModal open={templatesOpen} onClose={() => setTemplatesOpen(false)} />
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+    </Suspense>
+
+    {compact && (
+      <MobileMoreSheet
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        projectName={project.name}
+        onRenameProject={(name) => {
+          renameProject(project.id, name).catch((err) => {
+            if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
+            else console.error('[PixelDeck] Failed to rename project', err)
+          })
+        }}
+        groups={[
+          {
+            key: 'project',
+            title: t('toolbar.projects'),
+            actions: [
+              { key: 'projects', icon: 'grid', label: t('toolbar.projects'), onClick: runAndClose(() => setProjectsOpen(true)) },
+              { key: 'templates', icon: 'template', label: t('toolbar.templates'), onClick: runAndClose(() => setTemplatesOpen(true)) },
+              { key: 'preview', icon: 'eye', label: t('slides.preview'), onClick: runAndClose(onPreview) },
+              { key: 'export', icon: 'download', label: t('common.export'), onClick: runAndClose(onExport), primary: true },
+            ],
+          },
+          {
+            key: 'edit',
+            title: t('workspace.edit'),
+            actions: [
+              { key: 'undo', icon: 'undo', label: t('toolbar.undo'), onClick: () => undo(), disabled: !canUndo },
+              { key: 'redo', icon: 'redo', label: t('toolbar.redo'), onClick: () => redo(), disabled: !canRedo },
+              { key: 'snap', icon: 'magnet', label: t('toolbar.smartSnap'), onClick: toggleSmartSnap, active: smartSnap },
+              ...(selectedLayerIds.length >= 2 ? [{
+                key: 'group',
+                icon: 'group' as const,
+                label: `${t('toolbar.group')} (${selectedLayerIds.length})`,
+                onClick: runAndClose(() => createGroup(selectedLayerIds)),
+              }] : []),
+            ],
+          },
+          {
+            key: 'workspace',
+            title: t('workspace.tools'),
+            actions: [
+              { key: 'localization', icon: 'languages', label: mode === 'localization' ? t('toolbar.backToDesign') : t('toolbar.localization'), onClick: runAndClose(() => onSetMode(mode === 'localization' ? 'editor' : 'localization')), active: mode === 'localization' },
+              { key: 'settings', icon: 'settings', label: t('toolbar.settings'), onClick: runAndClose(() => setSettingsOpen(true)) },
+              { key: 'help', icon: 'help', label: t('toolbar.help'), onClick: runAndClose(() => setHelpOpen(true)) },
+              { key: 'github', icon: 'github', label: t('toolbar.github'), onClick: () => {}, href: 'https://github.com/ElyasOmarcodes/FixFlow' },
+            ],
+          },
+        ]}
+      />
+    )}
+
     <div className="pd-mobile-header">
       <button aria-label={t('toolbar.projects')} onClick={() => setProjectsOpen(true)}><Icon name="grid" size={20} /></button>
       <strong>{project.name}</strong>
@@ -119,21 +188,13 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
       <button aria-label={t('toolbar.settings')} onClick={() => setSettingsOpen(true)}><Icon name="settings" size={20} /></button>
       <button aria-label={t('workspace.more')} aria-expanded={moreOpen} onClick={() => setMoreOpen(!moreOpen)}><Icon name="more-horizontal" size={20} /></button>
     </div>
-    <header
-      className={`pd-toolbar ${moreOpen ? 'pd-toolbar-expanded' : ''} shrink-0 flex min-h-12 items-center gap-3 border-b px-3 max-[1099px]:gap-2 max-[1099px]:px-2`}
+    {!compact && <header
+      className="pd-toolbar shrink-0 flex min-h-12 items-center gap-3 border-b px-3 max-[1099px]:gap-2 max-[1099px]:px-2"
       style={{
         background: 'var(--pd-c-18181f)',
         borderColor: 'rgba(255,255,255,0.08)',
       }}
     >
-      {/* Projects / Templates / API modals — lazy loaded on first open */}
-      <Suspense>
-        <ProjectsModal open={projectsOpen} onClose={() => setProjectsOpen(false)} />
-        <TemplatesModal open={templatesOpen} onClose={() => setTemplatesOpen(false)} />
-        <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-        <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
-      </Suspense>
-
       {/* Logo */}
       <Logo />
       <ThemeControl />
@@ -369,6 +430,6 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
           <span className="max-[1099px]:hidden">{t('toolbar.github')}</span>
         </a>
       </div>
-    </header>
+    </header>}
   </>)
 }
