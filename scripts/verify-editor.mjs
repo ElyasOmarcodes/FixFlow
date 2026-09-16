@@ -45,7 +45,8 @@ try {
     await page.getByRole('button', { name: 'Select all', exact: true }).click()
     await expect(page.getByRole('button', { name: 'Group selected layers', exact: true })).toBeEnabled()
     await page.getByRole('button', { name: 'Group selected layers', exact: true }).click()
-    await expect(page.getByRole('button', { name: 'Ungroup', exact: true })).toBeEnabled()
+    const ungroup = page.locator('.pd-layer-footer').getByRole('button', { name: 'Ungroup', exact: true })
+    await expect(ungroup).toBeEnabled()
     await page.locator('.pd-layer-list').getByRole('button', { name: 'Rename', exact: true }).first().click()
     const rename = page.locator('.pd-layer-list input').first()
     await rename.fill('Collection')
@@ -62,7 +63,7 @@ try {
       await expect(page.locator('.pd-slides')).toBeHidden()
     }
     await page.screenshot({ path: `test-results/editor/layers-${width}.png` })
-    await page.getByRole('button', { name: 'Ungroup', exact: true }).click()
+    await ungroup.click()
     await page.locator('.pd-layer-list').getByText('Text', { exact: true }).last().click()
     // Real UI operations: duplicate, delete and undo.
     await page.locator('.pd-layer-footer').getByRole('button', { name: 'Duplicate', exact: true }).click()
