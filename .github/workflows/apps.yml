@@ -24,6 +24,10 @@ on:
         description: 'Build the Android APK'
         type: boolean
         default: true
+      release_tag:
+        description: 'Publish a GitHub release at this tag (e.g. v0.9.0). Leave empty to only upload artifacts.'
+        type: string
+        default: ''
   # Keep the app packaging honest on PRs that touch it, without spending CI
   # minutes on every unrelated change.
   pull_request:
@@ -305,11 +309,17 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-  # ── Attach everything to the GitHub release on a v* tag ─────────────────────
+  # ── Attach everything to the GitHub release ─────────────────────────────────
+  #
+  # Two ways in. Pushing a v* tag is the usual one. A manual run can also
+  # publish, by naming the tag in `release_tag` — the action creates that tag at
+  # the commit being built. That path exists because pushing a tag is not always
+  # available (a CI identity or a sandbox may be scoped to branch refs only),
+  # and "the installers exist but cannot be published" is a poor place to stop.
   release:
     name: Attach to release
     needs: [desktop, android]
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -324,5 +334,8 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
+          # Empty on a tag push, where the action reads the tag from the ref.
+          tag_name: ${{ inputs.release_tag }}
           files: artifacts/*
           fail_on_unmatched_files: true
+          generate_release_notes: true
