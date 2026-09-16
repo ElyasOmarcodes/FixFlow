@@ -216,6 +216,10 @@ const ICONS = {
   ),
 
   // ── Domain / feature ─────────────────────────────────────────────────────
+  // Stacking order: a filled card lifted clear of two outlined ones behind it,
+  // and its mirror for sending to the back. The arrow says which way it travels.
+  'bring-to-front': <><rect x="3" y="8" width="10" height="10" rx="2" /><rect x="8" y="3" width="13" height="13" rx="2" fill="currentColor" stroke="none" /></>,
+  'send-to-back': <><rect x="11" y="6" width="10" height="10" rx="2" /><rect x="3" y="8" width="13" height="13" rx="2" fill="currentColor" stroke="none" /></>,
   // Horseshoe magnet: two prongs and the arc joining them, with the pole tips
   // left open so the shape still reads at 13px.
   magnet: <><path d="M6 15V7a6 6 0 0 1 12 0v8" /><path d="M6 15v2a6 6 0 0 0 12 0v-2" /><path d="M6 11h4M14 11h4" /></>,

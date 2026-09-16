@@ -792,6 +792,21 @@
   border-color: #e5484d;
 }
 
+/* The two drag grips read as grips, not buttons: a resize cursor, and no
+   browser gesture stealing the pointer mid-drag. */
+.pd-handle-action-drag { cursor: grab; touch-action: none; }
+.pd-handle-action-drag:active { cursor: grabbing; }
+
+/* While a grip is being dragged it stays lit, so it is obvious which of the
+   two gestures is running even when the pointer has travelled far from it. */
+.pd-handle-action-active,
+.pd-handle-action-active:hover {
+  background: var(--pd-accent);
+  border-color: var(--pd-accent);
+  color: #fff;
+  transform: scale(1.06);
+}
+
 /* Touch needs a bigger target and more clearance from the resize anchors — a
    fingertip covers both at the pointer-fine size. */
 @media (pointer: coarse) {

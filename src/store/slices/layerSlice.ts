@@ -35,6 +35,10 @@ export const createLayerSlice = (
   | 'duplicateLayer'
   | 'moveLayerUp'
   | 'moveLayerDown'
+  | 'bringLayerForward'
+  | 'sendLayerBackward'
+  | 'bringLayerToFront'
+  | 'sendLayerToBack'
   | 'reorderLayers'
   | 'setLayerVisibility'
   | 'setLayerLocked'
@@ -205,6 +209,58 @@ export const createLayerSlice = (
       if (idx < 0 || idx >= g.layers.length - 1 || g.layers[idx]?.type === 'background') return g
       const layers = [...g.layers]
       ;[layers[idx], layers[idx + 1]] = [layers[idx + 1], layers[idx]]
+      return { ...g, layers }
+    })
+  },
+
+  /**
+   * Z-order helpers.
+   *
+   * `layers` is painted front-to-back by array order, so a *higher* index draws
+   * in front. The background is pinned at index 0 and is never reordered, which
+   * is why the floor for every move below is 1 rather than 0. (moveLayerUp /
+   * moveLayerDown above are named for the array, not the screen; these are
+   * named for what the user sees.)
+   */
+  bringLayerForward: (layerId) => {
+    mutateActiveGroup(set, (g) => {
+      const idx = g.layers.findIndex((l) => l.id === layerId)
+      if (idx < 1 || idx >= g.layers.length - 1) return g
+      const layers = [...g.layers]
+      ;[layers[idx], layers[idx + 1]] = [layers[idx + 1], layers[idx]]
+      return { ...g, layers }
+    })
+  },
+
+  sendLayerBackward: (layerId) => {
+    mutateActiveGroup(set, (g) => {
+      const idx = g.layers.findIndex((l) => l.id === layerId)
+      if (idx <= 1) return g
+      const layers = [...g.layers]
+      ;[layers[idx - 1], layers[idx]] = [layers[idx], layers[idx - 1]]
+      return { ...g, layers }
+    })
+  },
+
+  bringLayerToFront: (layerId) => {
+    mutateActiveGroup(set, (g) => {
+      const idx = g.layers.findIndex((l) => l.id === layerId)
+      if (idx < 1 || idx === g.layers.length - 1) return g
+      const layers = [...g.layers]
+      const [moved] = layers.splice(idx, 1)
+      layers.push(moved)
+      return { ...g, layers }
+    })
+  },
+
+  sendLayerToBack: (layerId) => {
+    mutateActiveGroup(set, (g) => {
+      const idx = g.layers.findIndex((l) => l.id === layerId)
+      if (idx <= 1) return g
+      const layers = [...g.layers]
+      const [moved] = layers.splice(idx, 1)
+      // Index 1, not 0: the background keeps the bottom slot.
+      layers.splice(g.layers[0]?.type === 'background' ? 1 : 0, 0, moved)
       return { ...g, layers }
     })
   },

@@ -1,30 +1,105 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEditorStore } from '@/store'
 import { resolveGroupView } from '@/utils/canvasFormats'
 import { findLayerInTree } from '@/utils/layerTree'
 import { Icon } from '@/components/ui/Icon'
 import { useT } from '@/i18n'
-import type { Layer } from '@/types'
-export function SelectionActions({ onEdit }: { onEdit: () => void }) {
-  const state = useEditorStore()
+import type { IconName } from '@/components/ui/Icon'
+
+/**
+ * The floating bar under the selected layer.
+ *
+ * Deliberately narrow in purpose: duplication and stacking order. Everything
+ * that changes the layer's *geometry* — delete, lock, resize, rotate — lives on
+ * the selection box corners instead, where it is attached to the thing it acts
+ * on. Splitting them this way keeps either cluster small enough to read at a
+ * glance, and means neither one grows into a second properties panel.
+ */
+export function SelectionActions() {
   const t = useT()
-  const group = state.project.slideGroups.find((item) => item.id === state.activeSlideGroupId)
-  const layer = group && state.selection?.layerId ? findLayerInTree(resolveGroupView(group, state.project.settings, state.activeLocale, state.activeCanvasFormat).layers, state.selection.layerId) : undefined
-  if (!layer || layer.type === 'background' || state.editingTextId) return null
-  const resize = (factor: number) => {
-    const patch: Record<string, number> = {}
-    const values = layer as unknown as Record<string, unknown>
-    const keys = layer.type === 'group' || layer.type === 'phone' ? ['scale'] : layer.type === 'text' || layer.type === 'emoji' ? ['fontSize', 'width', 'height'] : ['width', 'height']
-    for (const key of keys) if (typeof values[key] === 'number' || key === 'scale') patch[key] = (typeof values[key] === 'number' ? values[key] as number : 1) * factor
-    state.updateLayer(layer.id, patch as Partial<Layer>)
-  }
-  const edit = () => { if (layer.type === 'text') state.startTextEdit(layer.id); else onEdit() }
-  return <div className="pd-selection-actions" role="toolbar" aria-label={t('actions.selected')}>
-    <button title={t('actions.edit')} aria-label={t('actions.edit')} onClick={edit}><Icon name="settings" size={18} /></button>
-    <button title={t('actions.rotate')} aria-label={t('actions.rotate')} disabled={layer.locked} onClick={() => state.updateLayer(layer.id, { rotation: (layer.rotation + 90) % 360 })}><Icon name="rotate-cw" size={18} /></button>
-    <button title={t('actions.shrink')} aria-label={t('actions.shrink')} disabled={layer.locked} onClick={() => resize(1 / 1.1)}>−</button>
-    <button title={t('actions.grow')} aria-label={t('actions.grow')} disabled={layer.locked} onClick={() => resize(1.1)}>+</button>
-    <button title={t('workspace.duplicate')} aria-label={t('workspace.duplicate')} onClick={() => state.duplicateLayer(layer.id)}><Icon name="copy" size={18} /></button>
-    {layer.type === 'group' && <button title={t('layerUi.ungroup')} aria-label={t('layerUi.ungroup')} onClick={() => state.dissolveGroup(layer.id)}><Icon name="ungroup" size={18} /></button>}
-    <button title={t('workspace.delete')} aria-label={t('workspace.delete')} onClick={() => state.removeLayer(layer.id)}><Icon name="trash" size={18} /></button>
-  </div>
+  const {
+    project, activeSlideGroupId, activeLocale, activeCanvasFormat,
+    selection, selectedLayerIds, editingTextId, editingGroupId,
+  } = useEditorStore(useShallow((s) => ({
+    project: s.project,
+    activeSlideGroupId: s.activeSlideGroupId,
+    activeLocale: s.activeLocale,
+    activeCanvasFormat: s.activeCanvasFormat,
+    selection: s.selection,
+    selectedLayerIds: s.selectedLayerIds,
+    editingTextId: s.editingTextId,
+    editingGroupId: s.editingGroupId,
+  })))
+
+  const targetIds = selectedLayerIds.length > 0
+    ? selectedLayerIds
+    : selection?.layerId ? [selection.layerId] : []
+
+  const group = project.slideGroups.find((item) => item.id === activeSlideGroupId)
+  const layer = targetIds.length === 1 && group
+    ? findLayerInTree(resolveGroupView(group, project.settings, activeLocale, activeCanvasFormat).layers, targetIds[0])
+    : undefined
+
+  // Nothing to reorder while typing, and the background owns the bottom of the
+  // stack by definition — offering to move it would be a lie.
+  if (targetIds.length === 0 || editingTextId) return null
+  if (targetIds.length === 1 && (!layer || layer.type === 'background')) return null
+
+  const store = useEditorStore.getState
+  // Reordering inside a group edits the group's children, which is a different
+  // list from the slide's; only duplication is meaningful there.
+  const canReorder = !editingGroupId
+
+  const actions: { key: string; icon: IconName; label: string; run: () => void }[] = [
+    {
+      key: 'duplicate',
+      icon: 'copy',
+      label: t('workspace.duplicate'),
+      run: () => { for (const id of targetIds) store().duplicateLayer(id) },
+    },
+    ...(canReorder ? [
+      {
+        key: 'front',
+        icon: 'bring-to-front' as IconName,
+        label: t('actions.bringToFront'),
+        // Front-most last: applying in order leaves the selection stacked the
+        // way it was, rather than reversed.
+        run: () => { for (const id of targetIds) store().bringLayerToFront(id) },
+      },
+      {
+        key: 'forward',
+        icon: 'arrow-up' as IconName,
+        label: t('actions.bringForward'),
+        run: () => { for (const id of [...targetIds].reverse()) store().bringLayerForward(id) },
+      },
+      {
+        key: 'backward',
+        icon: 'arrow-down' as IconName,
+        label: t('actions.sendBackward'),
+        run: () => { for (const id of targetIds) store().sendLayerBackward(id) },
+      },
+      {
+        key: 'back',
+        icon: 'send-to-back' as IconName,
+        label: t('actions.sendToBack'),
+        run: () => { for (const id of [...targetIds].reverse()) store().sendLayerToBack(id) },
+      },
+    ] : []),
+  ]
+
+  return (
+    <div className="pd-selection-actions" role="toolbar" aria-label={t('actions.selected')}>
+      {actions.map((action) => (
+        <button
+          key={action.key}
+          type="button"
+          title={action.label}
+          aria-label={action.label}
+          onClick={action.run}
+        >
+          <Icon name={action.icon} size={18} />
+        </button>
+      ))}
+    </div>
+  )
 }

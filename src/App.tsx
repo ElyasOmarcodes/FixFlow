@@ -318,8 +318,8 @@ export default function App() {
                 user while the exported PNGs stayed the same. */}
             <div dir="ltr" style={{ flex: 1, position: 'relative', zIndex: 0, overflow: 'hidden' }}>
               <StageCanvas stageRef={stageRef} />
-              <SelectionHandleActions onEdit={() => setMobilePanel('properties')} />
-              <SelectionActions onEdit={() => setMobilePanel('properties')} />
+              <SelectionHandleActions />
+              <SelectionActions />
               {(scopedEditingIndicator.isFormatScoped || scopedEditingIndicator.isLocaleScoped) && (
                 <div
                   aria-hidden="true"

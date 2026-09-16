@@ -264,31 +264,110 @@ try {
       console.log(`  smart snap: on -> x=${snapped.x} with ${guidesWhileSnapping} guide(s); off -> x=${free.x.toFixed(1)}, no guides`)
 
       // ── Selection handle actions ──────────────────────────────────────────
-      // Four buttons ringing the selected layer's box, and they have to be the
-      // real actions, not decoration — so each is exercised through the store.
-      // The layer is enlarged first: below ~74 screen pixels the buttons would
-      // cover the artwork and the resize anchors, so they deliberately hide,
-      // and the default 300x200 at fit-zoom is under that.
+      // Four grips ringing the layer: delete and lock are buttons, resize and
+      // rotate are drags. The layer is enlarged first because the cluster hides
+      // below ~26 screen pixels, and the default shape at fit-zoom is near that.
+      await page.locator('.pd-toolbar').getByRole('button', { name: 'Snap', exact: true }).click()
+      await page.waitForTimeout(200)
       await page.evaluate(async (id) => {
         const { useEditorStore } = await import('/src/store/index.ts')
         const state = useEditorStore.getState()
-        state.updateLayer(id, { x: 200, y: 400, width: 800, height: 700 })
+        state.updateLayer(id, { x: 200, y: 400, width: 800, height: 700, rotation: 0 })
         state.select(id)
       }, mover.id)
       await page.waitForTimeout(500)
+
       const handles = page.locator('.pd-handle-action')
       await expect(handles).toHaveCount(4)
-      expect(await handles.evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')).sort()))
-        .toEqual(['Delete', 'Duplicate', 'Edit', 'Lock layer'])
-      const shapeCount = async () => (await readShapes()).length
-      const beforeDuplicate = await shapeCount()
-      await page.locator('.pd-handle-action[aria-label="Duplicate"]').click()
-      await page.waitForTimeout(350)
-      expect(await shapeCount()).toBe(beforeDuplicate + 1)
-      await page.locator('.pd-handle-action[aria-label="Delete"]').click()
-      await page.waitForTimeout(350)
-      expect(await shapeCount()).toBe(beforeDuplicate)
+      // Corner order matters: delete top-left, lock top-right, resize
+      // bottom-left, rotate bottom-right.
+      const corners = await handles.evaluateAll((els) => els.map((el) => {
+        const r = el.getBoundingClientRect()
+        return { label: el.getAttribute('aria-label'), x: Math.round(r.x), y: Math.round(r.y) }
+      }))
+      const at = (predicate) => corners.find(predicate)
+      const del = at((c) => c.label === 'Delete')
+      const lock = at((c) => c.label === 'Lock layer')
+      const resize = at((c) => (c.label || '').includes('resize'))
+      const rotate = at((c) => (c.label || '').includes('rotate'))
+      expect(del && lock && resize && rotate).toBeTruthy()
+      expect(del.x).toBeLessThan(lock.x)
+      expect(resize.x).toBeLessThan(rotate.x)
+      expect(del.y).toBeLessThan(resize.y)
+      expect(lock.y).toBeLessThan(rotate.y)
+
+      const shapeState = () => page.evaluate(async (id) => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        const group = state.project.slideGroups.find((g) => g.id === state.activeSlideGroupId)
+        const layer = group.layers.find((l) => l.id === id)
+        return {
+          width: layer.width,
+          height: layer.height,
+          rotation: layer.rotation,
+          undo: useEditorStore.temporal.getState().pastStates.length,
+        }
+      }, mover.id)
+
+      const dragHandle = async (selector, dx, dy) => {
+        const grip = await page.locator(selector).boundingBox()
+        await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2)
+        await page.mouse.down()
+        await page.mouse.move(grip.x + grip.width / 2 + dx, grip.y + grip.height / 2 + dy, { steps: 10 })
+        await page.mouse.up()
+        await page.waitForTimeout(300)
+      }
+
+      const beforeGestures = await shapeState()
+      // Smart snap is on here, so the rotation must land on a multiple of 45.
+      await dragHandle('.pd-handle-action[aria-label*="rotate"]', -150, 120)
+      const rotated = await shapeState()
+      expect(rotated.rotation % 45).toBe(0)
+      expect(rotated.rotation).not.toBe(beforeGestures.rotation)
+      expect(rotated.undo).toBe(beforeGestures.undo + 1)
+
+      await dragHandle('.pd-handle-action[aria-label*="resize"]', -120, 120)
+      const resized = await shapeState()
+      expect(resized.width).toBeGreaterThan(rotated.width)
+      // Proportional: the aspect ratio survives the drag.
+      expect(resized.width / resized.height).toBeCloseTo(rotated.width / rotated.height, 3)
+      // One undo step per gesture, not one per pointer move and not zero.
+      expect(resized.undo).toBe(rotated.undo + 1)
+
+      await page.keyboard.press('Control+z')
+      await page.waitForTimeout(300)
+      const undone = await shapeState()
+      expect(undone.width).toBeCloseTo(rotated.width, 3)
+      expect(undone.rotation).toBe(rotated.rotation)
       await page.screenshot({ path: 'test-results/editor/selection-handles.png' })
+
+      // ── Bottom bar: duplication and stacking order ────────────────────────
+      const bottomActions = await page.locator('.pd-selection-actions button')
+        .evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))
+      expect(bottomActions).toEqual([
+        'Duplicate', 'Bring to front', 'Bring forward', 'Send backward', 'Send to back',
+      ])
+
+      // Ids, not types: both content layers are shapes, so a type list would look
+      // unchanged however they are reordered.
+      const order = () => page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        const group = state.project.slideGroups.find((g) => g.id === state.activeSlideGroupId)
+        return group.layers.map((l) => ({ id: l.id, type: l.type }))
+      })
+      const beforeOrder = await order()
+      await page.locator('.pd-selection-actions button[aria-label="Send to back"]').click()
+      await page.waitForTimeout(300)
+      const afterBack = await order()
+      // The background never loses the bottom slot, whatever is sent behind.
+      expect(afterBack[0].type).toBe('background')
+      expect(afterBack.map((l) => l.id)).not.toEqual(beforeOrder.map((l) => l.id))
+      await page.locator('.pd-selection-actions button[aria-label="Bring to front"]').click()
+      await page.waitForTimeout(300)
+      expect((await order()).map((l) => l.id)).toEqual(beforeOrder.map((l) => l.id))
+      console.log(`  selection handles: 4 grips in corners, rotate snapped to ${rotated.rotation}deg, resize proportional, 1 undo step each`)
+      console.log('  bottom bar: duplicate + 4 stacking actions, background stays at the bottom')
 
       // The background covers the whole canvas; ringing it would strand four
       // buttons in the corners of the viewport.
@@ -300,10 +379,9 @@ try {
       })
       await page.waitForTimeout(400)
       await expect(handles).toHaveCount(0)
-      console.log('  selection handles: 4 corner actions, duplicate/delete wired, none on the background')
 
-      // Restore the default and a clean project for the template sweep.
-      await page.locator('.pd-toolbar').getByRole('button', { name: 'Snap', exact: true }).click()
+      // Snapping was already restored before the handle checks; just reset the
+      // project for the template sweep below.
       await page.evaluate(async () => {
         const { useEditorStore } = await import('/src/store/index.ts')
         useEditorStore.getState().resetProject()

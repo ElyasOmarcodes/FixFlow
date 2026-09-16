@@ -148,6 +148,15 @@ export interface EditorStore {
   duplicateLayer: (layerId: string) => void
   moveLayerUp: (layerId: string) => void
   moveLayerDown: (layerId: string) => void
+  /**
+   * Z-order, named by what the user sees rather than by array direction.
+   * `layers` is painted in order, so a higher index draws in front; the
+   * background holds index 0 and never moves.
+   */
+  bringLayerForward: (layerId: string) => void
+  sendLayerBackward: (layerId: string) => void
+  bringLayerToFront: (layerId: string) => void
+  sendLayerToBack: (layerId: string) => void
   reorderLayers: (layerIds: string[]) => void
   setLayerVisibility: (layerId: string, visible: boolean) => void
   setLayerLocked: (layerId: string, locked: boolean) => void
