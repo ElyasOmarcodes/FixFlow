@@ -324,10 +324,40 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Checkout runs first and deliberately so: it cleans the workspace, which
+      # would delete the downloaded installers if it ran after them. Only
+      # CHANGELOG.md is fetched — the release notes are the sole reason the
+      # repository is needed here at all.
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: CHANGELOG.md
+          sparse-checkout-cone-mode: false
+
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
           merge-multiple: true
+
+      - name: Extract this version's changelog section
+        id: notes
+        run: |
+          set -euo pipefail
+          tag="${{ inputs.release_tag || github.ref_name }}"
+          version="${tag#v}"
+          # The section runs from its own "## [x.y.z]" heading to the next
+          # "## " heading, with the heading line itself dropped.
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          if [ -s notes.md ]; then
+            echo "Found $(wc -l < notes.md) lines of notes for $version."
+            echo "have_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No CHANGELOG section for $version; falling back to generated notes."
+            echo "have_notes=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: List what will be published
         run: ls -lh artifacts/
@@ -336,6 +366,7 @@ jobs:
         with:
           # Empty on a tag push, where the action reads the tag from the ref.
           tag_name: ${{ inputs.release_tag }}
+          body_path: ${{ steps.notes.outputs.have_notes == 'true' && 'notes.md' || '' }}
+          generate_release_notes: ${{ steps.notes.outputs.have_notes != 'true' }}
           files: artifacts/*
           fail_on_unmatched_files: true
-          generate_release_notes: true
