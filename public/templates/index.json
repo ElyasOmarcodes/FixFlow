@@ -36,6 +36,33 @@
       "file": "/templates/deep-focus.template.json",
       "slides": 6,
       "previewSize": "1290×2796"
+    },
+    {
+      "slug": "noor-editorial",
+      "name": "Noor · Editorial",
+      "description": "Seven original coordinated layouts with editable typography, feature cards and replaceable device screens.",
+      "category": "Editorial",
+      "file": "/templates/noor-editorial.template.json",
+      "slides": 7,
+      "previewSize": "1320×2868"
+    },
+    {
+      "slug": "orbit-studio",
+      "name": "Orbit · Studio",
+      "description": "Seven original coordinated layouts with editable typography, feature cards and replaceable device screens.",
+      "category": "Editorial",
+      "file": "/templates/orbit-studio.template.json",
+      "slides": 7,
+      "previewSize": "1320×2868"
+    },
+    {
+      "slug": "serein-wellness",
+      "name": "Serein · Wellness",
+      "description": "Seven original coordinated layouts with editable typography, feature cards and replaceable device screens.",
+      "category": "Editorial",
+      "file": "/templates/serein-wellness.template.json",
+      "slides": 7,
+      "previewSize": "1320×2868"
     }
   ]
 }

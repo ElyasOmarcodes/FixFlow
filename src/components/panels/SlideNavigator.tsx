@@ -8,11 +8,10 @@ import { SortableContext, useSortable, horizontalListSortingStrategy, arrayMove 
 import { CSS } from '@dnd-kit/utilities'
 import { useEditorStore } from '@/store'
 import { fillToCss } from '@/utils/gradients'
-import { BASE_CANVAS_FORMAT, getExportTargets, getFormatCanvasDims, getProjectBaseFormat, selectFormatViewGroups } from '@/utils/canvasFormats'
+import { BASE_CANVAS_FORMAT, getFormatCanvasDims, getProjectBaseFormat, selectFormatViewGroups } from '@/utils/canvasFormats'
 import { MAX_PANO_COMPENSATION_PX } from '@/utils/panoGeometry'
 import type { BackgroundLayer, SlideGroup } from '@/types'
 import type { ThumbnailMap } from '@/hooks/useThumbnails'
-import { ExportModal } from './ExportModal'
 import { Icon } from '@/components/ui/Icon'
 import { useT, type TranslationKey } from '@/i18n'
 
@@ -27,7 +26,6 @@ interface SlideNavigatorProps {
   staleGroupIds: Set<string>
   stageRef: React.RefObject<Konva.Stage | null>
   onCaptureThumbnail: (groupId: string) => void
-  onOpenPreview: () => void
 }
 
 const NUM_SLIDES_OPTIONS: { value: number; labelKey: TranslationKey; suffix?: string }[] = [
@@ -216,7 +214,7 @@ function SortableGroupItem({
   )
 }
 
-export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureThumbnail, onOpenPreview }: SlideNavigatorProps) {
+export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }: SlideNavigatorProps) {
   const compact = useCompactLayout()
   const [slideOptionsOpen, setSlideOptionsOpen] = useState(false)
   const t = useT()
@@ -251,7 +249,6 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
   })))
 
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null)
-  const [exportOpen, setExportOpen] = useState(false)
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const renameInputRef = useRef<HTMLInputElement>(null)
@@ -272,7 +269,6 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
 
   // The formats currently active for this project
   // Export targets — Base is used when no platform or custom formats are active.
-  const exportableFormats = getExportTargets(project)
 
   // Close context menu on outside click
   useEffect(() => {
@@ -457,25 +453,6 @@ export function SlideNavigator({ thumbnails, staleGroupIds, stageRef, onCaptureT
           <Icon name="plus" size={15} strokeWidth={2.2} />
         </button>
       </div>
-
-      <div className="flex items-center gap-2 shrink-0 border-l border-[rgba(255,255,255,0.06)] pl-3">
-        <button
-          onClick={onOpenPreview}
-          className="text-xs text-[var(--pd-c-e8e8f0)] px-3 py-2 rounded border border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
-        >
-          {t('slides.preview')}
-        </button>
-
-        <button
-          onClick={() => setExportOpen(true)}
-          disabled={exportableFormats.length === 0}
-          className="text-xs text-white px-3 py-2 rounded bg-[var(--pd-c-7c6ef6)] hover:bg-[#6c5ed6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          {t('common.export')}
-        </button>
-      </div>
-
-      <ExportModal open={exportOpen} onClose={() => setExportOpen(false)} stageRef={stageRef} />
 
       {/* Context menu */}
       {contextMenu && (

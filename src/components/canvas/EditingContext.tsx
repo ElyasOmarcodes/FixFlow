@@ -225,6 +225,7 @@ export function EditingContextBar() {
   const [customLabel, setCustomLabel] = useState('')
   const [customW, setCustomW] = useState('')
   const [customH, setCustomH] = useState('')
+  const [customDpi, setCustomDpi] = useState('96')
   const [formatMenuPosition, setFormatMenuPosition] = useState({ left: 0, top: 0 })
   const dropdownRef = useRef<HTMLDivElement>(null)
   const formatMenuRef = useRef<HTMLDivElement>(null)
@@ -239,8 +240,6 @@ export function EditingContextBar() {
   const isCreated = (formatId: CanvasFormatId) => activeFormats.includes(formatId) && hasFormatLayout(project, formatId)
   const activeFamilyFormats = selectFamilyFormats(project, activeFamily)
     .filter(isCreated)
-  const activeFamilyPresetFormats = activeFamilyFormats.filter((formatId): formatId is BuiltInFormatId => !isCustomFormatId(formatId))
-  const activeFamilyCustomFormats = activeFamilyFormats.filter(isCustomFormatId)
   const familyEntries = families.map((family) => {
     const formats = selectFamilyFormats(project, family)
       .filter(isCreated)
@@ -317,7 +316,7 @@ export function EditingContextBar() {
   }
   const openFormatMenu = () => {
     const rect = dropdownRef.current?.getBoundingClientRect()
-    if (rect) setFormatMenuPosition({ left: rect.left, top: rect.bottom + 4 })
+    if (rect) setFormatMenuPosition({ left: Math.max(8, Math.min(rect.left, window.innerWidth - 290)), top: rect.bottom + 4 })
     setDropdownOpen((open) => !open)
   }
   const runFormatAction = (action: (format: CanvasFormatId) => void) => {
@@ -381,6 +380,8 @@ export function EditingContextBar() {
       >
         +
       </button>
+      <button title={t('formats.earlier')} aria-label={t('formats.earlier')} onClick={() => { const order = [...activeFormats]; const index = order.indexOf(activeCanvasFormat); if (index > 0) { [order[index - 1], order[index]] = [order[index], order[index - 1]]; useEditorStore.getState().updateSettings({ activeFormats: order }) } }}><Icon name="chevron-left" size={16} /></button>
+      <button title={t('formats.later')} aria-label={t('formats.later')} onClick={() => { const order = [...activeFormats]; const index = order.indexOf(activeCanvasFormat); if (index >= 0 && index < order.length - 1) { [order[index], order[index + 1]] = [order[index + 1], order[index]]; useEditorStore.getState().updateSettings({ activeFormats: order }) } }}><Icon name="chevron-right" size={16} /></button>
     </div>
   )
   const renderFormatMenuFamilies = (
@@ -498,8 +499,7 @@ export function EditingContextBar() {
             <HorizontalScrollAffordance>
               <div className="relative flex h-full min-w-max items-stretch">
                 {renderBaseTab()}
-                {activeFamilyPresetFormats.map(renderPresetTab)}
-                {activeFamilyCustomFormats.map(renderCustomTab)}
+                {activeFamilyFormats.map((format) => isCustomFormatId(format) ? renderCustomTab(format) : renderPresetTab(format))}
                 {renderFormatAddButton()}
                 <SlidingUnderline accentClass="bg-[#f59e0b]" activeKey={activeCanvasFormat} />
               </div>
@@ -566,13 +566,15 @@ export function EditingContextBar() {
                     className="w-20 rounded border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-2 py-1 text-xs text-[var(--pd-c-e8e8f0)] [appearance:textfield] focus:outline-none"
                   />
                 </div>
+                <label className="mb-2 flex items-center gap-2 text-xs">DPI<input aria-label="DPI" type="number" min="1" max="1200" value={customDpi} onChange={(event) => setCustomDpi(event.target.value)} className="w-20 rounded bg-[var(--pd-field-bg)] px-2 py-1" /></label>
+                <p className="mb-2 text-[10px]">{t('formats.dpiHint')}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
                       const width = parseInt(customW)
                       const height = parseInt(customH)
                       if (width >= 100 && width <= 9999 && height >= 100 && height <= 9999) {
-                        addCustomFormat(customLabel.trim() || `Custom ${width}×${height}`, width, height)
+                        addCustomFormat(customLabel.trim() || `Custom ${width}×${height}`, width, height, Number(customDpi))
                       }
                       clearCustomForm()
                     }}

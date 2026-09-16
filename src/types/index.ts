@@ -58,11 +58,13 @@ export type PhoneModel = 'iphone-16-pro' | 'iphone-16-pro-plain' | 'pixel-9' | '
 
 // ─── Canvas Formats ──────────────────────────────────────────────────────────
 
-export type BuiltInFormatId = 'base' | 'iphone-69' | 'android-phone' | 'ipad-13' | 'android-tablet' | 'ipad-11' | 'apple-watch' | 'wear-os' | 'mac' | 'appletv' | 'visionpro' | 'steam' | 'meta-quest'
+export type BuiltInFormatId = 'base' | 'iphone-69' | 'android-phone' | 'ipad-13' | 'android-tablet' | 'ipad-11' | 'apple-watch' | 'wear-os' | 'mac' | 'appletv' | 'visionpro' | 'steam' | 'meta-quest' | 'android-tablet-7' | 'play-feature' | 'play-tv' | 'play-chromebook' | 'play-xr' | 'play-auto' | 'play-auto-landscape' | 'iphone-65' | 'iphone-63' | 'iphone-61' | 'iphone-55' | 'ipad-129' | 'iphone-69-landscape' | 'ipad-13-landscape' | 'ipad-11-landscape' | 'android-phone-landscape' | 'android-tablet-landscape' | 'android-tablet-7-landscape'
 export type CustomFormatId = `custom:${string}`
 export type CanvasFormatId = BuiltInFormatId | CustomFormatId
 
 export interface CustomCanvasFormat {
+  /** PNG density metadata; does not change pixel dimensions. */
+  dpi?: number
   id: CustomFormatId
   label: string
   width: number

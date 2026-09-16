@@ -98,7 +98,7 @@ export interface EditorStore {
   setLayerFormatVisibility: (layerId: string, format: CanvasFormatId, visible: boolean | undefined) => void
   setLayerOnlyInFormat: (layerId: string, format?: CanvasFormatId) => void
   clearLayerFormatVisibility: (layerId: string) => void
-  addCustomFormat: (label: string, width: number, height: number) => void
+  addCustomFormat: (label: string, width: number, height: number, dpi?: number) => void
   removeCustomFormat: (id: CustomFormatId) => void
   updateCustomFormat: (id: CustomFormatId, patch: Partial<Pick<CustomCanvasFormat, 'label' | 'width' | 'height'>>) => void
   clearLayerFormatOverrideKey: (layerId: string, key: string, format?: CanvasFormatId) => void

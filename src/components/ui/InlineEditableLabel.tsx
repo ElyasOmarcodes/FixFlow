@@ -1,3 +1,5 @@
+import { Icon } from './Icon'
+import { useT } from '@/i18n'
 import { useState, type CSSProperties, type ReactNode } from 'react'
 
 function normalizeInlineLabel(value: string): string | null {
@@ -14,6 +16,7 @@ interface InlineEditableLabelProps {
   inputStyle?: CSSProperties
   editing?: boolean
   onEditingChange?: (editing: boolean) => void
+  renameButton?: boolean
   children?: ReactNode
 }
 
@@ -27,7 +30,9 @@ export function InlineEditableLabel({
   editing: controlledEditing,
   onEditingChange,
   children,
+  renameButton = false,
 }: InlineEditableLabelProps) {
+  const t = useT()
   const [internalEditing, setInternalEditing] = useState(false)
   const [draft, setDraft] = useState(value)
   const editing = controlledEditing ?? internalEditing
@@ -71,13 +76,12 @@ export function InlineEditableLabel({
     )
   }
 
-  return (
+  return <>
     <span
       className={className}
       style={style}
       onDoubleClick={(event) => { event.stopPropagation(); begin() }}
-    >
-      {value}{children}
-    </span>
-  )
+    >{value}{children}</span>
+    {renameButton && <button type="button" className="pd-rename-button" aria-label={t('actions.rename')} onClick={(event) => { event.stopPropagation(); begin() }}><Icon name="pencil" size={14} /></button>}
+  </>
 }

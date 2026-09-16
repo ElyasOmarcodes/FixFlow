@@ -1,3 +1,4 @@
+import { RecentFills } from './RecentFills'
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent, ReactNode } from 'react'
 import type { FillValue, GradientStop, LinearGradient, RadialGradient } from '@/types'
@@ -163,6 +164,7 @@ export function ColorField({
 
   return (
     <div>
+      <RecentFills fill={value} onChange={(next) => { if (typeof next === 'string') onChange(next) }} />
       {/* Brand colors row — always visible */}
       <div className="flex flex-wrap gap-1.5 mb-2 items-center">
         {brandColors.map((bc) => (
@@ -434,6 +436,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
 
   return (
     <div className="space-y-3">
+      <RecentFills fill={fill} onChange={onChange} />
       <SegmentedControl
         value={mode}
         options={[

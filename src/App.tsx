@@ -1,3 +1,5 @@
+import { ExportModal } from '@/components/panels/ExportModal'
+import { SelectionActions } from '@/components/canvas/SelectionActions'
 import { Capacitor } from '@capacitor/core'
 import { App as NativeApp } from '@capacitor/app'
 import { useT } from '@/i18n'
@@ -69,6 +71,7 @@ export default function App() {
   const scopedEditingIndicator = getScopedEditingIndicator(project, activeLocale, activeCanvasFormat)
   const { undo, redo } = useUndoRedo()
   const [view, setView] = useState<'editor' | 'localization'>('editor')
+  const [exportOpen, setExportOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   // Locale the preview opens in + the view to return to when it closes.
   const [previewLocale, setPreviewLocale] = useState<string | undefined>(undefined)
@@ -255,6 +258,12 @@ export default function App() {
     setPreviewLocale(undefined)
   }
 
+  useEffect(() => {
+    const edit = () => setMobilePanel('properties')
+    window.addEventListener('pd-edit-layer', edit)
+    return () => window.removeEventListener('pd-edit-layer', edit)
+  }, [])
+
   return (
     <div className="pd-app flex flex-col overflow-hidden bg-[var(--pd-c-0f0f13)]">
       <ConfirmDialog
@@ -268,6 +277,8 @@ export default function App() {
       <Toolbar
         mode={view}
         onSetMode={handleSetMode}
+        onExport={() => setExportOpen(true)}
+        onPreview={() => setPreviewOpen(true)}
       />
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {/* Localization view — absolutely covers the editor when active */}
@@ -306,6 +317,7 @@ export default function App() {
                 user while the exported PNGs stayed the same. */}
             <div dir="ltr" style={{ flex: 1, position: 'relative', zIndex: 0, overflow: 'hidden' }}>
               <StageCanvas stageRef={stageRef} />
+              <SelectionActions onEdit={() => setMobilePanel('properties')} />
               {(scopedEditingIndicator.isFormatScoped || scopedEditingIndicator.isLocaleScoped) && (
                 <div
                   aria-hidden="true"
@@ -337,7 +349,8 @@ export default function App() {
         <button aria-pressed={mobilePanel === null} onClick={() => setMobilePanel(null)}><Icon name="image" size={20} /><span>{t('toolbar.backToDesign')}</span></button>
         <button aria-controls="mobile-properties" aria-expanded={mobilePanel === 'properties'} onClick={() => setMobilePanel(mobilePanel === 'properties' ? null : 'properties')}><Icon name="settings" size={20} /><span>{t('props.title')}</span></button>
       </nav>}
-      <SlideNavigator thumbnails={thumbnails} staleGroupIds={staleGroupIds} stageRef={stageRef} onCaptureThumbnail={(groupId) => { void captureNow(groupId) }} onOpenPreview={() => setPreviewOpen(true)} />
+      <ExportModal open={exportOpen} onClose={() => setExportOpen(false)} stageRef={stageRef} />
+      <SlideNavigator thumbnails={thumbnails} staleGroupIds={staleGroupIds} stageRef={stageRef} onCaptureThumbnail={(groupId) => { void captureNow(groupId) }} />
 
       <PreviewModal
         open={previewOpen}

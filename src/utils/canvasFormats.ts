@@ -14,6 +14,10 @@ import { getModelForPlatform, getPhoneSpec } from '@/assets/mockups/specs'
 import { findLayerInTree, forEachLayerTree, mapLayerTree } from '@/utils/layerTree'
 import { applyLocaleToGroup } from './locale'
 
+// Store specifications checked 2026-09-16:
+// https://support.google.com/googleplay/android-developer/answer/9866151
+// https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
+// Google phone/tablet dimensions are useful presets within accepted ranges, not unique mandated resolutions.
 export const CANVAS_FORMAT_PRESETS = [
   { id: 'iphone-69', label: 'iPhone 6.9"', width: 1320, height: 2868 },
   { id: 'android-phone', label: 'Android Phone', width: 1080, height: 1920 },
@@ -27,6 +31,24 @@ export const CANVAS_FORMAT_PRESETS = [
   { id: 'visionpro', label: 'Vision Pro', width: 3840, height: 2160 },
   { id: 'steam', label: 'Steam', width: 1920, height: 1080 },
   { id: 'meta-quest', label: 'Meta Quest', width: 2560, height: 1440 },
+  { id: 'android-tablet-7', label: "Play \u00b7 7-inch tablet (suggested)", width: 1200, height: 1920 },
+  { id: 'play-feature', label: "Play \u00b7 Feature graphic", width: 1024, height: 500 },
+  { id: 'play-tv', label: "Play \u00b7 Android TV", width: 1920, height: 1080 },
+  { id: 'play-chromebook', label: "Play \u00b7 Chromebook (suggested)", width: 1920, height: 1080 },
+  { id: 'play-xr', label: "Play \u00b7 Android XR", width: 3840, height: 2400 },
+  { id: 'play-auto', label: "Play \u00b7 Automotive portrait", width: 800, height: 1280 },
+  { id: 'play-auto-landscape', label: "Play \u00b7 Automotive landscape", width: 1024, height: 768 },
+  { id: 'iphone-65', label: "App Store \u00b7 iPhone 6.5-inch", width: 1284, height: 2778 },
+  { id: 'iphone-63', label: "App Store \u00b7 iPhone 6.3-inch", width: 1206, height: 2622 },
+  { id: 'iphone-61', label: "App Store \u00b7 iPhone 6.1-inch", width: 1170, height: 2532 },
+  { id: 'iphone-55', label: "App Store \u00b7 iPhone 5.5-inch", width: 1242, height: 2208 },
+  { id: 'ipad-129', label: "App Store \u00b7 iPad 12.9-inch", width: 2048, height: 2732 },
+  { id: 'iphone-69-landscape', label: "iPhone 6.9-inch \u00b7 Landscape", width: 2868, height: 1320 },
+  { id: 'ipad-13-landscape', label: "iPad 13-inch \u00b7 Landscape", width: 2752, height: 2064 },
+  { id: 'ipad-11-landscape', label: "iPad 11-inch \u00b7 Landscape", width: 2420, height: 1668 },
+  { id: 'android-phone-landscape', label: "Play phone \u00b7 Landscape", width: 1920, height: 1080 },
+  { id: 'android-tablet-landscape', label: "Play 10-inch tablet \u00b7 Landscape", width: 2560, height: 1600 },
+  { id: 'android-tablet-7-landscape', label: "Play 7-inch tablet \u00b7 Landscape", width: 1920, height: 1200 },
 ] as const satisfies readonly { id: CanvasFormatId; label: string; width: number; height: number }[]
 
 export const BASE_CANVAS_FORMAT: CanvasFormatId = 'base'
@@ -56,6 +78,24 @@ export const FORMAT_PLATFORM: Record<BuiltInFormatId, 'ios' | 'android' | null> 
   visionpro: 'ios',
   steam: null,
   'meta-quest': null,
+  'android-tablet-7': "android",
+  'play-feature': null,
+  'play-tv': "android",
+  'play-chromebook': null,
+  'play-xr': null,
+  'play-auto': "android",
+  'play-auto-landscape': "android",
+  'iphone-65': "ios",
+  'iphone-63': "ios",
+  'iphone-61': "ios",
+  'iphone-55': "ios",
+  'ipad-129': "ios",
+  'iphone-69-landscape': "ios",
+  'ipad-13-landscape': "ios",
+  'ipad-11-landscape': "ios",
+  'android-phone-landscape': "android",
+  'android-tablet-landscape': "android",
+  'android-tablet-7-landscape': "android",
 }
 
 /**
@@ -78,6 +118,24 @@ export const FORMAT_FAMILY: Record<BuiltInFormatId, FormatFamilyKey> = {
   visionpro: 'vr',
   steam: 'game',
   'meta-quest': 'vr',
+  'android-tablet-7': "tablet",
+  'play-feature': "desktop",
+  'play-tv': "tv",
+  'play-chromebook': "desktop",
+  'play-xr': "vr",
+  'play-auto': "tablet",
+  'play-auto-landscape': "tablet",
+  'iphone-65': "phone",
+  'iphone-63': "phone",
+  'iphone-61': "phone",
+  'iphone-55': "phone",
+  'ipad-129': "tablet",
+  'iphone-69-landscape': "phone",
+  'ipad-13-landscape': "tablet",
+  'ipad-11-landscape': "tablet",
+  'android-phone-landscape': "phone",
+  'android-tablet-landscape': "tablet",
+  'android-tablet-7-landscape': "tablet",
 }
 
 export type FormatFamilyKey = 'phone' | 'tablet' | 'watch' | 'desktop' | 'tv' | 'vr' | 'game'
@@ -206,6 +264,24 @@ export function getFormatLabel(id: CanvasFormatId, customFormats?: CustomCanvasF
     visionpro: 'Vision Pro',
     steam: 'Steam',
     'meta-quest': 'Meta Quest',
+    'android-tablet-7': "Play \u00b7 7-inch tablet (suggested)",
+    'play-feature': "Play \u00b7 Feature graphic",
+    'play-tv': "Play \u00b7 Android TV",
+    'play-chromebook': "Play \u00b7 Chromebook (suggested)",
+    'play-xr': "Play \u00b7 Android XR",
+    'play-auto': "Play \u00b7 Automotive portrait",
+    'play-auto-landscape': "Play \u00b7 Automotive landscape",
+    'iphone-65': "App Store \u00b7 iPhone 6.5-inch",
+    'iphone-63': "App Store \u00b7 iPhone 6.3-inch",
+    'iphone-61': "App Store \u00b7 iPhone 6.1-inch",
+    'iphone-55': "App Store \u00b7 iPhone 5.5-inch",
+    'ipad-129': "App Store \u00b7 iPad 12.9-inch",
+    'iphone-69-landscape': "iPhone 6.9-inch \u00b7 Landscape",
+    'ipad-13-landscape': "iPad 13-inch \u00b7 Landscape",
+    'ipad-11-landscape': "iPad 11-inch \u00b7 Landscape",
+    'android-phone-landscape': "Play phone \u00b7 Landscape",
+    'android-tablet-landscape': "Play 10-inch tablet \u00b7 Landscape",
+    'android-tablet-7-landscape': "Play 7-inch tablet \u00b7 Landscape",
   }
   return labels[id]
 }
@@ -248,7 +324,8 @@ export function selectFamilyFormats(project: Project, family: FormatFamilyKey): 
       ? (group.formats ?? []).filter(isCustomFormatId)
       : []
   ))
-  return Array.from(new Set([...builtIns, ...customs]))
+  const order = project.settings.activeFormats ?? []
+  return Array.from(new Set([...builtIns, ...customs])).sort((a, b) => (order.includes(a) ? order.indexOf(a) : 999) - (order.includes(b) ? order.indexOf(b) : 999))
 }
 
 /** All groups belonging to one named built-in family, retaining project order. */

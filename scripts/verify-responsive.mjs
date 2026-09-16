@@ -30,6 +30,14 @@ try {
     if (width < 1024) {
       await page.locator('.pd-mobile-nav button').first().click()
       await expect(page.locator('#mobile-layers')).toBeVisible()
+      await expect(page.locator('.pd-slides')).toBeHidden()
+      await page.getByRole('button', { name: 'New layer', exact: true }).click()
+      const insert = page.getByRole('menu', { name: 'New layer', exact: true })
+      await expect(insert).toBeVisible()
+      const insertBox = await insert.boundingBox()
+      expect(insertBox.y).toBeGreaterThanOrEqual(0)
+      await page.getByRole('menuitem', { name: 'Shape', exact: true }).click()
+      await expect(insert).toHaveCount(0)
       await page.locator('#mobile-layers .pd-panel-close').click()
       await expect(page.locator('#mobile-layers')).toBeHidden()
       await page.locator('.pd-mobile-nav button').last().click()
@@ -37,7 +45,7 @@ try {
       await page.locator('#mobile-properties .pd-panel-close').click()
     }
     await page.screenshot({ path: `test-results/responsive/${width}x${height}.png` })
-    await page.locator('.pd-slides').getByRole('button', { name: 'Export', exact: true }).click()
+    await page.locator(width < 1024 ? '.pd-mobile-header' : '.pd-toolbar').getByRole('button', { name: 'Export', exact: true }).click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible()
     const dialogBox = await dialog.boundingBox()

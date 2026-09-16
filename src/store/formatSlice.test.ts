@@ -280,7 +280,7 @@ describe('custom formats', () => {
     useEditorStore.getState().updateCustomFormat(id, { label: 'Square', width: 1080, height: 1080 })
 
     expect(useEditorStore.getState().project.settings.customFormats?.[0]).toEqual({
-      id, label: 'Square', width: 1080, height: 1080,
+      id, label: 'Square', width: 1080, height: 1080, dpi: 96,
     })
   })
 

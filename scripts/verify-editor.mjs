@@ -12,7 +12,7 @@ for (let i = 0; i < 50; i++) {
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined, args: ['--no-sandbox', '--disable-dev-shm-usage'] })
 await mkdir('test-results/editor', { recursive: true })
 try {
-  for (const width of [390, 1440]) {
+  for (const width of [390, 768, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 900 }, hasTouch: width < 1024 })
     const errors = []
     page.on('pageerror', (error) => errors.push(error.message))
@@ -46,17 +46,31 @@ try {
     await expect(page.getByRole('button', { name: 'Group selected layers', exact: true })).toBeEnabled()
     await page.getByRole('button', { name: 'Group selected layers', exact: true }).click()
     await expect(page.getByRole('button', { name: 'Ungroup', exact: true })).toBeEnabled()
+    await page.locator('.pd-layer-list').getByRole('button', { name: 'Rename', exact: true }).first().click()
+    const rename = page.locator('.pd-layer-list input').first()
+    await rename.fill('Collection')
+    await rename.press('Enter')
+    const child = page.locator('.pd-layer-list [class~="group/child"]').filter({ hasText: 'Text' }).first()
+    await child.getByRole('button', { name: 'Edit', exact: true }).click()
+    const childEditor = page.locator('[contenteditable=true]').filter({ visible: true }).first()
+    await childEditor.fill('متن داخل گروه')
+    if (width < 1024) await page.getByRole('button', { name: 'Done', exact: true }).click()
+    else await childEditor.press('Escape')
+    await page.locator('.pd-layer-list').getByText('Collection', { exact: true }).click()
+    if (width < 1024) {
+      await expect(page.locator('.pd-mobile-header')).toBeHidden()
+      await expect(page.locator('.pd-slides')).toBeHidden()
+    }
     await page.screenshot({ path: `test-results/editor/layers-${width}.png` })
     await page.getByRole('button', { name: 'Ungroup', exact: true }).click()
     await page.locator('.pd-layer-list').getByText('Text', { exact: true }).last().click()
     // Real UI operations: duplicate, delete and undo.
     await page.locator('.pd-layer-footer').getByRole('button', { name: 'Duplicate', exact: true }).click()
     await page.locator('.pd-layer-footer').getByRole('button', { name: 'Delete', exact: true }).click()
-    if (width < 1024) await page.locator('.pd-mobile-header').getByRole('button', { name: 'Undo', exact: true }).click()
+    if (width < 1024) { await page.locator('#mobile-layers .pd-panel-close').click(); await page.locator('.pd-mobile-header').getByRole('button', { name: 'Undo', exact: true }).click() }
     else await page.getByTitle('Undo (Ctrl+Z)').click()
     await page.screenshot({ path: `test-results/editor/workspace-${width}-system.png` })
     if (width < 1024) {
-      await page.locator('#mobile-layers .pd-panel-close').click()
       await page.getByRole('button', { name: 'More tools', exact: true }).click()
     }
     await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light')
@@ -108,6 +122,27 @@ try {
       await expect(page.getByRole('heading', { name: aiTitle })).toBeVisible()
       await page.screenshot({ path: `test-results/editor/guide-${lang}-${width}.png` })
       await page.keyboard.press('Escape')
+    }
+    if (width === 1440) {
+      await page.evaluate(() => localStorage.setItem('pixeldeck.ui-language', 'en'))
+      await page.reload()
+      for (const slug of ['noor-editorial', 'orbit-studio', 'serein-wellness']) {
+        await page.evaluate(async (name) => {
+          const { useEditorStore } = await import('/src/store/index.ts')
+          const template = await (await fetch(`/templates/${name}.template.json`)).json()
+          useEditorStore.getState().importTemplateAsNewProject(template)
+        }, slug)
+        await page.waitForTimeout(1200)
+        for (let index = 0; index < 7; index++) {
+          await page.evaluate(async (i) => {
+            const { useEditorStore } = await import('/src/store/index.ts')
+            const state = useEditorStore.getState()
+            state.setActiveSlideGroup(state.project.slideGroups[i].id)
+          }, index)
+          await page.waitForTimeout(350)
+          await page.screenshot({ path: `test-results/editor/${slug}-${index + 1}.png` })
+        }
+      }
     }
     expect(errors).toEqual([])
     console.log(`PASS ${width}: type RTL text, duplicate/delete/undo, themes, guide`)

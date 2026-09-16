@@ -199,7 +199,7 @@ export const createFormatSlice = (
     }))
   },
 
-  addCustomFormat: (label, width, height) => {
+  addCustomFormat: (label, width, height, dpi = 96) => {
     const id = `custom:${nanoid()}` as const
     const { project, activeFamily } = get()
     const activeFormats = getProjectActiveFormats(project)
@@ -207,7 +207,7 @@ export const createFormatSlice = (
       project: touchProject(state.project, {
         settings: {
           ...state.project.settings,
-          customFormats: [...(state.project.settings.customFormats ?? []), { id, label, width, height }],
+          customFormats: [...(state.project.settings.customFormats ?? []), { id, label, width, height, dpi: Math.max(1, Math.min(1200, Math.round(dpi) || 96)) }],
           activeFormats: [...activeFormats, id],
         },
         slideGroups: appendFormatToFamilyGroups(state.project, activeFamily, id),

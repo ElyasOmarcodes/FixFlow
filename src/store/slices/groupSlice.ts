@@ -1,3 +1,4 @@
+import { preserveGroupLayout, transformChild, groupTransform } from '@/utils/groupLayout'
 import type { Layer, GroupLayer } from '@/types'
 import type { EditorStore, EditorSet, EditorGet } from '../types'
 import {
@@ -34,7 +35,7 @@ export const createGroupSlice = (
     const ids = layerIds.length > 0 ? layerIds : get().selectedLayerIds
     if (!group || ids.length < 2) return
 
-    const toGroup = group.layers.filter((l) => ids.includes(l.id))
+    const toGroup = group.layers.filter((l) => l.type !== 'background' && ids.includes(l.id))
     if (toGroup.length < 2) return
 
     // Auto-flatten: dissolve any nested groups into their children (absolute coords)
@@ -42,10 +43,8 @@ export const createGroupSlice = (
     for (const l of toGroup) {
       if (l.type === 'group') {
         const grp = l as GroupLayer
-        const grpScale = grp.scale ?? 1
         for (const child of grp.children) {
-          const baked = bakeLayerScale(child, grpScale)
-          flatLayers.push({ ...baked, x: baked.x + grp.x, y: baked.y + grp.y } as Layer)
+          flatLayers.push(transformChild(child, groupTransform(grp)))
         }
       } else {
         flatLayers.push(l)
@@ -73,13 +72,11 @@ export const createGroupSlice = (
       })),
     }
 
-    mutateActiveGroup(set, (g) => ({
-      ...g,
-      layers: [
-        ...g.layers.filter((l) => !ids.includes(l.id)),
-        newGroup,
-      ],
-    }))
+    mutateActiveGroup(set, (g) => {
+      const lastIndex = Math.max(...g.layers.map((layer, index) => ids.includes(layer.id) ? index : -1))
+      const layers = g.layers.flatMap((layer, index) => index === lastIndex ? [newGroup] : ids.includes(layer.id) ? [] : [layer])
+      return preserveGroupLayout(g, { ...g, layers }, get().project.settings, new Set(flatLayers.map((layer) => layer.id)))
+    })
     set({ selectedLayerIds: [] })
     get().select(newGroup.id)
   },
@@ -90,19 +87,9 @@ export const createGroupSlice = (
     const grp = group.layers.find((l) => l.id === groupId) as GroupLayer | undefined
     if (!grp || grp.type !== 'group') return
 
-    const grpScale = grp.scale ?? 1
-    const children = grp.children.map((c) => {
-      const baked = bakeLayerScale(c, grpScale)
-      return { ...baked, x: baked.x + grp.x, y: baked.y + grp.y }
-    })
-
-    mutateActiveGroup(set, (g) => ({
-      ...g,
-      layers: [
-        ...g.layers.filter((l) => l.id !== groupId),
-        ...children,
-      ],
-    }))
+    const children = grp.children.map((child) => transformChild(child, groupTransform(grp)))
+    mutateActiveGroup(set, (g) => preserveGroupLayout(g, { ...g, layers: g.layers.flatMap((layer) => layer.id === groupId ? children : [layer]) }, get().project.settings, new Set(children.map((child) => child.id))))
+    set({ editingGroupId: null, selection: null, selectedLayerIds: children.map((child) => child.id) })
   },
 
   addToGroup: (groupId, layer) => {

@@ -24,11 +24,13 @@ const HelpModal = lazy(() =>
 )
 
 interface ToolbarProps {
+  onExport: () => void
+  onPreview: () => void
   mode: 'editor' | 'localization'
   onSetMode: (mode: 'editor' | 'localization') => void
 }
 
-export function Toolbar({ mode, onSetMode }: ToolbarProps) {
+export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) {
   const t = useT()
   const {
     project,
@@ -106,6 +108,8 @@ export function Toolbar({ mode, onSetMode }: ToolbarProps) {
     <div className="pd-mobile-header">
       <button aria-label={t('toolbar.projects')} onClick={() => setProjectsOpen(true)}><Icon name="grid" size={20} /></button>
       <strong>{project.name}</strong>
+      <button aria-label={t('slides.preview')} onClick={onPreview}><Icon name="eye" size={18} /></button>
+      <button aria-label={t('common.export')} onClick={onExport}><Icon name="download" size={18} /></button>
       <button aria-label={t('toolbar.undo')} disabled={!canUndo} onClick={() => undo()}><Icon name="undo" size={20} /></button>
       <button aria-label={t('toolbar.redo')} disabled={!canRedo} onClick={() => redo()}><Icon name="redo" size={20} /></button>
       <button aria-label={t('toolbar.settings')} onClick={() => setSettingsOpen(true)}><Icon name="settings" size={20} /></button>
@@ -296,6 +300,8 @@ export function Toolbar({ mode, onSetMode }: ToolbarProps) {
 
       <div className="min-w-2 flex-1" />
 
+      <button onClick={onPreview} title={t('slides.preview')}><Icon name="eye" size={18} /></button>
+      <button onClick={onExport} title={t('common.export')} className="rounded-lg bg-violet-600 px-3 py-2 text-white">{t('common.export')}</button>
       {/* Right section */}
       <div className="flex shrink-0 items-center gap-2 max-[1099px]:gap-1">
         <button

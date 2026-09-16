@@ -116,7 +116,7 @@ export async function exportProjectImages(
           groupName: batch.group.name,
           phase: 'rendering',
         })
-      }, options.signal, options.onBlobUrl)
+      }, options.signal, options.onBlobUrl, project.settings.customFormats?.find((format) => format.id === batch.formatId)?.dpi)
       for (const image of images) {
         const target = buildExportFileTarget({
           formatId: batch.formatId,

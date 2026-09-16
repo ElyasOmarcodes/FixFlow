@@ -1,3 +1,4 @@
+import { CANVAS_FORMAT_PRESETS, FORMAT_FAMILY } from '@/utils/canvasFormats'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useEditorStore } from './index'
 import { BASE_CANVAS_FORMAT, FORMAT_FAMILY_ANCHOR, getFormatScaleFactor, getGroupFamilyKey, groupTargetsFormat, resolveForkSourceFormat, selectFamilyFormats, selectFamilyGroups, selectFormatViewGroups, selectForkSourceCandidates, selectForkSourceGroups, selectProjectFamilies } from '@/utils/canvasFormats'
@@ -119,7 +120,7 @@ describe('forkSlideGroupForFormat', () => {
     expect(fork).toMatchObject({
       slideWidth: 2064,
       slideHeight: 2752,
-      formats: ['ipad-13', 'android-tablet', 'ipad-11'],
+      formats: CANVAS_FORMAT_PRESETS.filter((item) => FORMAT_FAMILY[item.id] === 'tablet').map((item) => item.id),
     })
     expect(fork.layers).toHaveLength(1)
     expect(fork.layers[0]).toMatchObject({ type: 'background' })
@@ -197,7 +198,7 @@ describe('forkSlideGroupForFormat', () => {
     expect(copied.height).toBeCloseTo(layer.height * scaleFactor)
     expect(copied.rotation).toBe(layer.rotation)
     expect(copied.localeContent).toEqual(layer.localeContent)
-    expect(fork.formats).toEqual(['iphone-69', 'android-phone'])
+    expect(fork.formats).toEqual(CANVAS_FORMAT_PRESETS.filter((item) => FORMAT_FAMILY[item.id] === 'phone').map((item) => item.id))
   })
 })
 
@@ -513,14 +514,14 @@ describe('format-family layout actions', () => {
 
   it('removes a complete family through format deletion and relocates to a survivor', () => {
     const phone = getActiveGroup()
-    const tablet = { ...phone, id: 'tablet-family', formats: ['ipad-13', 'android-tablet', 'ipad-11'] as CanvasFormatId[] }
+    const tablet = { ...phone, id: 'tablet-family', formats: CANVAS_FORMAT_PRESETS.filter((item) => FORMAT_FAMILY[item.id] === 'tablet').map((item) => item.id) as CanvasFormatId[] }
     useEditorStore.getState().updateProject({
       settings: { ...useEditorStore.getState().project.settings, activeFormats: ['iphone-69', 'ipad-13', 'android-tablet', 'ipad-11'] },
       slideGroups: [{ ...phone, formats: ['iphone-69' as CanvasFormatId] }, tablet],
     })
     useEditorStore.setState({ activeFamily: 'tablet', activeSlideGroupId: tablet.id, activeCanvasFormat: 'ipad-13' })
 
-    for (const format of ['ipad-13', 'android-tablet', 'ipad-11'] as const) useEditorStore.getState().deleteFormatLayout(format)
+    for (const format of CANVAS_FORMAT_PRESETS.filter((item) => FORMAT_FAMILY[item.id] === 'tablet').map((item) => item.id)) useEditorStore.getState().deleteFormatLayout(format)
 
     const state = useEditorStore.getState()
     expect(selectProjectFamilies(state.project)).not.toContain('tablet')
@@ -534,7 +535,7 @@ describe('format-family layout actions', () => {
       content: 'copy', sourceFormat: BASE_CANVAS_FORMAT,
     })
     const created = useEditorStore.getState().project.slideGroups.find((group) => group.id === createdGroupIds[0])!
-    expect(created.formats).toEqual(['ipad-13', 'android-tablet', 'ipad-11'])
+    expect(created.formats).toEqual(CANVAS_FORMAT_PRESETS.filter((item) => FORMAT_FAMILY[item.id] === 'tablet').map((item) => item.id))
     expect(useEditorStore.getState().project.settings.activeFormats).toContain('ipad-11')
 
     useEditorStore.getState().deleteFormatLayout('ipad-11')

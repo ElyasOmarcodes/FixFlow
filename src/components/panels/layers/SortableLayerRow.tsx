@@ -3,6 +3,8 @@ import { CSS } from '@dnd-kit/utilities'
 import type { Layer, GroupLayer } from '@/types'
 import { InlineEditableLabel } from '@/components/ui/InlineEditableLabel'
 import { Icon, type IconName } from '@/components/ui/Icon'
+import { useT } from '@/i18n'
+import { useEditorStore } from '@/store'
 import { LAYER_ICON, type ItemData } from './constants'
 
 // ─── SortableLayer (regular top-level layers) ────────────────────────────────
@@ -60,7 +62,7 @@ export function SortableLayer({
 
       <span className="shrink-0" style={{ color: 'var(--pd-c-8a86a0)' }}><Icon name={LAYER_ICON[layer.type]} size={13} /></span>
 
-      <InlineEditableLabel
+      <InlineEditableLabel renameButton
         value={layer.name}
         onCommit={onRename}
         className="flex-1 text-xs truncate"
@@ -94,6 +96,7 @@ export interface SortableChildProps {
 }
 
 export function SortableChild({ child, groupId, isSelected, onSelect, onRename }: SortableChildProps) {
+  const t = useT()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: child.id,
     data: { container: 'group', groupId } satisfies ItemData,
@@ -123,7 +126,8 @@ export function SortableChild({ child, groupId, isSelected, onSelect, onRename }
       <span className="shrink-0 flex w-4 justify-center text-[#7d7898]">
         <Icon name={LAYER_ICON[child.type] ?? 'shape'} size={12} />
       </span>
-      <InlineEditableLabel
+      <button aria-label={t('actions.edit')} onClick={(event) => { event.stopPropagation(); onSelect(); if (child.type === 'text') useEditorStore.getState().startTextEdit(child.id); else window.dispatchEvent(new Event('pd-edit-layer')) }}><Icon name="settings" size={16} /></button>
+      <InlineEditableLabel renameButton
         value={child.name}
         onCommit={onRename}
         className="flex-1 text-xs truncate"
@@ -213,7 +217,7 @@ export function SortableGroup({
 
         <span className="shrink-0 text-[#b6adff]"><Icon name="group" size={13} /></span>
 
-        <InlineEditableLabel
+        <InlineEditableLabel renameButton
           value={layer.name}
           onCommit={onRename}
           className="flex-1 text-xs truncate font-semibold"

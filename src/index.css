@@ -634,3 +634,34 @@ button { touch-action: manipulation; }
   .pd-settings-content input:not([type=checkbox]):not([type=range]), .pd-settings-content select { font-size: 16px; }
   .pd-layer-list .text-xs { font-size: 13px; }
 }
+@media (max-width: 1023px) {
+  .pd-app:has(.pd-sidebar-open) .pd-slides { display: none; }
+  .pd-layer-insert { max-height: calc(100dvh - 160px); overflow-y: auto; }
+}
+@media (max-width: 1023px) and (max-height: 500px) {
+  .pd-layer-insert { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pd-layer-header { padding-block: 6px; }
+  .pd-layer-selection { margin-top: 2px; }
+}
+.pd-selection-actions { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; padding: 4px; max-width: calc(100% - 16px); overflow-x: auto; border: 1px solid var(--pd-field-border); border-radius: 12px; background: var(--pd-panel); box-shadow: 0 4px 16px #0003; z-index: 5; }
+.pd-selection-actions button { min-width: 38px; min-height: 40px; display: grid; place-items: center; border-radius: 7px; }
+.pd-selection-actions button:active { background: #7c6ef633; }
+.pd-rename-button { display: inline-grid; place-items: center; margin-inline-start: 6px; vertical-align: middle; opacity: .7; }
+.pd-layer-insert { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 2px; padding: 6px; }
+.pd-layer-insert button { flex-direction: column; gap: 4px; padding: 7px 4px; font-size: 11px; }
+@media (max-width: 1023px) {
+  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-mobile-header, .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-toolbar { display: none; }
+  .pd-app:has(.pd-sidebar-open) .pd-selection-actions { display: none; }
+  .pd-mobile-header { gap: 1px; padding-inline: 4px; }
+  .pd-mobile-header button { min-width: 34px; }
+  .pd-mobile-header strong { font-size: 12px; }
+  .pd-slide-options { display: flex !important; grid-column: 1 / -1; }
+  .pd-slide-options summary { min-height: 32px; }
+  .pd-rename-button { min-width: 30px !important; }
+  .pd-editing-context .group\/tab > div, .pd-editing-context .group\/tab > button { opacity: 1; pointer-events: auto; }
+}
+@media (max-width: 1023px) and (max-height: 500px) {
+  .pd-slide-thumbnails { display: flex; max-height: 44px; min-height: 32px; }
+  .pd-mobile-header { min-height: 44px; padding-block: 0; }
+  .pd-mobile-nav button { min-height: 42px; padding: 2px; }
+}
