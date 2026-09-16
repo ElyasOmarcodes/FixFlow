@@ -255,6 +255,17 @@ export const ps: Record<TranslationKey, string> = {
 
   // ── Templates ────────────────────────────────────────────────────────────
   'templates.addSlides': 'سلایډونه اوسني پروژې ته ورزیات کړه',
+  'templates.applyFailed': 'دا تمپلیټ پلي نه شو.',
+  'templates.empty': 'لا تر اوسه هیڅ تمپلیټ نشته',
+  'templates.export': 'صادرول',
+  'templates.exportTitle': 'اوسنۍ پروژه د تمپلیټ په توګه صادر کړه',
+  'templates.import': 'واردول',
+  'templates.importTitle': 'د .template.json فایل وارد کړه',
+  'templates.loadFailed': 'تمپلیټونه ونه لوستل شول',
+  'templates.loading': 'تمپلیټونه لوستل کېږي…',
+  'templates.notATemplate': 'دا فایل تمپلیټ نه دی. د پروژې فایلونو لپاره «پروژه واردول» وکاروه.',
+  'templates.title': 'تمپلیټونه',
+  'templates.unreadable': 'فایل ونه لوستل شو.',
   'templates.applying': 'پلي کېږي…',
   'templates.applyMode': 'تمپلیټ څنګه پرانیځم',
   'templates.applyModeAppend': 'اوسنۍ پروژې ته ورزیات کړه',

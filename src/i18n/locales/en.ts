@@ -260,6 +260,17 @@ export const en = {
 
   // ── Templates ────────────────────────────────────────────────────────────
   'templates.addSlides': 'Add slides to project',
+  'templates.applyFailed': 'Could not apply this template.',
+  'templates.empty': 'No bundled templates yet',
+  'templates.export': 'Export',
+  'templates.exportTitle': 'Export current project as a template',
+  'templates.import': 'Import',
+  'templates.importTitle': 'Import a .template.json file',
+  'templates.loadFailed': 'Failed to load templates',
+  'templates.loading': 'Loading templates…',
+  'templates.notATemplate': 'This file is not a template. Use "Import Project" for project files.',
+  'templates.title': 'Templates',
+  'templates.unreadable': 'Could not read file.',
   'templates.applying': 'Applying…',
   'templates.applyMode': 'Open template as',
   'templates.applyModeAppend': 'Add to current project',

@@ -340,7 +340,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
           )}
 
           {/* Project list */}
-          <div style={{ overflowY: 'auto', flex: 1, padding: '8px 8px' }}>
+          <div className="pd-stagger" style={{ overflowY: 'auto', flex: 1, padding: '8px 8px' }}>
             {sorted.length === 0 && (
               <p style={{ textAlign: 'center', color: 'var(--pd-c-6b6b7a)', fontSize: 13, padding: '24px 0' }}>
                 No projects yet

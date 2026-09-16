@@ -106,14 +106,14 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
           if (!tpl.schemaVersion) tpl.schemaVersion = 1
           void applyTemplateToEditor(tpl)
             .then(onClose)
-            .catch(() => setImportError('Could not apply this template.'))
+            .catch(() => setImportError(t('templates.applyFailed')))
         } else {
           setImportError(
-            'This file is not a template. Use "Import Project" for project files.',
+            t('templates.notATemplate'),
           )
         }
       } catch {
-        setImportError('Could not read file.')
+        setImportError(t('templates.unreadable'))
       }
     }
     reader.readAsText(file)
@@ -126,7 +126,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
     width: '100%',
     boxSizing: 'border-box',
     background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    border: '1px solid var(--pd-field-border)',
     borderRadius: 6,
     color: 'var(--pd-c-e8e8f0)',
     fontSize: 12,
@@ -144,14 +144,14 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
       backdropClassName="fixed inset-0 z-[200] flex items-center justify-center"
       backdropStyle={{ background: 'rgba(0,0,0,0.6)' }}
       panelClassName=""
-      panelStyle={{ width: 680, maxHeight: '80vh', background: 'var(--pd-c-18181f)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.6)', overflow: 'hidden' }}
+      panelStyle={{ width: 680, maxHeight: '80vh', background: 'var(--pd-c-18181f)', border: '1px solid var(--pd-field-border)', borderRadius: 12, display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.6)', overflow: 'hidden' }}
       showCloseButton={false}
       header={<div
           style={{
             padding: '14px 16px 14px 20px',
             borderBottom: exportOpen
               ? 'none'
-              : '1px solid rgba(255,255,255,0.07)',
+              : '1px solid var(--pd-field-border)',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
@@ -168,7 +168,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               letterSpacing: '-0.01em',
             }}
           >
-            Templates
+            {t('templates.title')}
           </span>
 
           {/* Action buttons */}
@@ -176,10 +176,10 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
             {/* Import */}
             <button
               onClick={() => importRef.current?.click()}
-              title="Import a .template.json file"
+              title={t('templates.importTitle')}
               style={{
                 background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid var(--pd-field-border)',
                 borderRadius: 6,
                 color: 'var(--pd-c-a0a0b0)',
                 cursor: 'pointer',
@@ -193,28 +193,28 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)'
-                e.currentTarget.style.color = '#c8c8d8'
+                e.currentTarget.style.color = 'var(--pd-c-e8e8f0)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                e.currentTarget.style.color = '#a0a0b0'
+                e.currentTarget.style.color = 'var(--pd-c-a0a0b0)'
               }}
             >
               <Icon name="upload" size={12} />
-              Import
+              {t('templates.import')}
             </button>
 
             {/* Export */}
             <button
               onClick={() => setExportOpen((v) => !v)}
-              title="Export current project as a template"
+              title={t('templates.exportTitle')}
               style={{
                 background: exportOpen ? 'rgba(124,110,246,0.18)' : 'rgba(255,255,255,0.04)',
                 border: exportOpen
                   ? '1px solid rgba(124,110,246,0.45)'
-                  : '1px solid rgba(255,255,255,0.1)',
+                  : '1px solid var(--pd-field-border)',
                 borderRadius: 6,
-                color: exportOpen ? '#c4b9fc' : '#a0a0b0',
+                color: exportOpen ? 'var(--pd-c-c4b5fd)' : 'var(--pd-c-a0a0b0)',
                 cursor: 'pointer',
                 fontSize: 12,
                 fontWeight: 500,
@@ -238,7 +238,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               }}
             >
               <Icon name="download" size={12} />
-              Export
+              {t('templates.export')}
             </button>
 
             {/* Divider */}
@@ -273,7 +273,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
           </div>
         </div>}
       footerClassName=""
-      footer={<div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: 'var(--pd-c-4a4a5a)', textAlign: 'center', flexShrink: 0 }}>Add templates to <code style={{ background: 'rgba(255,255,255,0.04)', padding: '1px 4px', borderRadius: 3 }}>public/templates/</code> to include them in the gallery</div>}
+      footer={<div style={{ padding: '10px 20px', borderTop: '1px solid var(--pd-field-border)', fontSize: 11, color: 'var(--pd-c-4a4a5a)', textAlign: 'center', flexShrink: 0 }}>Add templates to <code style={{ background: 'rgba(255,255,255,0.04)', padding: '1px 4px', borderRadius: 3 }}>public/templates/</code> to include them in the gallery</div>}
     >
 
         {/* ── Export panel (inline collapsible) ──────────────── */}
@@ -466,12 +466,12 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
 
           {loading && (
             <p style={{ textAlign: 'center', color: 'var(--pd-c-6b6b7a)', fontSize: 13, marginTop: 32 }}>
-              Loading templates…
+              {t('templates.loading')}
             </p>
           )}
           {error && (
             <p style={{ textAlign: 'center', color: '#f87171', fontSize: 13, marginTop: 32 }}>
-              Failed to load templates
+              {t('templates.loadFailed')}
             </p>
           )}
 
@@ -486,7 +486,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
             >
               <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center', color: '#4d4d60' }}><Icon name="template" size={34} strokeWidth={1.4} /></div>
               <p style={{ margin: '0 0 6px', color: 'var(--pd-c-a0a0b0)', fontWeight: 500 }}>
-                No bundled templates yet
+                {t('templates.empty')}
               </p>
               <p style={{ margin: 0, fontSize: 11 }}>
                 Add templates to{' '}
@@ -506,6 +506,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
 
           {manifest.length > 0 && (
             <div
+              className="pd-stagger"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
@@ -517,7 +518,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                   key={entry.slug}
                   style={{
                     background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: '1px solid var(--pd-field-border)',
                     borderRadius: 10,
                     overflow: 'hidden',
                   }}
@@ -557,7 +558,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                               background: 'rgba(124,110,246,0.18)',
                               border: '1px solid rgba(124,110,246,0.3)',
                               borderRadius: 20,
-                              color: '#c4b9fc',
+                              color: 'var(--pd-c-c4b5fd)',
                               fontSize: 9,
                               fontWeight: 600,
                               letterSpacing: '0.06em',

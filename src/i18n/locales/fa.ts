@@ -255,6 +255,17 @@ export const fa: Record<TranslationKey, string> = {
 
   // ── Templates ────────────────────────────────────────────────────────────
   'templates.addSlides': 'افزودن اسلایدها به پروژهٔ فعلی',
+  'templates.applyFailed': 'این قالب اعمال نشد.',
+  'templates.empty': 'هنوز هیچ قالبی وجود ندارد',
+  'templates.export': 'برون‌بری',
+  'templates.exportTitle': 'برون‌بری پروژهٔ فعلی به صورت قالب',
+  'templates.import': 'درون‌ریزی',
+  'templates.importTitle': 'درون‌ریزی یک فایل .template.json',
+  'templates.loadFailed': 'بارگیری قالب‌ها ناموفق بود',
+  'templates.loading': 'در حال بارگیری قالب‌ها…',
+  'templates.notATemplate': 'این فایل قالب نیست. برای فایل‌های پروژه از «درون‌ریزی پروژه» استفاده کنید.',
+  'templates.title': 'قالب‌ها',
+  'templates.unreadable': 'فایل خوانده نشد.',
   'templates.applying': 'در حال اعمال…',
   'templates.applyMode': 'باز کردن قالب به صورت',
   'templates.applyModeAppend': 'افزودن به پروژهٔ فعلی',

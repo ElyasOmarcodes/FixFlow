@@ -481,16 +481,6 @@
   to { transform: translateY(0); }
 }
 
-@keyframes pd-slide-start-in {
-  from { opacity: 0; transform: translateX(calc(-16px * var(--pd-dir, 1))); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes pd-slide-end-in {
-  from { opacity: 0; transform: translateX(calc(16px * var(--pd-dir, 1))); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
 @keyframes pd-rise-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -505,30 +495,9 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
-@keyframes pd-spin { to { transform: rotate(360deg); } }
-
-@keyframes pd-pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-
-/* A single travelling highlight — used for skeletons and busy strips. */
-@keyframes pd-shimmer {
-  from { background-position: -160% 0; }
-  to { background-position: 260% 0; }
-}
-
-.pd-animate-fade { animation: pd-fade-in var(--pd-dur-base) var(--pd-ease-standard) both; }
-.pd-animate-pop { animation: pd-pop-in var(--pd-dur-base) var(--pd-ease-decel) both; }
-.pd-animate-rise { animation: pd-rise-in var(--pd-dur-base) var(--pd-ease-decel) both; }
-.pd-animate-sheet { animation: pd-sheet-in var(--pd-dur-sheet) var(--pd-ease-decel) both; }
-.pd-animate-slide-start { animation: pd-slide-start-in var(--pd-dur-base) var(--pd-ease-decel) both; }
-.pd-animate-slide-end { animation: pd-slide-end-in var(--pd-dur-base) var(--pd-ease-decel) both; }
-.pd-spin { animation: pd-spin 900ms linear infinite; }
-
-/* Stagger helper: children appear in sequence rather than all at once, which
-   is what makes a list of templates or projects feel assembled instead of
-   dumped. Capped at 10 so a long list never drags its tail. */
+/* Stagger: children appear in sequence rather than all at once, which is what
+   makes a gallery feel assembled instead of dumped. Capped at 10 so a long
+   list never drags its tail. */
 .pd-stagger > * { animation: pd-rise-in var(--pd-dur-base) var(--pd-ease-decel) both; }
 .pd-stagger > *:nth-child(1) { animation-delay: 0ms; }
 .pd-stagger > *:nth-child(2) { animation-delay: 26ms; }
@@ -541,20 +510,7 @@
 .pd-stagger > *:nth-child(9) { animation-delay: 208ms; }
 .pd-stagger > *:nth-child(n+10) { animation-delay: 230ms; }
 
-/* Press feedback. Applied broadly to chrome buttons: the scale is small enough
-   to read as a physical push rather than a bounce, and it is driven by
-   `transform` only so it never triggers layout. */
-.pd-pressable {
-  transition:
-    background-color var(--pd-dur-fast) var(--pd-ease-standard),
-    border-color var(--pd-dur-fast) var(--pd-ease-standard),
-    color var(--pd-dur-fast) var(--pd-ease-standard),
-    box-shadow var(--pd-dur-fast) var(--pd-ease-standard),
-    transform var(--pd-dur-instant) var(--pd-ease-spring);
-}
-.pd-pressable:active:not(:disabled) { transform: scale(0.96); }
-
-/* The same feedback across every chrome surface, so a button behaves the same
+/* Press feedback across every chrome surface, so a button behaves the same
    whether it lives in the toolbar, a modal or a panel. Scoped to these
    containers rather than `button` globally: the canvas overlays position some
    of their controls with transforms, and a press scale would fight them.
@@ -1092,9 +1048,6 @@
    Everything above uses logical properties, so this section only has to
    handle what CSS cannot express logically: transforms, physical gradients
    and glyphs whose meaning is "backwards along the line". */
-
-:root[dir='rtl'] { --pd-dir: -1; }
-:root[dir='ltr'] { --pd-dir: 1; }
 
 /* Arrows and chevrons that mean start/end rather than left/right. Icon.tsx
    tags only those glyphs, so vertical arrows are never touched. */
