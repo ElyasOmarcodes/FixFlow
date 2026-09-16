@@ -13,6 +13,41 @@ import {
   touchSettings,
 } from '../helpers'
 
+/**
+ * Every transient id that points *into* the outgoing project. Loading another
+ * project or template while any of these survive leaves the canvas holding
+ * transformers, group outlines and an inline text editor anchored to layers
+ * that no longer exist — two designs fighting over one stage.
+ */
+function clearedOnProjectSwap(): Pick<
+  EditorStore,
+  | 'selection'
+  | 'editingGroupId'
+  | 'selectedLayerIds'
+  | 'selectedAccentIndex'
+  | 'editingTextId'
+  | 'pendingContentFocusLayerId'
+  | 'clipboardSourceGroupId'
+  | 'panoRenderOverride'
+  | 'lastFormatByFamily'
+  | 'lastGroupByFamily'
+> {
+  // Rebuilt per call: the empty array/maps below become live state, so a shared
+  // instance would let one project's selection leak into the next.
+  return {
+    selection: null,
+    editingGroupId: null,
+    selectedLayerIds: [],
+    selectedAccentIndex: null,
+    editingTextId: null,
+    pendingContentFocusLayerId: null,
+    clipboardSourceGroupId: null,
+    panoRenderOverride: null,
+    lastFormatByFamily: {},
+    lastGroupByFamily: {},
+  }
+}
+
 export const createProjectSlice = (
   set: EditorSet,
   get: EditorGet,
@@ -81,17 +116,12 @@ export const createProjectSlice = (
     assertProjectShape(rawProject)
     const project = migrateProject(rawProject)
     set({
+      ...clearedOnProjectSwap(),
       project,
       activeSlideGroupId: project.slideGroups[0]?.id ?? '',
-      selection: null,
-      editingGroupId: null,
-      selectedLayerIds: [],
-      selectedAccentIndex: null,
       activeLocale: project.settings.defaultLocale ?? 'en',
       activeCanvasFormat: BASE_CANVAS_FORMAT,
       activeFamily: project.slideGroups[0] ? (getGroupFamilyKey(project.slideGroups[0]) ?? 'phone') : 'phone',
-      lastFormatByFamily: {},
-      lastGroupByFamily: {},
     })
     // Clear undo history — undo must not cross project boundaries
     clearHistory()
@@ -100,17 +130,12 @@ export const createProjectSlice = (
   resetProject: () => {
     const project = newProject()
     set({
+      ...clearedOnProjectSwap(),
       project,
       activeSlideGroupId: project.slideGroups[0].id,
-      selection: null,
-      editingGroupId: null,
-      selectedLayerIds: [],
-      selectedAccentIndex: null,
       activeLocale: 'en',
       activeCanvasFormat: BASE_CANVAS_FORMAT,
       activeFamily: project.slideGroups[0] ? (getGroupFamilyKey(project.slideGroups[0]) ?? 'phone') : 'phone',
-      lastFormatByFamily: {},
-      lastGroupByFamily: {},
     })
     // Clear undo history — new project starts fresh
     clearHistory()
@@ -135,17 +160,12 @@ export const createProjectSlice = (
       slideGroups: extracted.slideGroups,
     })
     set({
+      ...clearedOnProjectSwap(),
       project,
       activeSlideGroupId: extracted.slideGroups[0]?.id ?? '',
-      selection: null,
-      editingGroupId: null,
-      selectedLayerIds: [],
-      selectedAccentIndex: null,
       activeLocale: project.settings.defaultLocale ?? 'en',
       activeCanvasFormat: BASE_CANVAS_FORMAT,
       activeFamily: project.slideGroups[0] ? (getGroupFamilyKey(project.slideGroups[0]) ?? 'phone') : 'phone',
-      lastFormatByFamily: {},
-      lastGroupByFamily: {},
     })
     // Clear undo history — new project starts fresh
     clearHistory()
@@ -162,14 +182,32 @@ export const createProjectSlice = (
       const existing = s.project.settings.brandColors ?? []
       const existingIds = new Set(existing.map((c) => c.id))
       const incoming = (settings?.brandColors ?? []).filter((c) => !existingIds.has(c.id))
+      const merged = touchProject(s.project, {
+        settings: incoming.length > 0
+          ? { ...s.project.settings, brandColors: [...existing, ...incoming] }
+          : s.project.settings,
+        slideGroups: [...s.project.slideGroups, ...extracted.slideGroups],
+      })
+      const firstAdded = extracted.slideGroups[0]
+      // The appended groups carry their own format set. Re-deriving the
+      // project's active formats keeps the format switcher in sync with what
+      // now exists; without it the canvas can be asked to render a format the
+      // new groups never declared.
+      const project = normalizeProjectFormats(merged)
       return {
-        project: touchProject(s.project, {
-          settings: incoming.length > 0
-            ? { ...s.project.settings, brandColors: [...existing, ...incoming] }
-            : s.project.settings,
-          slideGroups: [...s.project.slideGroups, ...extracted.slideGroups],
-        }),
-        activeSlideGroupId: extracted.slideGroups[0]?.id ?? s.activeSlideGroupId,
+        project,
+        activeSlideGroupId: firstAdded?.id ?? s.activeSlideGroupId,
+        // Every selection-ish id below refers to a layer in the *previous*
+        // group. Carrying them across the switch leaves transformers, the
+        // group-edit outline and the inline text editor anchored to nodes that
+        // are no longer on the stage — the "two designs on one canvas" effect.
+        ...(firstAdded
+          ? {
+              ...clearedOnProjectSwap(),
+              activeCanvasFormat: BASE_CANVAS_FORMAT,
+              activeFamily: getGroupFamilyKey(firstAdded) ?? s.activeFamily,
+            }
+          : {}),
       }
     })
   },

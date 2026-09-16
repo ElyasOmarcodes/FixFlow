@@ -321,7 +321,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                   key={item.value}
                   type="button"
                   onClick={() => setExportScope(item.value)}
-                  className={`text-left rounded border px-2.5 py-2 transition-colors ${exportScope === item.value
+                  className={`text-start rounded border px-2.5 py-2 transition-colors ${exportScope === item.value
                     ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-white'
                     : 'border-[rgba(255,255,255,0.08)] text-[#a6a7b8] hover:border-[rgba(255,255,255,0.18)]'}`}
                 >
@@ -433,7 +433,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                       const next = normalizePanoCompensationPx(parseInt(panoCompensationInput, 10) || 0)
                       setPanoCompensationInput(String(next || DEFAULT_PANO_COMPENSATION_PX))
                     }}
-                    className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-right text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
+                    className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
                   />
                   <span className="text-[var(--pd-c-6b6b7a)]">px</span>
                 </label>
@@ -460,7 +460,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                     type="button"
                     disabled={disabled}
                     onClick={() => setExportOutput(item.value)}
-                    className={`text-left rounded border px-2 py-1.5 transition-colors ${exportOutput === item.value
+                    className={`text-start rounded border px-2 py-1.5 transition-colors ${exportOutput === item.value
                       ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-white'
                       : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:text-white'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >

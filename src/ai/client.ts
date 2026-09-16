@@ -1,4 +1,5 @@
 import { aiFetch } from './http'
+import { formatProviderHttpError } from '@/ai/errors'
 import { buildOpenAiCompatibleHeaders } from '@/ai/headers'
 import { getDefaultModel, getProviderConfig } from '@/ai/providers'
 import type { AiProvider } from '@/ai/providers'
@@ -224,7 +225,7 @@ async function requestJsonWithRetry(
         const body = await response.text()
         const httpError = new AiClientError(
           'http',
-          `${httpErrorLabel} ${response.status}: ${body}`,
+          formatProviderHttpError(httpErrorLabel, response.status, body, provider),
           { status: response.status },
         )
         const transient = response.status === 429 || response.status >= 500

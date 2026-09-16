@@ -258,6 +258,16 @@ export const en = {
   'settings.project': 'PROJECT',
   'settings.title': 'Settings',
 
+  // ── Templates ────────────────────────────────────────────────────────────
+  'templates.addSlides': 'Add slides to project',
+  'templates.applying': 'Applying…',
+  'templates.applyMode': 'Open template as',
+  'templates.applyModeAppend': 'Add to current project',
+  'templates.applyModeAppendHint': 'Appends the template slides after your own. Use only when both designs share a canvas size.',
+  'templates.applyModeNew': 'A new project',
+  'templates.applyModeNewHint': 'Your current project is saved first, then the template opens on its own canvas.',
+  'templates.useTemplate': 'Use this template',
+
   // ── Localization view ────────────────────────────────────────────────────
   'loc.backToEditor': 'Back to Editor',
   'loc.empty': 'No localizable content',

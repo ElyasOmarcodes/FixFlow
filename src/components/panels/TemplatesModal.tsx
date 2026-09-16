@@ -7,7 +7,10 @@ import { saveFile, isSaveCancelled } from '@/utils/saveFile'
 import type { Template } from '@/types'
 import { ModalShell } from '@/components/ui/ModalShell'
 import { FileUploadButton } from '@/components/ui/FileUploadButton'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { Icon } from '@/components/ui/Icon'
+import { useProjectsStore } from '@/store/projects'
+import { useT } from '@/i18n'
 
 interface TemplatesModalProps {
   open: boolean
@@ -15,6 +18,7 @@ interface TemplatesModalProps {
 }
 
 export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
+  const t = useT()
   const { manifest, loading, error, loadManifest, fetchTemplate } = useTemplatesStore()
   const { project, exportActiveAsTemplate, addTemplateSlideGroups } =
     useEditorStore(useShallow((s) => ({
@@ -23,9 +27,18 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
       addTemplateSlideGroups: s.addTemplateSlideGroups,
     })))
 
+  const createProjectFromTemplate = useProjectsStore((s) => s.createProjectFromTemplate)
+
   const [applying, setApplying] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [exportOpen, setExportOpen] = useState(false)
+  /**
+   * How a template lands. 'new' is the default because appending a template's
+   * slides into an open project is what makes two designs share one canvas —
+   * different slide sizes, backgrounds and brand palettes on top of each other.
+   * Appending stays available, but as a deliberate choice.
+   */
+  const [applyMode, setApplyMode] = useState<'new' | 'append'>('new')
 
   const [exportName, setExportName] = useState('')
   const [exportDescription, setExportDescription] = useState('')
@@ -41,11 +54,16 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
     }
   }, [open, project.name])
 
+  const applyTemplateToEditor = async (tpl: Template) => {
+    if (applyMode === 'new') await createProjectFromTemplate(tpl)
+    else addTemplateSlideGroups(tpl)
+  }
+
   const handleGalleryApply = async (entry: typeof manifest[0]) => {
     setApplying(entry.slug)
     try {
       const tpl = await fetchTemplate(entry)
-      addTemplateSlideGroups(tpl)
+      await applyTemplateToEditor(tpl)
       onClose()
     } catch {
       setApplying(null)
@@ -86,8 +104,9 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
           const tpl = obj as Template
           if (!tpl.kind) tpl.kind = 'template'
           if (!tpl.schemaVersion) tpl.schemaVersion = 1
-          addTemplateSlideGroups(tpl)
-          onClose()
+          void applyTemplateToEditor(tpl)
+            .then(onClose)
+            .catch(() => setImportError('Could not apply this template.'))
         } else {
           setImportError(
             'This file is not a template. Use "Import Project" for project files.',
@@ -386,6 +405,28 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
             onFiles={handleImportFile}
           >Import template</FileUploadButton>
 
+          {/* ── Where the template lands ──────────────────────
+              Placed above the gallery so the choice is made before, not after,
+              a template is picked. */}
+          <div className="pd-template-mode">
+            <span className="pd-template-mode-label">{t('templates.applyMode')}</span>
+            <SegmentedControl
+              value={applyMode}
+              onChange={setApplyMode}
+              options={[
+                { value: 'new', label: t('templates.applyModeNew') },
+                { value: 'append', label: t('templates.applyModeAppend') },
+              ]}
+              className="pd-segmented"
+              optionClassName="pd-segmented-option"
+              activeClassName="pd-segmented-option-active"
+              inactiveClassName="pd-segmented-option-idle"
+            />
+            <p className="pd-template-mode-hint">
+              {applyMode === 'new' ? t('templates.applyModeNewHint') : t('templates.applyModeAppendHint')}
+            </p>
+          </div>
+
           {/* Import error (shown inline in gallery area) */}
           {importError && (
             <div
@@ -407,7 +448,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
               <button
                 onClick={() => setImportError(null)}
                 style={{
-                  marginLeft: 'auto',
+                  marginInlineStart: 'auto',
                   background: 'none',
                   border: 'none',
                   color: '#f87171',
@@ -601,7 +642,11 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                         padding: '6px 0',
                       }}
                     >
-                      {applying === entry.slug ? 'Adding…' : '+ Add slides to project'}
+                      {applying === entry.slug
+                        ? t('templates.applying')
+                        : applyMode === 'new'
+                          ? t('templates.useTemplate')
+                          : t('templates.addSlides')}
                     </button>
                   </div>
                 </div>

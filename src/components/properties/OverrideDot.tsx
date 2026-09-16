@@ -154,11 +154,11 @@ function Dot({
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute left-0 top-5 z-50 rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-xl py-1 min-w-[130px]"
+          className="absolute start-0 top-5 z-50 rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-xl py-1 min-w-[130px]"
         >
           <button
             type="button"
-            className="w-full text-left px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
             onClick={() => {
               onReset()
               setMenuOpen(false)
@@ -210,11 +210,11 @@ function FormatOverrideDot({
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute left-0 top-5 z-50 rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-xl py-1 min-w-[130px]"
+          className="absolute start-0 top-5 z-50 rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-xl py-1 min-w-[130px]"
         >
           <button
             type="button"
-            className="w-full text-left px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
             onClick={() => {
               onResetToAuto()
               setMenuOpen(false)
@@ -224,7 +224,7 @@ function FormatOverrideDot({
           </button>
           <button
             type="button"
-            className="w-full text-left px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
             onClick={() => {
               onUseAsShared()
               setMenuOpen(false)

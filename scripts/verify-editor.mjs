@@ -59,7 +59,16 @@ try {
     else await childEditor.press('Escape')
     await page.locator('.pd-layer-list').getByText('Collection', { exact: true }).click()
     if (width < 1024) {
-      await expect(page.locator('.pd-mobile-header')).toBeHidden()
+      // A phone sheet is full-screen, so the chrome behind it is hidden to buy
+      // height. A tablet sheet only takes the lower two thirds, so the header
+      // stays put and the canvas remains visible while you work the layer list.
+      if (width < 768) await expect(page.locator('.pd-mobile-header')).toBeHidden()
+      else {
+        await expect(page.locator('.pd-mobile-header')).toBeVisible()
+        const sheet = await page.locator('#mobile-layers').boundingBox()
+        const header = await page.locator('.pd-mobile-header').boundingBox()
+        expect(sheet.y).toBeGreaterThan(header.y + header.height)
+      }
       await expect(page.locator('.pd-slides')).toBeHidden()
     }
     await page.screenshot({ path: `test-results/editor/layers-${width}.png` })
@@ -129,6 +138,57 @@ try {
     if (width === 1440) {
       await page.evaluate(() => localStorage.setItem('pixeldeck.ui-language', 'en'))
       await page.reload()
+      await page.waitForTimeout(2500)
+
+      // Applying a template must not merge it into whatever is already open —
+      // that is what put two designs on one canvas. Driven through the real
+      // modal, because the store could always do this; the UI never offered it.
+      const groupCount = () => page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        return {
+          groups: state.project.slideGroups.length,
+          name: state.project.name,
+          selection: state.selection,
+          editingGroupId: state.editingGroupId,
+          selectedLayerIds: state.selectedLayerIds.length,
+        }
+      })
+      // Leave a selection behind, so a surviving one would be visible.
+      await page.locator('.pd-layer-list button').first().click()
+      const before = await groupCount()
+      await page.locator('.pd-toolbar').getByRole('button', { name: 'Templates', exact: true }).click()
+      const gallery = page.getByRole('dialog')
+      await expect(gallery.getByRole('button', { name: 'A new project', exact: true })).toHaveAttribute('aria-pressed', 'true')
+      await gallery.getByRole('button', { name: 'Use this template', exact: true }).first().click()
+      await page.waitForTimeout(1800)
+      const after = await groupCount()
+      // A fresh project, not the old one with extra slides bolted on.
+      expect(after.name).not.toBe(before.name)
+      // And nothing still pointing at a layer from the project we left.
+      expect(after.selection).toBeNull()
+      expect(after.editingGroupId).toBeNull()
+      expect(after.selectedLayerIds).toBe(0)
+
+      // Apply the same template again in append mode. Only then should the
+      // groups accumulate — which is what proves the default did not append.
+      await page.locator('.pd-toolbar').getByRole('button', { name: 'Templates', exact: true }).click()
+      const appendGallery = page.getByRole('dialog')
+      await appendGallery.getByRole('button', { name: 'Add to current project', exact: true }).click()
+      await appendGallery.getByRole('button', { name: 'Add slides to project', exact: true }).first().click()
+      await page.waitForTimeout(1800)
+      const appended = await groupCount()
+      expect(appended.groups).toBe(after.groups * 2)
+      expect(appended.name).toBe(after.name)
+      console.log(`  templates: new-project ${before.groups}->${after.groups} groups (not ${before.groups + after.groups}); append ${after.groups}->${appended.groups}; selection cleared both times`)
+
+      // Back to a clean slate for the template screenshot sweep below.
+      await page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        useEditorStore.getState().resetProject()
+      })
+      await page.waitForTimeout(600)
+
       for (const slug of ['noor-editorial', 'orbit-studio', 'serein-wellness']) {
         await page.evaluate(async (name) => {
           const { useEditorStore } = await import('/src/store/index.ts')

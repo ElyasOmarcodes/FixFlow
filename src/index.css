@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/* ══════════════════════════════════════════════════════════════════════════
+   PixelDeck stylesheet
+   ─────────────────────────────────────────────────────────────────────────
+   Order matters; sections are additive and never re-open an earlier one:
+
+     1. Theme + design tokens        6. Panels, sheets and popovers
+     2. Native-control base layer    7. Writing direction (RTL)
+     3. Motion system                8. Responsive tiers
+     4. App shell                    9. Input modality + reduced motion
+     5. Editor chrome
+
+   Two invariants hold throughout:
+     · Chrome uses *logical* properties (inline-start/end), so the whole
+       interface mirrors for Pashto and Persian without a second stylesheet.
+     · The design surface does not. `.pd-editor main > div[dir=ltr]` pins the
+       Konva stage to LTR: mirroring it would flip slide coordinates and pano
+       seams on screen while the exported PNGs stayed the same.
+   ══════════════════════════════════════════════════════════════════════════ */
+
 @theme {
   --font-sans: 'Inter', 'Vazirmatn Variable', 'Vazirmatn', system-ui, sans-serif;
   --color-surface: #0f0f13;
@@ -10,9 +29,14 @@
   --color-accent-2: #ec4899;
 }
 
+/* ─── 1. Theme + design tokens ─────────────────────────────────────────────
+   Every colour the components reference lives here under a `--pd-c-<hex>`
+   name (the hex is the *dark* value — the light theme rebinds the same token
+   to a different colour). Keeping the names stable is what lets one theme
+   switch repaint the app without touching a component. */
+
 :root {
-  /* Control-chrome tokens — the whole native-widget layer below reads these,
-     so a theme tweak is one edit instead of forty. */
+  /* Control chrome — the native-widget layer in section 2 reads these. */
   --pd-field-bg: #0f0f13;
   --pd-field-border: rgba(255,255,255,0.1);
   --pd-field-border-hover: rgba(255,255,255,0.2);
@@ -21,11 +45,117 @@
   --pd-track: rgba(255,255,255,0.12);
   --pd-scroll-thumb: rgba(255,255,255,0.16);
   --pd-scroll-thumb-hover: rgba(255,255,255,0.3);
+
+  /* Surfaces and text. */
+  --pd-c-0f0f13: #0f0f13;
+  --pd-c-111118: #111118;
+  --pd-c-18181f: #18181f;
+  --pd-c-131318: #131318;
+  --pd-c-15151b: #15151b;
+  --pd-c-1e1e28: #1e1e28;
+  --pd-c-e8e8f0: #e8e8f0;
+  --pd-c-f0eff8: #f0eff8;
+  --pd-c-d8d8e2: #d8d8e2;
+  --pd-c-a0a0b0: #a0a0b0;
+  --pd-c-6b6b7a: #6b6b7a;
+  --pd-c-777786: #777786;
+  --pd-c-4a4a5a: #4a4a5a;
+  --pd-c-525260: #525260;
+  --pd-c-7c6ef6: #7c6ef6;
+  --pd-c-b0b0c4: #b0b0c4;
+  --pd-c-8a86a0: #8a86a0;
+  --pd-c-3a3a4a: #3a3a4a;
+  --pd-c-a8a8b8: #a8a8b8;
+  --pd-c-c4b5fd: #c4b5fd;
+  --pd-c-b8afff: #b8afff;
+  --pd-c-9b8fff: #9b8fff;
+  --pd-c-484858: #484858;
+  --pd-text: #e8e8f0;
+  --pd-panel: #18181f;
+  --pd-workspace: #111118;
+
+  /* Tinted washes, derived once so hover/press states stay consistent. */
+  --pd-accent-wash: rgba(124,110,246,0.14);
+  --pd-accent-wash-strong: rgba(124,110,246,0.24);
+  --pd-hover: rgba(255,255,255,0.06);
+  --pd-press: rgba(255,255,255,0.1);
+
+  /* Elevation. Panels sit flat; only things that float get a shadow. */
+  --pd-shadow-popover: 0 10px 34px rgba(0,0,0,0.38), 0 2px 8px rgba(0,0,0,0.24);
+  --pd-shadow-modal: 0 28px 80px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.3);
+  --pd-shadow-sheet: 0 -14px 46px rgba(0,0,0,0.42);
+
+  /* ── Motion ────────────────────────────────────────────────────────────
+     Four curves, and nothing improvises outside them:
+       standard — the default for anything that both moves and settles
+       decel    — things entering the screen (fast in, gentle stop)
+       accel    — things leaving it (gentle start, quick exit)
+       spring   — a small overshoot, for press/pop feedback only
+     Durations follow distance: the further something travels, the longer it
+     may take. A 120ms colour change next to a 320ms sheet slide is what makes
+     an interface read as responsive rather than merely animated. */
+  --pd-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --pd-ease-decel: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --pd-ease-accel: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --pd-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --pd-dur-instant: 90ms;
+  --pd-dur-fast: 140ms;
+  --pd-dur-base: 200ms;
+  --pd-dur-slow: 280ms;
+  --pd-dur-sheet: 340ms;
+
+  /* Chrome metrics, shared between the shell and the media queries so a
+     bottom sheet can never overlap the bar it is supposed to sit above. */
+  --pd-railbar-h: 68px;
+  --pd-mobile-header-h: 58px;
+  --pd-radius-sheet: 22px;
 }
 
-/* ─── Native-control layer ────────────────────────────────────────────────
-   Kept inside @layer base so every Tailwind utility on a component still
-   wins: these rules only replace what the browser would otherwise draw. */
+:root[data-theme="light"] {
+  --pd-c-0f0f13: #f3f4f7;
+  --pd-c-111118: #e4e7ed;
+  --pd-c-18181f: #ffffff;
+  --pd-c-131318: #f1f3f7;
+  --pd-c-15151b: #f7f8fb;
+  --pd-c-1e1e28: #edf0f6;
+  --pd-c-e8e8f0: #222735;
+  --pd-c-f0eff8: #171d2c;
+  --pd-c-d8d8e2: #303747;
+  --pd-c-a0a0b0: #586175;
+  --pd-c-6b6b7a: #657087;
+  --pd-c-777786: #59657b;
+  --pd-c-4a4a5a: #69758a;
+  --pd-c-525260: #687387;
+  --pd-c-7c6ef6: #6550dc;
+  --pd-c-b0b0c4: #414b60;
+  --pd-c-8a86a0: #667189;
+  --pd-c-3a3a4a: #8190a8;
+  --pd-c-a8a8b8: #4c586f;
+  --pd-c-c4b5fd: #6550dc;
+  --pd-c-b8afff: #6550dc;
+  --pd-c-9b8fff: #6550dc;
+  --pd-c-484858: #73819a;
+  --pd-text: #222735;
+  --pd-panel: #ffffff;
+  --pd-workspace: #e4e7ed;
+  --pd-field-bg: #f3f4f7;
+  --pd-field-border: #ced4df;
+  --pd-field-border-hover: #a3afc3;
+  --pd-track: #cdd3e0;
+  --pd-scroll-thumb: #b4bece;
+  --pd-scroll-thumb-hover: #8a98b0;
+  --pd-accent-wash: rgba(101,80,220,0.12);
+  --pd-accent-wash-strong: rgba(101,80,220,0.2);
+  --pd-hover: rgba(20,24,40,0.05);
+  --pd-press: rgba(20,24,40,0.09);
+  --pd-shadow-popover: 0 10px 30px rgba(28,35,54,0.14), 0 2px 6px rgba(28,35,54,0.08);
+  --pd-shadow-modal: 0 26px 70px rgba(28,35,54,0.22), 0 4px 14px rgba(28,35,54,0.1);
+  --pd-shadow-sheet: 0 -12px 40px rgba(28,35,54,0.16);
+}
+
+/* ─── 2. Native-control base layer ─────────────────────────────────────────
+   Inside @layer base so every Tailwind utility on a component still wins:
+   these rules only replace what the browser would otherwise draw. */
 
 @layer base {
   * { box-sizing: border-box; }
@@ -38,13 +168,11 @@
 
   body {
     margin: 0;
-    background: #0f0f13;
-    color: #e8e8f0;
+    background: var(--pd-workspace);
+    color: var(--pd-text);
+    color-scheme: dark;
     font-family: 'Inter', 'Vazirmatn Variable', 'Vazirmatn', system-ui, sans-serif;
     overflow: hidden;
-    /* Hints the OS/browser to theme native controls (select popups, checkboxes,
-       scrollbars) dark instead of defaulting to a light popup on a dark app. */
-    color-scheme: dark;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* App chrome is not a document: no caret drag-select over labels and
@@ -54,12 +182,17 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  :root[data-theme="light"] body { color-scheme: light; }
+
   /* Pashto and Persian need a face that carries the script. Vazirmatn leads
      the stack for those UI languages (it also has Latin glyphs, so mixed
      strings like "iPhone 16 Pro" stay consistent). */
   :root[lang='ps'] body,
   :root[lang='fa'] body {
     font-family: 'Vazirmatn Variable', 'Vazirmatn', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+    /* Arabic-script faces carry taller ascenders and deeper descenders than
+       Inter, so the tight line-heights tuned for Latin clip diacritics. */
+    line-height: 1.75;
   }
 
   /* Anything the user genuinely reads or edits stays selectable. */
@@ -77,7 +210,7 @@
   /* Images and links in the chrome must not start a native drag. */
   img, svg, a { -webkit-user-drag: none; }
 
-  /* ─── Scrollbars ──────────────────────────────────────────────────────────
+  /* ─── Scrollbars ────────────────────────────────────────────────────────
      Overlay-style pill on a transparent track, sized via a transparent border
      so it reads as a 4px rail with breathing room instead of a 10px web bar. */
 
@@ -97,7 +230,7 @@
     border-radius: 999px;
     background-color: var(--pd-scroll-thumb);
     background-clip: padding-box;
-    transition: background-color 0.15s;
+    transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
   }
 
   ::-webkit-scrollbar-thumb:hover { background-color: var(--pd-scroll-thumb-hover); }
@@ -106,7 +239,7 @@
   /* Chrome/Safari draw stepper arrows on some platforms — an app has none. */
   ::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
 
-  /* ─── Focus ───────────────────────────────────────────────────────────────
+  /* ─── Focus ─────────────────────────────────────────────────────────────
      The platform focus ring (blue halo on macOS, dotted box on Windows) is the
      single most "web page" tell in the UI. Replaced by an accent ring that only
      appears for keyboard users. */
@@ -119,7 +252,7 @@
     border-radius: 4px;
   }
 
-  /* ─── Text fields ─────────────────────────────────────────────────────────── */
+  /* ─── Text fields ───────────────────────────────────────────────────────── */
 
   input, textarea, select, button {
     font: inherit;
@@ -127,8 +260,19 @@
   }
 
   input::placeholder, textarea::placeholder { color: #575766; }
+  :root[data-theme="light"] input::placeholder,
+  :root[data-theme="light"] textarea::placeholder { color: #8b95a8; }
 
   input, textarea { caret-color: var(--pd-accent); }
+
+  input:not([type='checkbox']):not([type='range']):not([type='color']),
+  textarea,
+  select {
+    transition:
+      border-color var(--pd-dur-fast) var(--pd-ease-standard),
+      background-color var(--pd-dur-fast) var(--pd-ease-standard),
+      box-shadow var(--pd-dur-fast) var(--pd-ease-standard);
+  }
 
   /* Number spinners are desktop-browser furniture — the app uses drag sliders
      and typed values instead. */
@@ -144,7 +288,7 @@
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e8e8f0;
+    -webkit-text-fill-color: var(--pd-text);
     -webkit-box-shadow: 0 0 0 1000px var(--pd-field-bg) inset;
     caret-color: var(--pd-accent);
   }
@@ -155,7 +299,7 @@
   input::-ms-reveal,
   input::-ms-clear { display: none; appearance: none; }
 
-  /* ─── Select ──────────────────────────────────────────────────────────────
+  /* ─── Select ────────────────────────────────────────────────────────────
      Replaces the OS dropdown button with the app's own chevron. The arrow is an
      inline SVG data URI so it needs no network request and no CSP allowance. */
 
@@ -173,17 +317,17 @@
 
   [dir='rtl'] select { background-position: left 8px center; }
 
-  select:hover { background-color: rgba(255,255,255,0.03); }
+  select:hover { background-color: var(--pd-hover); }
   select:disabled { cursor: not-allowed; opacity: 0.45; }
 
-  /* The popup list itself is drawn by the OS; color-scheme: dark on <body>
-     themes it, and these keep the rows legible where the UA honours them. */
+  /* The popup list itself is drawn by the OS; color-scheme on <body> themes
+     it, and these keep the rows legible where the UA honours them. */
   select option, select optgroup {
-    background: #18181f;
-    color: #e8e8f0;
+    background: var(--pd-panel);
+    color: var(--pd-text);
   }
 
-  /* ─── Range slider ────────────────────────────────────────────────────────
+  /* ─── Range slider ──────────────────────────────────────────────────────
      Native range inputs look completely different on each platform. This draws
      one flat rail + accent knob everywhere. */
 
@@ -212,13 +356,15 @@
     border-radius: 50%;
     background: var(--pd-accent);
     box-shadow: 0 1px 4px rgba(0,0,0,0.5);
-    transition: transform 0.12s, box-shadow 0.12s;
+    transition:
+      transform var(--pd-dur-instant) var(--pd-ease-spring),
+      box-shadow var(--pd-dur-instant) var(--pd-ease-standard);
   }
 
   input[type='range']:hover::-webkit-slider-thumb { transform: scale(1.15); }
   input[type='range']:active::-webkit-slider-thumb {
-    transform: scale(1.25);
-    box-shadow: 0 0 0 5px rgba(124,110,246,0.18);
+    transform: scale(1.3);
+    box-shadow: 0 0 0 6px rgba(124,110,246,0.18);
   }
 
   input[type='range']::-moz-range-track {
@@ -234,11 +380,13 @@
     border-radius: 50%;
     background: var(--pd-accent);
     box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    transition: transform var(--pd-dur-instant) var(--pd-ease-spring);
   }
 
+  input[type='range']:active::-moz-range-thumb { transform: scale(1.3); }
   input[type='range']:disabled { cursor: not-allowed; opacity: 0.4; }
 
-  /* ─── Checkbox ────────────────────────────────────────────────────────────── */
+  /* ─── Checkbox ──────────────────────────────────────────────────────────── */
 
   input[type='checkbox'] {
     -webkit-appearance: none;
@@ -251,10 +399,14 @@
     border-radius: 4px;
     background: var(--pd-field-bg);
     cursor: pointer;
-    transition: background-color 0.12s, border-color 0.12s;
+    transition:
+      background-color var(--pd-dur-fast) var(--pd-ease-standard),
+      border-color var(--pd-dur-fast) var(--pd-ease-standard),
+      transform var(--pd-dur-instant) var(--pd-ease-spring);
   }
 
   input[type='checkbox']:hover:not(:disabled) { border-color: var(--pd-field-border-hover); }
+  input[type='checkbox']:active:not(:disabled) { transform: scale(0.9); }
 
   input[type='checkbox']:checked {
     border-color: var(--pd-accent);
@@ -276,7 +428,7 @@
 
   input[type='checkbox']:disabled { cursor: not-allowed; opacity: 0.4; }
 
-  /* ─── Color swatch ────────────────────────────────────────────────────────
+  /* ─── Color swatch ──────────────────────────────────────────────────────
      The native control ships a thick inset border and light padding; strip it
      back to a flat rounded chip. */
 
@@ -289,24 +441,153 @@
     background: none;
     cursor: pointer;
     overflow: hidden;
+    transition: border-color var(--pd-dur-fast) var(--pd-ease-standard),
+                transform var(--pd-dur-instant) var(--pd-ease-spring);
   }
 
   input[type='color']:hover { border-color: var(--pd-field-border-hover); }
+  input[type='color']:active { transform: scale(0.94); }
   input[type='color']::-webkit-color-swatch-wrapper { padding: 0; }
   input[type='color']::-webkit-color-swatch { border: none; border-radius: 5px; }
   input[type='color']::-moz-color-swatch { border: none; border-radius: 5px; }
 
-  /* ─── Buttons ─────────────────────────────────────────────────────────────── */
+  /* ─── Buttons ───────────────────────────────────────────────────────────── */
 
   button:not(:disabled) { cursor: pointer; }
   button:disabled { cursor: not-allowed; }
+  button { touch-action: manipulation; }
 
-  /* ─── File input ──────────────────────────────────────────────────────────
+  /* ─── File input ────────────────────────────────────────────────────────
      Every visible upload affordance in the app is a styled button that proxies
      to a hidden input, so the native "Choose File" widget should never show. */
   input[type='file']::-webkit-file-upload-button,
   input[type='file']::file-selector-button { display: none; }
 }
+
+/* ─── 3. Motion system ─────────────────────────────────────────────────────
+   Named keyframes plus the handful of utilities that use them. Anything that
+   appears, disappears or changes position in the chrome should reach for one
+   of these rather than inventing a curve. */
+
+@keyframes pd-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes pd-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pd-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pd-slide-start-in {
+  from { opacity: 0; transform: translateX(calc(-16px * var(--pd-dir, 1))); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pd-slide-end-in {
+  from { opacity: 0; transform: translateX(calc(16px * var(--pd-dir, 1))); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pd-rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Same entrance as pd-pop-in, but for elements that are centred with
+   `translateX(-50%)`. An animation's own transform replaces the element's, so
+   the centring offset has to be carried through every keyframe or the element
+   snaps half a width to the side the moment the animation lands. */
+@keyframes pd-pop-in-centred {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.975); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@keyframes pd-spin { to { transform: rotate(360deg); } }
+
+@keyframes pd-pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* A single travelling highlight — used for skeletons and busy strips. */
+@keyframes pd-shimmer {
+  from { background-position: -160% 0; }
+  to { background-position: 260% 0; }
+}
+
+.pd-animate-fade { animation: pd-fade-in var(--pd-dur-base) var(--pd-ease-standard) both; }
+.pd-animate-pop { animation: pd-pop-in var(--pd-dur-base) var(--pd-ease-decel) both; }
+.pd-animate-rise { animation: pd-rise-in var(--pd-dur-base) var(--pd-ease-decel) both; }
+.pd-animate-sheet { animation: pd-sheet-in var(--pd-dur-sheet) var(--pd-ease-decel) both; }
+.pd-animate-slide-start { animation: pd-slide-start-in var(--pd-dur-base) var(--pd-ease-decel) both; }
+.pd-animate-slide-end { animation: pd-slide-end-in var(--pd-dur-base) var(--pd-ease-decel) both; }
+.pd-spin { animation: pd-spin 900ms linear infinite; }
+
+/* Stagger helper: children appear in sequence rather than all at once, which
+   is what makes a list of templates or projects feel assembled instead of
+   dumped. Capped at 10 so a long list never drags its tail. */
+.pd-stagger > * { animation: pd-rise-in var(--pd-dur-base) var(--pd-ease-decel) both; }
+.pd-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.pd-stagger > *:nth-child(2) { animation-delay: 26ms; }
+.pd-stagger > *:nth-child(3) { animation-delay: 52ms; }
+.pd-stagger > *:nth-child(4) { animation-delay: 78ms; }
+.pd-stagger > *:nth-child(5) { animation-delay: 104ms; }
+.pd-stagger > *:nth-child(6) { animation-delay: 130ms; }
+.pd-stagger > *:nth-child(7) { animation-delay: 156ms; }
+.pd-stagger > *:nth-child(8) { animation-delay: 182ms; }
+.pd-stagger > *:nth-child(9) { animation-delay: 208ms; }
+.pd-stagger > *:nth-child(n+10) { animation-delay: 230ms; }
+
+/* Press feedback. Applied broadly to chrome buttons: the scale is small enough
+   to read as a physical push rather than a bounce, and it is driven by
+   `transform` only so it never triggers layout. */
+.pd-pressable {
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    box-shadow var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+.pd-pressable:active:not(:disabled) { transform: scale(0.96); }
+
+/* The same feedback across every chrome surface, so a button behaves the same
+   whether it lives in the toolbar, a modal or a panel. Scoped to these
+   containers rather than `button` globally: the canvas overlays position some
+   of their controls with transforms, and a press scale would fight them.
+   `transform` only — no layout, no paint of anything but the element itself. */
+.pd-toolbar button,
+.pd-mobile-header button,
+.pd-mobile-nav button,
+.pd-modal-panel button,
+.pd-modal-panel a,
+.pd-sidebar button,
+.pd-slides button {
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    opacity var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-toolbar button:active:not(:disabled),
+.pd-mobile-header button:active:not(:disabled),
+.pd-mobile-nav button:active:not(:disabled),
+.pd-modal-panel button:active:not(:disabled),
+.pd-sidebar button:active:not(:disabled),
+.pd-slides button:active:not(:disabled) { transform: scale(0.96); }
+
+/* Rows are wide; scaling a full-width row looks like the panel is breathing.
+   They get the wash instead. */
+.pd-layer-list button:active:not(:disabled),
+.pd-settings-tabs button:active:not(:disabled),
+.pd-layer-header [role=tab]:active { transform: none; }
+
+/* ─── App loading screen ──────────────────────────────────────────────── */
 
 @keyframes pixeldeck-loader-enter {
   from { opacity: 0; transform: translateY(7px); }
@@ -324,15 +605,13 @@
 }
 
 .pixeldeck-loader-enter {
-  animation: pixeldeck-loader-enter 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: pixeldeck-loader-enter 380ms var(--pd-ease-decel) both;
 }
 
-.pixeldeck-loader-enter-delay {
-  animation-delay: 90ms;
-}
+.pixeldeck-loader-enter-delay { animation-delay: 90ms; }
 
 .pixeldeck-loader-words {
-  --pixeldeck-loader-bg: #18181f;
+  --pixeldeck-loader-bg: var(--pd-panel);
   display: flex;
   align-items: center;
   height: 42px;
@@ -347,9 +626,7 @@
   line-height: 24px;
 }
 
-.pixeldeck-loader-label {
-  color: #7d7a90;
-}
+.pixeldeck-loader-label { color: #7d7a90; }
 
 .pixeldeck-loader-window {
   position: relative;
@@ -378,7 +655,7 @@
   display: flex;
   height: 168px;
   flex-direction: column;
-  color: #9b8fff;
+  color: var(--pd-c-9b8fff);
   animation: pixeldeck-loader-words 10s cubic-bezier(0.65, 0, 0.35, 1) infinite;
   will-change: transform;
 }
@@ -386,282 +663,874 @@
 .pixeldeck-loader-word-track > span {
   height: 24px;
   flex: 0 0 24px;
-  padding-left: 6px;
+  padding-inline-start: 6px;
   white-space: nowrap;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .pixeldeck-loader-enter,
-  .pixeldeck-loader-word-track {
-    animation: none;
-  }
+/* ─── 4. App shell ─────────────────────────────────────────────────────────
+   The shell follows the usable viewport, including rotation and system insets.
+   `dvh` matters on Android: with `vh` the editor sits under the browser's
+   collapsing URL bar and the bottom rail is unreachable. */
 
-  .pixeldeck-loader-word-track { transform: translateY(0); }
-}
-
-/* The shell follows the usable viewport, including rotation and system insets. */
 .pd-app {
   width: 100%;
   height: 100vh;
   height: 100dvh;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-.pd-sidebar { flex: 0 0 auto; min-height: 0; }
-.pd-mobile-nav, .pd-panel-close { display: none; }
-.pd-modal-panel { max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); min-width: 0; }
-.pd-modal-backdrop { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-.pd-modal-panel > * { min-width: 0; }
-.pd-slide-options summary { font-size: 10px; color: #8f90a3; list-style: none; pointer-events: none; }
-
-@media (max-width: 1023px) {
-  .pd-toolbar { flex-wrap: wrap; gap: 6px; padding-block: 6px; max-height: 26dvh; overflow: auto; }
-  .pd-toolbar > * { flex-shrink: 0; }
-  .pd-editor { position: relative; }
-  .pd-sidebar { display: none; }
-  .pd-sidebar-open { display: flex; flex-direction: column; position: absolute; inset-block: 0; inset-inline-start: 0; width: min(340px, 100%); z-index: 60; background: #18181f; box-shadow: 8px 0 24px #0008; }
-  .pd-properties { inset-inline-start: auto; inset-inline-end: 0; }
-  .pd-sidebar > aside { width: 100%; min-height: 0; flex: 1; }
-  .pd-panel-close { display: flex; align-self: flex-end; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
-  .pd-mobile-nav { display: flex; flex-shrink: 0; background: #18181f; border-top: 1px solid #ffffff18; }
-  .pd-mobile-nav button { flex: 1; min-width: 0; min-height: 44px; font-size: 12px; padding: 6px; }
-  .pd-mobile-nav button[aria-expanded='true'], .pd-mobile-nav button[aria-pressed='true'] { color: #b5aaff; background: #7c6ef620; }
-  .pd-slides { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; padding: 6px 8px; position: relative; }
-  .pd-slide-thumbnails { grid-column: 1 / -1; grid-row: 1; min-height: 58px; }
-  .pd-slide-options { width: auto; border: 0; padding: 0; min-width: 0; }
-  .pd-slide-options summary { pointer-events: auto; min-height: 44px; display: flex; align-items: center; cursor: pointer; }
-  .pd-slide-options:not([open]) > :not(summary) { display: none; }
-  .pd-slide-options[open] > :not(summary) { position: relative; padding: 6px; background: #18181f; }
-  .pd-slide-options[open] { position: absolute; bottom: 0; inset-inline-start: 8px; z-index: 25; border: 1px solid #ffffff30; border-radius: 8px; padding: 8px; background: #18181f; }
-  .pd-modal-panel { margin-inline: 8px; max-width: calc(100% - 16px); }
-}
-@media (pointer: coarse) {
-  .pd-toolbar button, .pd-slides button, .pd-sidebar button, .pd-modal-panel button { min-height: 40px; }
-  .pd-toolbar button { min-width: 40px; }
-  input, select, textarea { font-size: 16px; }
-}
-@media (max-height: 500px) and (max-width: 1023px) {
-  .pd-slide-thumbnails { display: none; }
-  .pd-toolbar { max-height: 22dvh; }
-}
-@media (max-width: 600px) {
-  .pd-editing-context { height: auto; min-height: 44px; padding-inline: 6px; }
-  .pd-editing-context > div { flex-wrap: wrap; }
-  .pd-editing-context section { min-height: 38px; }
-  .pd-editing-context section[aria-label='Editing locale'] { margin-inline-start: 0; padding-inline-start: 0; max-width: 100%; width: 100%; border: 0; }
+  background: var(--pd-workspace);
 }
 
-:root {
-  --pd-c-0f0f13: #0f0f13;
-  --pd-c-111118: #111118;
-  --pd-c-18181f: #18181f;
-  --pd-c-131318: #131318;
-  --pd-c-15151b: #15151b;
-  --pd-c-1e1e28: #1e1e28;
-  --pd-c-e8e8f0: #e8e8f0;
-  --pd-c-f0eff8: #f0eff8;
-  --pd-c-d8d8e2: #d8d8e2;
-  --pd-c-a0a0b0: #a0a0b0;
-  --pd-c-6b6b7a: #6b6b7a;
-  --pd-c-777786: #777786;
-  --pd-c-4a4a5a: #4a4a5a;
-  --pd-c-525260: #525260;
-  --pd-c-7c6ef6: #7c6ef6;
-  --pd-text: #e8e8f0;
-  --pd-panel: #18181f;
-  --pd-workspace: #111118;
+.pd-editor { transition: none; }
+
+/* ─── 5. Editor chrome ───────────────────────────────────────────────────── */
+
+.pd-theme-control {
+  max-width: 100px;
+  padding: 6px 22px 6px 8px;
+  font-size: 11px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 7px;
 }
-:root[data-theme="light"] {
-  --pd-c-0f0f13: #f3f4f7;
-  --pd-c-111118: #e4e7ed;
-  --pd-c-18181f: #ffffff;
-  --pd-c-131318: #f1f3f7;
-  --pd-c-15151b: #f7f8fb;
-  --pd-c-1e1e28: #edf0f6;
-  --pd-c-e8e8f0: #222735;
-  --pd-c-f0eff8: #171d2c;
-  --pd-c-d8d8e2: #303747;
-  --pd-c-a0a0b0: #586175;
-  --pd-c-6b6b7a: #657087;
-  --pd-c-777786: #59657b;
-  --pd-c-4a4a5a: #69758a;
-  --pd-c-525260: #687387;
-  --pd-c-7c6ef6: #6550dc;
-  --pd-text: #222735;
-  --pd-panel: #ffffff;
-  --pd-workspace: #e4e7ed;
-  --pd-field-bg: #f3f4f7;
-  --pd-field-border: #ced4df;
-  --pd-field-border-hover: #a3afc3;
-  --pd-track: #cdd3e0;
-  --pd-scroll-thumb: #b4bece;
-  --pd-scroll-thumb-hover: #8a98b0;
+
+.pd-workspace-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 52px;
+  background: var(--pd-panel);
+  border-inline-end: 1px solid var(--pd-field-border);
+  padding: 10px 4px;
+  gap: 5px;
 }
-body { background: var(--pd-workspace); color: var(--pd-text); color-scheme: inherit; }
-.pd-app { background: var(--pd-workspace); }
-.pd-theme-control { max-width: 100px; padding: 6px 22px 6px 8px; font-size: 11px; border: 1px solid var(--pd-field-border); border-radius: 7px; }
-.pd-workspace-tools { display: flex; flex-direction: column; align-items: center; flex: 0 0 52px; background: var(--pd-panel); border-inline-end: 1px solid var(--pd-field-border); padding: 10px 4px; gap: 5px; }
-.pd-workspace-tools button { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 8px; color: var(--pd-text); transition: background 150ms, transform 150ms; }
+
+.pd-workspace-tools button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  color: var(--pd-text);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
 .pd-workspace-tools button span { display: none; }
-.pd-workspace-tools button:hover { background: #7c6ef625; }
-.pd-workspace-tools button:active { transform: scale(.94); }
-.pd-workspace-tools button:disabled { opacity: .3; }
-.pd-tool-divider { width: 26px; height: 1px; margin: 5px 0; background: var(--pd-field-border); }
-.pd-sidebar { border-inline-end: 1px solid var(--pd-field-border); }
+.pd-workspace-tools button:hover:not(:disabled) { background: var(--pd-accent-wash); }
+.pd-workspace-tools button:active:not(:disabled) { transform: scale(0.92); background: var(--pd-accent-wash-strong); }
+.pd-workspace-tools button:disabled { opacity: 0.3; }
+
+.pd-tool-divider {
+  width: 26px;
+  height: 1px;
+  margin: 5px 0;
+  background: var(--pd-field-border);
+}
+
+.pd-sidebar {
+  flex: 0 0 auto;
+  min-height: 0;
+  border-inline-end: 1px solid var(--pd-field-border);
+}
+
 .pd-mobile-header { display: none; }
-.pd-mobile-text-editor { position: fixed; inset: 0; z-index: 10000; background: var(--pd-panel); color: var(--pd-text); overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
-.pd-mobile-text-editor header { display: flex; align-items: center; justify-content: space-between; }
-.pd-mobile-text-editor header button { padding: 12px 22px; border-radius: 24px; background: #7c6ef6; color: white; }
-.pd-mobile-text-editor p { font-size: 13px; opacity: .7; }
+.pd-mobile-nav, .pd-panel-close { display: none; }
+
+.pd-slide-options summary {
+  font-size: 10px;
+  color: #8f90a3;
+  list-style: none;
+  pointer-events: none;
+}
+
+/* ── Floating canvas controls ──────────────────────────────────────────────
+   Two clusters share the bottom of the stage: the zoom pill and, when
+   something is selected, the action toolbar. On a desktop canvas they sit
+   side by side; below that the toolbar is wide enough to run straight through
+   the pill, so the responsive tier stacks them instead of letting them
+   overlap. `--pd-canvas-inset` is the one number both read. */
+.pd-canvas-zoom {
+  position: absolute;
+  bottom: var(--pd-canvas-inset, 12px);
+  inset-inline-end: 12px;
+}
+
+/* `left/translateX` centres the toolbar in both writing directions, so it
+   deliberately stays physical. */
+.pd-selection-actions {
+  position: absolute;
+  bottom: var(--pd-canvas-inset, 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  max-width: calc(100% - 16px);
+  overflow-x: auto;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 12px;
+  background: var(--pd-panel);
+  box-shadow: var(--pd-shadow-popover);
+  z-index: 5;
+  animation: pd-pop-in-centred var(--pd-dur-base) var(--pd-ease-decel) both;
+}
+
+.pd-selection-actions button {
+  min-width: 38px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-selection-actions button:hover:not(:disabled) { background: var(--pd-hover); }
+.pd-selection-actions button:active:not(:disabled) { background: var(--pd-accent-wash-strong); transform: scale(0.92); }
+
+.pd-rename-button {
+  display: inline-grid;
+  place-items: center;
+  margin-inline-start: 6px;
+  vertical-align: middle;
+  opacity: 0.7;
+  transition: opacity var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-rename-button:hover { opacity: 1; }
+
+/* Scroll-edge fades. The gradient has to follow the writing direction, so it
+   lives here rather than in a physical Tailwind `bg-gradient-to-*`. */
+.pd-scroll-fade-start {
+  background: linear-gradient(
+    to right,
+    var(--pd-c-18181f) 0%,
+    color-mix(in srgb, var(--pd-c-18181f) 90%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+.pd-scroll-fade-end {
+  background: linear-gradient(
+    to left,
+    var(--pd-c-18181f) 0%,
+    color-mix(in srgb, var(--pd-c-18181f) 90%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+/* ─── 6. Panels, sheets and popovers ─────────────────────────────────────── */
+
+.pd-modal-backdrop {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: pd-fade-in var(--pd-dur-fast) var(--pd-ease-standard) both;
+}
+
+.pd-modal-panel {
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-width: 0;
+  animation: pd-pop-in var(--pd-dur-base) var(--pd-ease-decel) both;
+}
+
+.pd-modal-panel > * { min-width: 0; }
+
+/* Dismissal. ModalShell keeps the dialog mounted for one animation, tagged
+   with this class; the durations here and EXIT_MS in that file are one
+   number expressed twice, so they change together. */
+@keyframes pd-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pd-pop-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(4px) scale(0.985); }
+}
+
+.pd-modal-exiting {
+  pointer-events: none;
+  animation: pd-fade-out var(--pd-dur-fast) var(--pd-ease-accel) both;
+}
+
+.pd-modal-exiting .pd-modal-panel {
+  animation: pd-pop-out var(--pd-dur-fast) var(--pd-ease-accel) both;
+}
+
+/* Mode picker at the head of the templates gallery. */
+.pd-template-mode {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 12px;
+  background: var(--pd-c-0f0f13);
+}
+
+.pd-template-mode-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-template-mode-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--pd-c-1e1e28);
+}
+
+.pd-segmented-option {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  transition:
+    background-color var(--pd-dur-base) var(--pd-ease-standard),
+    color var(--pd-dur-base) var(--pd-ease-standard),
+    box-shadow var(--pd-dur-base) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-segmented-option:active:not(:disabled) { transform: scale(0.97); }
+.pd-segmented-option-active {
+  background: var(--pd-panel);
+  color: var(--pd-c-7c6ef6);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.22);
+}
+.pd-segmented-option-idle { background: transparent; color: var(--pd-c-a0a0b0); }
+.pd-segmented-option-idle:hover { color: var(--pd-text); background: var(--pd-hover); }
+
+/* Layer management occupies the panel; creation is a single footer action. */
+.pd-layer-header {
+  flex-shrink: 0;
+  padding: 12px;
+  border-bottom: 1px solid var(--pd-field-border);
+}
+
+.pd-layer-header [role=tablist] {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--pd-field-bg);
+  border-radius: 10px;
+}
+
+.pd-layer-header [role=tab] {
+  flex: 1;
+  padding: 9px;
+  font-size: 13px;
+  border-radius: 8px;
+  transition:
+    background-color var(--pd-dur-base) var(--pd-ease-standard),
+    color var(--pd-dur-base) var(--pd-ease-standard),
+    box-shadow var(--pd-dur-base) var(--pd-ease-standard);
+}
+
+.pd-layer-header [aria-selected=true] {
+  background: var(--pd-panel);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.13);
+  color: var(--pd-c-7c6ef6);
+}
+
+.pd-layer-selection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.pd-layer-selection button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-layer-selection button[aria-pressed=true] { background: var(--pd-accent-wash-strong); }
+.pd-layer-selection span { margin-inline-start: auto; color: var(--pd-c-6b6b7a); }
+
+.pd-layer-assets {
+  min-height: 0;
+  overflow-y: auto;
+  flex: 1;
+  padding: 12px;
+}
+
+.pd-layer-assets[hidden], .pd-layer-list[hidden] { display: none; }
+
+.pd-layer-list { padding: 6px 0; }
+.pd-layer-list > div, .pd-layer-list .group { min-height: 42px; }
+
+.pd-layer-footer {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid var(--pd-field-border);
+  background: var(--pd-panel);
+}
+
+.pd-layer-footer > button {
+  flex: 1;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 4px 2px;
+  border-radius: 8px;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-layer-footer > button:first-of-type { background: var(--pd-accent); color: #fff; }
+.pd-layer-footer > button:active:not(:disabled) { transform: scale(0.96); }
+.pd-layer-footer > button span { font-size: 10px; line-height: 1.2; max-width: 100%; }
+.pd-layer-footer button:disabled { opacity: 0.3; }
+
+.pd-layer-insert {
+  position: absolute;
+  inset-inline: 8px;
+  bottom: calc(100% + 6px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 14px;
+  background: var(--pd-panel);
+  box-shadow: var(--pd-shadow-popover);
+  z-index: 90;
+  transform-origin: bottom center;
+  animation: pd-pop-in var(--pd-dur-fast) var(--pd-ease-decel) both;
+}
+
+.pd-layer-insert button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 4px;
+  border-radius: 8px;
+  font-size: 11px;
+  text-align: center;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-layer-insert button:hover { background: var(--pd-accent-wash); }
+.pd-layer-insert button:active { transform: scale(0.94); }
+
+.pd-layer-context button {
+  min-height: 42px;
+  text-align: start;
+  transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-settings-content input[type=range] { min-width: 0; }
+
+.pd-mobile-text-editor {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--pd-panel);
+  color: var(--pd-text);
+  overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: pd-rise-in var(--pd-dur-base) var(--pd-ease-decel) both;
+}
+
+.pd-mobile-text-editor header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pd-mobile-text-editor header button {
+  padding: 12px 22px;
+  border-radius: 24px;
+  background: var(--pd-accent);
+  color: #fff;
+}
+
+.pd-mobile-text-editor p { font-size: 13px; opacity: 0.7; }
 .pd-mobile-text-editor [contenteditable] { padding: 18px; min-height: 160px; }
+
+.pd-mobile-text-editor > div:last-child {
+  background: var(--pd-field-bg) !important;
+  outline-color: var(--pd-accent-soft) !important;
+  border-radius: 14px !important;
+}
+
+:root[data-theme='light'] .pd-sidebar { --pd-field-border: #d4d9e2; }
+:root[data-theme='light'] .pd-sidebar button { color: var(--pd-text); }
+
+/* ─── 7. Writing direction ─────────────────────────────────────────────────
+   Everything above uses logical properties, so this section only has to
+   handle what CSS cannot express logically: transforms, physical gradients
+   and glyphs whose meaning is "backwards along the line". */
+
+:root[dir='rtl'] { --pd-dir: -1; }
+:root[dir='ltr'] { --pd-dir: 1; }
+
+/* Arrows and chevrons that mean start/end rather than left/right. Icon.tsx
+   tags only those glyphs, so vertical arrows are never touched. */
+[dir='rtl'] .pd-dir-icon,
+[dir='rtl'] .pd-dir-flip { transform: scaleX(-1); }
+
+/* The toggle knob travels with a physical translate. Mirroring the whole
+   control is simpler and more exact than negating every knob offset, and the
+   knob is a symmetric circle so nothing reads as reversed. */
+[dir='rtl'] [role='switch'] { transform: scaleX(-1); }
+
+[dir='rtl'] .pd-scroll-fade-start { background-image: linear-gradient(to left, var(--pd-c-18181f) 0%, color-mix(in srgb, var(--pd-c-18181f) 90%, transparent) 45%, transparent 100%); }
+[dir='rtl'] .pd-scroll-fade-end { background-image: linear-gradient(to right, var(--pd-c-18181f) 0%, color-mix(in srgb, var(--pd-c-18181f) 90%, transparent) 45%, transparent 100%); }
+
+/* The theme <select> keeps room for the chevron on whichever side draws it. */
+[dir='rtl'] .pd-theme-control { padding: 6px 8px 6px 22px; }
+
+/* Numeric fields stay LTR: "1024" must not render as "4201" next to an
+   RTL label, and a minus sign belongs on the left of the digits. */
+[dir='rtl'] input[type='number'] { direction: ltr; text-align: end; }
+
+/* Latin identifiers (model ids, file names, hex colours) inside RTL prose. */
+[dir='rtl'] code, [dir='rtl'] kbd, [dir='rtl'] samp { direction: ltr; unicode-bidi: isolate; }
+
+/* Arabic-script UI needs looser rows than Latin at the same font size. */
+:root[lang='ps'] .pd-layer-list > div,
+:root[lang='fa'] .pd-layer-list > div,
+:root[lang='ps'] .pd-layer-context button,
+:root[lang='fa'] .pd-layer-context button { min-height: 46px; }
+
+/* ─── 8. Responsive tiers ──────────────────────────────────────────────────
+   Three tiers, and each one is defined once:
+
+     handheld  (max-width: 767px)   phone: bottom sheets, icon rail, no toolbar
+     tablet    (768px – 1023px)     roomier sheets, labelled rail, wider panels
+     desktop   (min-width: 1024px)  docked side panels and the full toolbar
+
+   Rules shared by handheld + tablet live in the `max-width: 1023px` block. */
+
 @media (min-width: 1024px) {
   .pd-toolbar { min-height: 56px; }
   .pd-editor > main { margin: 0 1px; }
   .pd-sidebar > aside { background: var(--pd-panel); }
 }
+
+/* ── Handheld and tablet ───────────────────────────────────────────────── */
 @media (max-width: 1023px) {
-  .pd-mobile-header { display: flex; align-items: center; gap: 6px; min-height: 58px; padding: 6px 10px; background: var(--pd-panel); border-bottom: 1px solid var(--pd-field-border); }
-  .pd-mobile-header strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
-  .pd-mobile-header button { min-width: 42px; min-height: 44px; display: grid; place-items: center; border-radius: 12px; }
-  .pd-mobile-header button:disabled { opacity: .3; }
+  .pd-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    min-height: var(--pd-mobile-header-h);
+    padding: 6px 4px;
+    background: var(--pd-panel);
+    border-bottom: 1px solid var(--pd-field-border);
+  }
+
+  .pd-mobile-header strong {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .pd-mobile-header button {
+    min-width: 34px;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    transition:
+      background-color var(--pd-dur-fast) var(--pd-ease-standard),
+      transform var(--pd-dur-instant) var(--pd-ease-spring);
+  }
+
+  .pd-mobile-header button:active:not(:disabled) { background: var(--pd-accent-wash); transform: scale(0.9); }
+  .pd-mobile-header button:disabled { opacity: 0.3; }
+
+  /* The desktop toolbar collapses into the "more" disclosure. */
   .pd-toolbar { display: none; }
-  .pd-toolbar.pd-toolbar-expanded { display: flex; max-height: 35dvh; background: var(--pd-panel); }
-  .pd-editor { flex-direction: column; }
-  .pd-workspace-tools { order: 2; flex: 0 0 68px; flex-direction: row; justify-content: space-around; gap: 2px; padding: 4px 6px; border-top: 1px solid var(--pd-field-border); border-inline-end: 0; overflow-x: auto; }
-  .pd-workspace-tools button { flex: 1; min-width: 45px; height: 56px; flex-direction: column; gap: 5px; }
+  .pd-toolbar.pd-toolbar-expanded {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-block: 6px;
+    max-height: 35dvh;
+    overflow: auto;
+    background: var(--pd-panel);
+    animation: pd-rise-in var(--pd-dur-fast) var(--pd-ease-decel) both;
+  }
+  .pd-toolbar > * { flex-shrink: 0; }
+
+  .pd-editor { position: relative; flex-direction: column; }
+
+  /* Tool rail moves to the bottom, above the panel nav. */
+  .pd-workspace-tools {
+    order: 2;
+    flex: 0 0 var(--pd-railbar-h);
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 2px;
+    padding: 4px 6px;
+    border-top: 1px solid var(--pd-field-border);
+    border-inline-end: 0;
+    overflow-x: auto;
+  }
+
+  .pd-workspace-tools button {
+    flex: 1;
+    min-width: 45px;
+    height: 56px;
+    flex-direction: column;
+    gap: 5px;
+  }
+
   .pd-workspace-tools button span { display: block; font-size: 10px; white-space: nowrap; }
   .pd-tool-divider { display: none; }
-  .pd-sidebar-open { inset-block-start: auto; inset-block-end: 68px; inset-inline: 0; width: 100%; height: min(64dvh, calc(100% - 68px)); border-radius: 22px 22px 0 0; background: var(--pd-panel); box-shadow: 0 -12px 45px #0005; animation: pd-sheet-in 180ms ease-out; }
-  .pd-panel-close { position: absolute; inset-inline-end: 8px; top: 3px; z-index: 2; border-radius: 50%; background: var(--pd-panel); }
-  .pd-sidebar > aside { padding-top: 38px; background: var(--pd-panel); border-radius: inherit; }
-  .pd-mobile-nav { order: 4; background: var(--pd-panel); }
-  .pd-mobile-nav button { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 60px; justify-content: center; font-size: 11px; }
-  .pd-slides { background: var(--pd-panel); }
-  .pd-slide-thumbnails { min-height: 42px; max-height: 54px; }
+
+  /* Side panels become bottom sheets. They are full-height so a long layer
+     list is reachable, and they slide rather than appear. */
+  .pd-sidebar { display: none; }
+
+  .pd-sidebar-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    z-index: 60;
+    border-radius: var(--pd-radius-sheet) var(--pd-radius-sheet) 0 0;
+    background: var(--pd-panel);
+    box-shadow: var(--pd-shadow-sheet);
+    animation: pd-sheet-in var(--pd-dur-sheet) var(--pd-ease-decel) both;
+    will-change: transform;
+  }
+
+  .pd-sidebar > aside {
+    width: 100%;
+    min-height: 0;
+    flex: 1;
+    padding-top: 42px;
+    background: var(--pd-panel);
+    border-radius: inherit;
+    border-inline: 0;
+  }
+
+  /* Grab handle — the affordance that says "this is a sheet". */
+  .pd-sidebar-open::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--pd-field-border-hover);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .pd-panel-close {
+    display: flex;
+    position: absolute;
+    inset-inline-end: 8px;
+    top: 3px;
+    z-index: 4;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 50%;
+    background: var(--pd-panel);
+    transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
+  }
+
+  .pd-panel-close:active { background: var(--pd-accent-wash); }
+
+  /* Bottom panel switcher. */
+  .pd-mobile-nav {
+    order: 4;
+    display: flex;
+    flex-shrink: 0;
+    background: var(--pd-panel);
+    border-top: 1px solid var(--pd-field-border);
+  }
+
+  .pd-mobile-nav button {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 60px;
+    padding: 6px;
+    font-size: 11px;
+    transition:
+      background-color var(--pd-dur-base) var(--pd-ease-standard),
+      color var(--pd-dur-base) var(--pd-ease-standard);
+  }
+
+  .pd-mobile-nav button[aria-expanded='true'],
+  .pd-mobile-nav button[aria-pressed='true'] {
+    color: var(--pd-c-b8afff);
+    background: var(--pd-accent-wash);
+  }
+
+  /* Slide strip. */
+  .pd-slides {
+    height: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+    padding: 6px 8px;
+    position: relative;
+    background: var(--pd-panel);
+  }
+
+  .pd-slide-thumbnails { grid-column: 1 / -1; grid-row: 1; min-height: 42px; max-height: 54px; }
+
+  .pd-slide-options {
+    display: flex !important;
+    grid-column: 1 / -1;
+    width: auto;
+    border: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .pd-slide-options summary {
+    pointer-events: auto;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .pd-slide-options:not([open]) > :not(summary) { display: none; }
+  .pd-slide-options[open] > :not(summary) { position: relative; padding: 6px; background: var(--pd-panel); }
+  .pd-slide-options[open] {
+    position: absolute;
+    bottom: 0;
+    inset-inline-start: 8px;
+    z-index: 25;
+    border: 1px solid var(--pd-field-border-hover);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--pd-panel);
+    animation: pd-pop-in var(--pd-dur-fast) var(--pd-ease-decel) both;
+  }
+
+  /* The selection toolbar is nearly as wide as the canvas here, so side by
+     side is not an option — it rides above the zoom pill instead. */
+  .pd-selection-actions { bottom: 60px; }
+  .pd-canvas-zoom { bottom: 12px; }
+
   .pd-editing-context { max-height: 44px; overflow: auto; }
+  .pd-editing-context .group\/tab > div,
+  .pd-editing-context .group\/tab > button { opacity: 1; pointer-events: auto; }
+
+  .pd-modal-panel { margin-inline: 8px; max-width: calc(100% - 16px); }
   .pd-modal-panel button, .pd-sidebar button { touch-action: manipulation; }
-}
-@media (max-height: 500px) and (max-width: 1023px) {
-  .pd-mobile-header { min-height: 46px; padding-block: 0; }
-  .pd-workspace-tools { flex-basis: 46px; }
-  .pd-workspace-tools button { height: 40px; flex-direction: row; }
-  .pd-mobile-nav button { min-height: 40px; flex-direction: row; }
-  .pd-sidebar-open { inset-block-end: 46px; height: 80%; }
-}
-@keyframes pd-sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 
-:root[data-theme='light'] .pd-sidebar { --pd-field-border: #d4d9e2; }
-:root[data-theme='light'] .pd-sidebar button { color: var(--pd-text); }
-.pd-mobile-text-editor > div:last-child { background: var(--pd-field-bg) !important; outline-color: var(--pd-accent-soft) !important; border-radius: 14px !important; }
-
-:root {
-  --pd-c-b0b0c4: #b0b0c4;
-  --pd-c-8a86a0: #8a86a0;
-  --pd-c-3a3a4a: #3a3a4a;
-  --pd-c-a8a8b8: #a8a8b8;
-  --pd-c-c4b5fd: #c4b5fd;
-  --pd-c-b8afff: #b8afff;
-  --pd-c-9b8fff: #9b8fff;
-  --pd-c-484858: #484858;
-}
-:root[data-theme="light"] {
-  --pd-c-b0b0c4: #414b60;
-  --pd-c-8a86a0: #667189;
-  --pd-c-3a3a4a: #8190a8;
-  --pd-c-a8a8b8: #4c586f;
-  --pd-c-c4b5fd: #6550dc;
-  --pd-c-b8afff: #6550dc;
-  --pd-c-9b8fff: #6550dc;
-  --pd-c-484858: #73819a;
-}
-/* Layer management occupies the panel; creation is a single footer action. */
-.pd-layer-header { flex-shrink: 0; padding: 12px; border-bottom: 1px solid var(--pd-field-border); }
-.pd-layer-header [role=tablist] { display: flex; gap: 4px; padding: 3px; background: var(--pd-field-bg); border-radius: 10px; }
-.pd-layer-header [role=tab] { flex: 1; padding: 9px; font-size: 13px; border-radius: 8px; }
-.pd-layer-header [aria-selected=true] { background: var(--pd-panel); box-shadow: 0 1px 4px #0002; color: var(--pd-c-7c6ef6); }
-.pd-layer-selection { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; }
-.pd-layer-selection button { display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 6px; }
-.pd-layer-selection button[aria-pressed=true] { background: #7c6ef626; }
-.pd-layer-selection span { margin-inline-start: auto; color: var(--pd-c-6b6b7a); }
-.pd-layer-assets { min-height: 0; overflow-y: auto; flex: 1; padding: 12px; }
-.pd-layer-assets[hidden], .pd-layer-list[hidden] { display: none; }
-.pd-layer-list { padding: 6px 0; }
-.pd-layer-list > div { min-height: 44px; }
-.pd-layer-footer { position: relative; display: flex; flex-shrink: 0; gap: 4px; padding: 8px; border-top: 1px solid var(--pd-field-border); background: var(--pd-panel); }
-.pd-layer-footer > button { flex: 1; height: 42px; display: grid; place-items: center; border-radius: 8px; }
-.pd-layer-footer > button:first-of-type { background: #7c6ef6; color: white; }
-.pd-layer-footer button:disabled { opacity: .3; }
-.pd-layer-insert { position: absolute; inset-inline: 8px; bottom: calc(100% + 6px); display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; padding: 10px; border: 1px solid var(--pd-field-border); border-radius: 14px; background: var(--pd-panel); box-shadow: 0 8px 32px #0004; z-index: 90; }
-.pd-layer-insert button { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; font-size: 13px; text-align: start; }
-.pd-layer-insert button:hover { background: #7c6ef622; }
-button { touch-action: manipulation; }
-@media (pointer: coarse) {
-  button:not(:disabled):active { background-color: #7c6ef624; }
-  .pd-layer-list button { min-width: 36px; }
-}
-@media (max-width: 1023px) {
-  .pd-sidebar-open { inset: 0; width: 100%; height: 100%; max-height: 100%; border-radius: 16px 16px 0 0; }
-  .pd-sidebar > aside { padding-top: 42px; }
   .pd-layer-list { overscroll-behavior: contain; }
-  .pd-settings.pd-modal-panel { width: 100%; max-width: 100%; margin: 0; height: 100dvh; max-height: 100dvh; border-radius: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  .pd-layer-insert { max-height: calc(100dvh - 160px); overflow-y: auto; }
+  .pd-rename-button { min-width: 30px !important; }
+
+  /* An open sheet owns the screen: the strip and floating actions underneath
+     it would only be half-visible and un-tappable. */
+  .pd-app:has(.pd-sidebar-open) .pd-slides { display: none; }
+  .pd-app:has(.pd-sidebar-open) .pd-selection-actions { display: none; }
+
+  /* Settings goes full-screen rather than being a small dialog on a small
+     screen — the tab column becomes a scrolling tab row. */
+  .pd-settings.pd-modal-panel {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   .pd-settings-body { flex-direction: column; }
-  .pd-settings-tabs { display: flex; width: 100%; padding: 8px 12px; gap: 8px; overflow-x: auto; overflow-y: hidden; background: var(--pd-field-bg) !important; border: 0; border-bottom: 1px solid var(--pd-field-border); }
+
+  .pd-settings-tabs {
+    display: flex;
+    width: 100%;
+    padding: 8px 12px;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: var(--pd-field-bg) !important;
+    border: 0;
+    border-bottom: 1px solid var(--pd-field-border);
+  }
+
   .pd-settings-tabs > div { display: contents; }
   .pd-settings-tabs p { display: none; }
-  .pd-settings-tabs button { flex: 0 0 auto; width: auto; white-space: nowrap; padding: 12px; min-height: 46px; }
+  .pd-settings-tabs button {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+    padding: 12px;
+    min-height: 46px;
+  }
+
   .pd-settings-content { width: 100%; padding: 18px; }
   .pd-settings > :last-child a { display: none; }
   .pd-settings-content input, .pd-settings-content select { max-width: 100%; }
   .pd-settings .pd-modal-panel { max-width: 100%; }
-}
 
-.pd-layer-context button { min-height: 42px; text-align: start; }
-.pd-layer-list > div, .pd-layer-list .group { min-height: 42px; }
-@media (pointer: coarse) {
-  .pd-layer-list button { min-width: 36px; min-height: 40px; }
-  .pd-layer-list .opacity-0 { opacity: 1; }
-  .pd-layer-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-}
-.pd-layer-footer > button { height: 58px; align-content: center; gap: 5px; padding: 4px 2px; }
-.pd-layer-footer > button span { font-size: 10px; line-height: 1.2; max-width: 100%; }
-.pd-settings-content input[type=range] { min-width: 0; }
-/* Keep small settings descriptions readable on handheld screens in both themes. */
-@media (max-width: 1023px) {
+  /* Small descriptive text has to stay readable on a handheld in both themes;
+     the desktop greys are too low-contrast at this size. */
   .pd-settings { --pd-c-6b6b7a: #a5a5b5; --pd-c-4a4a5a: #a5a5b5; }
   :root[data-theme='light'] .pd-settings { --pd-c-6b6b7a: #536078; --pd-c-4a4a5a: #536078; }
   .pd-settings-content p, .pd-settings-content label { font-size: 13px; line-height: 1.7; letter-spacing: normal; }
   .pd-settings-content h3 { font-size: 16px; }
-  .pd-settings-content input:not([type=checkbox]):not([type=range]), .pd-settings-content select { font-size: 16px; }
+  .pd-settings-content input:not([type=checkbox]):not([type=range]),
+  .pd-settings-content select { font-size: 16px; }
   .pd-layer-list .text-xs { font-size: 13px; }
 }
-@media (max-width: 1023px) {
-  .pd-app:has(.pd-sidebar-open) .pd-slides { display: none; }
-  .pd-layer-insert { max-height: calc(100dvh - 160px); overflow-y: auto; }
+
+/* ── Handheld only ─────────────────────────────────────────────────────────
+   On a phone the layers sheet is full-screen, so the chrome behind it is dead
+   weight that only steals height. A tablet sheet leaves it visible, so these
+   stay scoped here. */
+@media (max-width: 767px) {
+  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-mobile-header,
+  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-toolbar { display: none; }
 }
-@media (max-width: 1023px) and (max-height: 500px) {
-  .pd-layer-insert { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* The two editing axes share one bar; below ~600px it has to wrap instead of
+   scrolling its own content out of reach. */
+@media (max-width: 600px) {
+  .pd-editing-context { height: auto; min-height: 44px; padding-inline: 6px; }
+  .pd-editing-context > div { flex-wrap: wrap; }
+  .pd-editing-context section { min-height: 38px; }
+  .pd-editing-context section[aria-label='Editing locale'] {
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    max-width: 100%;
+    width: 100%;
+    border: 0;
+  }
+}
+
+/* ── Tablet ────────────────────────────────────────────────────────────────
+   768–1023px is not a big phone. There is room for the project title, wider
+   sheets that do not swallow the canvas, and a three-up insert menu. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pd-mobile-header { gap: 6px; padding-inline: 12px; }
+  .pd-mobile-header strong { font-size: 15px; }
+  .pd-mobile-header button { min-width: 44px; border-radius: 14px; }
+
+  .pd-workspace-tools { flex: 0 0 72px; padding-inline: 18px; gap: 6px; }
+  .pd-workspace-tools button { max-width: 96px; height: 60px; }
+  .pd-workspace-tools button span { font-size: 11px; }
+
+  /* A sheet that covers the whole tablet screen hides the design it is
+     editing. Two thirds keeps the canvas in view behind it. */
+  .pd-sidebar-open {
+    inset: auto 0 0 0;
+    height: min(66dvh, 620px);
+    max-height: 66dvh;
+  }
+
+  .pd-sidebar > aside { padding-top: 44px; }
+
+  .pd-mobile-nav button { flex-direction: row; gap: 8px; font-size: 13px; min-height: 56px; }
+
+  .pd-slide-thumbnails { min-height: 62px; max-height: 78px; }
+
+  .pd-layer-insert { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 10px; }
+  .pd-layer-insert button { padding: 12px 6px; font-size: 12px; }
+
+  .pd-modal-panel { margin-inline: auto; max-width: min(680px, calc(100% - 48px)); }
+  .pd-settings.pd-modal-panel { max-width: 100%; }
+  .pd-settings-content { padding: 24px 28px; }
+}
+
+/* ── Landscape handheld ────────────────────────────────────────────────────
+   Very little vertical room: trade label height for canvas height. */
+@media (max-height: 500px) and (max-width: 1023px) {
+  .pd-mobile-header { min-height: 44px; padding-block: 0; }
+  .pd-toolbar.pd-toolbar-expanded { max-height: 22dvh; }
+  .pd-workspace-tools { flex-basis: 46px; }
+  .pd-workspace-tools button { height: 40px; flex-direction: row; }
+  .pd-mobile-nav button { min-height: 42px; flex-direction: row; padding: 2px; }
+  .pd-slide-thumbnails { display: flex; max-height: 44px; min-height: 32px; }
+  .pd-layer-insert { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .pd-layer-header { padding-block: 6px; }
   .pd-layer-selection { margin-top: 2px; }
+  .pd-layer-footer > button { height: 46px; }
 }
-.pd-selection-actions { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; padding: 4px; max-width: calc(100% - 16px); overflow-x: auto; border: 1px solid var(--pd-field-border); border-radius: 12px; background: var(--pd-panel); box-shadow: 0 4px 16px #0003; z-index: 5; }
-.pd-selection-actions button { min-width: 38px; min-height: 40px; display: grid; place-items: center; border-radius: 7px; }
-.pd-selection-actions button:active { background: #7c6ef633; }
-.pd-rename-button { display: inline-grid; place-items: center; margin-inline-start: 6px; vertical-align: middle; opacity: .7; }
-.pd-layer-insert { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 2px; padding: 6px; }
-.pd-layer-insert button { flex-direction: column; gap: 4px; padding: 7px 4px; font-size: 11px; }
-@media (max-width: 1023px) {
-  .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-mobile-header, .pd-app:has(.pd-layers.pd-sidebar-open) > .pd-toolbar { display: none; }
-  .pd-app:has(.pd-sidebar-open) .pd-selection-actions { display: none; }
-  .pd-mobile-header { gap: 1px; padding-inline: 4px; }
-  .pd-mobile-header button { min-width: 34px; }
-  .pd-mobile-header strong { font-size: 12px; }
-  .pd-slide-options { display: flex !important; grid-column: 1 / -1; }
-  .pd-slide-options summary { min-height: 32px; }
-  .pd-rename-button { min-width: 30px !important; }
-  .pd-editing-context .group\/tab > div, .pd-editing-context .group\/tab > button { opacity: 1; pointer-events: auto; }
+
+/* ─── 9. Input modality and reduced motion ─────────────────────────────────
+   Touch targets and press feedback are a property of the *pointer*, not the
+   viewport: a 1200px tablet still needs 40px targets. */
+
+@media (pointer: coarse) {
+  .pd-toolbar button,
+  .pd-slides button,
+  .pd-sidebar button,
+  .pd-modal-panel button { min-height: 40px; }
+
+  .pd-toolbar button { min-width: 40px; }
+
+  /* 16px is the threshold below which mobile browsers zoom the page on focus. */
+  input, select, textarea { font-size: 16px; }
+
+  /* No hover on touch, so the press state carries all the feedback. */
+  button:not(:disabled):active { background-color: var(--pd-accent-wash-strong); }
+
+  .pd-layer-list button { min-width: 36px; min-height: 40px; }
+  /* Row actions revealed on hover have no trigger on touch — show them. */
+  .pd-layer-list .opacity-0 { opacity: 1; }
+  .pd-layer-list { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 }
-@media (max-width: 1023px) and (max-height: 500px) {
-  .pd-slide-thumbnails { display: flex; max-height: 44px; min-height: 32px; }
-  .pd-mobile-header { min-height: 44px; padding-block: 0; }
-  .pd-mobile-nav button { min-height: 42px; padding: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .pixeldeck-loader-word-track { transform: translateY(0); }
 }

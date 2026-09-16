@@ -148,7 +148,7 @@ export function AiProviderSettings() {
                 setProvider(item.id)
                 setModelSearch('')
               }}
-              className={`rounded-lg border px-2 py-2 text-xs transition-colors text-left ${
+              className={`rounded-lg border px-2 py-2 text-xs transition-colors text-start ${
                 provider === item.id
                   ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
                   : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]'
@@ -282,7 +282,7 @@ export function AiProviderSettings() {
                       key={model.id}
                       type="button"
                       onClick={() => setModel(provider, model.id)}
-                      className={`block w-full text-left px-3 py-2 border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors ${
+                      className={`block w-full text-start px-3 py-2 border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors ${
                         activeModel === model.id
                           ? 'bg-[rgba(124,110,246,0.16)] text-[#c4b5fd]'
                           : 'text-[#b8b8c8] hover:bg-[rgba(255,255,255,0.05)]'

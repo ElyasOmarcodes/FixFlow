@@ -57,7 +57,7 @@ export function LocaleRichTextEditor({
         type="button"
         onClick={() => setEditing(true)}
         title="Click to edit — select text to apply formatting"
-        className="block w-full cursor-text text-left text-sm leading-6 text-[#f3f2ff] outline-none"
+        className="block w-full cursor-text text-start text-sm leading-6 text-[#f3f2ff] outline-none"
       >
         {text ? (
           <span className="whitespace-pre-wrap break-words">
@@ -196,7 +196,7 @@ function ActiveLocaleEditor({
     <RichTextToolbar
       api={api}
       // Docked panel has room — let the fill editor flow inline (it scrolls).
-      fillPopoverClassName={usePortal ? undefined : 'absolute left-0 right-0 z-30 mt-1'}
+      fillPopoverClassName={usePortal ? undefined : 'absolute inset-x-0 z-30 mt-1'}
     />
   )
 

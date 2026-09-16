@@ -851,7 +851,7 @@ export function SliderField({
             const v = Number(e.target.value)
             if (!isNaN(v)) onChange(v)
           }}
-          className="w-14 shrink-0 bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-1.5 py-1 text-xs text-[var(--pd-c-e8e8f0)] text-right focus:outline-none focus:border-[rgba(124,110,246,0.5)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-14 shrink-0 bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-1.5 py-1 text-xs text-[var(--pd-c-e8e8f0)] text-end focus:outline-none focus:border-[rgba(124,110,246,0.5)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
     </div>

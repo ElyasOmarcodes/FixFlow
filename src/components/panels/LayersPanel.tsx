@@ -299,7 +299,7 @@ export function LayersPanel() {
   return (
     <aside
       className="pd-layer-panel h-full w-64 shrink-0 flex flex-col overflow-hidden min-[1440px]:w-72"
-      style={{ background: panelBg, borderRight: `1px solid ${borderColor}` }}
+      style={{ background: panelBg, borderInlineEnd: `1px solid ${borderColor}` }}
     >
       <header className="pd-layer-header">
         <div role="tablist" aria-label={t('layers.title')}>

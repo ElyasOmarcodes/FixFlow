@@ -72,7 +72,7 @@ function LanguageCombobox({
               type="button"
               disabled={disabled}
               onClick={() => handleSelect(lang.code)}
-              className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm transition ${
+              className={`flex w-full items-center justify-between px-3 py-2 text-start text-sm transition ${
                 disabled
                   ? 'cursor-default text-[var(--pd-c-4a4a5a)]'
                   : already
@@ -91,7 +91,7 @@ function LanguageCombobox({
           <button
             type="button"
             onClick={() => handleSelect(customCodeValid)}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#9d90f8] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white transition"
+            className="flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-[#9d90f8] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white transition"
           >
             <span className="text-[var(--pd-c-7c6ef6)]"><Icon name="plus" size={12} strokeWidth={2.4} /></span>
             Use custom code: <span className="font-mono">{customCodeValid}</span>

@@ -32,7 +32,7 @@ export function LayerContextMenu({ contextMenu, layers, clipboard, onMenuAction 
       {menuItems.map(({ action, label }) => (
         <button
           role="menuitem" key={action}
-          className="w-full text-left px-3 py-2 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+          className="w-full text-start px-3 py-2 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
           style={action === 'delete' ? { color: '#f87171' } : undefined}
           onClick={() => onMenuAction(action, contextMenu.layerId)}
         >{label}</button>

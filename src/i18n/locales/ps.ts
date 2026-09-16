@@ -253,6 +253,16 @@ export const ps: Record<TranslationKey, string> = {
   'settings.project': 'پروژه',
   'settings.title': 'تنظیمات',
 
+  // ── Templates ────────────────────────────────────────────────────────────
+  'templates.addSlides': 'سلایډونه اوسني پروژې ته ورزیات کړه',
+  'templates.applying': 'پلي کېږي…',
+  'templates.applyMode': 'تمپلیټ څنګه پرانیځم',
+  'templates.applyModeAppend': 'اوسنۍ پروژې ته ورزیات کړه',
+  'templates.applyModeAppendHint': 'د تمپلیټ سلایډونه ستاسو د خپلو سلایډونو وروسته ورزیاتوي. یوازې هغه وخت یې وکاروه چې دواړه ډیزاینونه یوه اندازه کانواس ولري.',
+  'templates.applyModeNew': 'نوې پروژه',
+  'templates.applyModeNewHint': 'لومړی ستاسو اوسنۍ پروژه خوندي کېږي، بیا تمپلیټ په خپل جلا کانواس کې پرانیستل کېږي.',
+  'templates.useTemplate': 'دا تمپلیټ وکاروه',
+
   // ── Localization view ────────────────────────────────────────────────────
   'loc.backToEditor': 'ایډیټر ته بېرته',
   'loc.empty': 'د ژباړې وړ منځپانګه نشته',

@@ -136,9 +136,14 @@ function HorizontalScrollAffordance({
     if (!element) return
     const updateEdges = () => {
       const overflow = element.scrollWidth > element.clientWidth + 1
+      // In an RTL container scrollLeft counts *down* from 0 as you scroll away
+      // from the start edge, so the raw value can be negative. Measuring the
+      // distance instead keeps "start" meaning the inline start in both
+      // directions.
+      const scrolled = Math.abs(element.scrollLeft)
       setEdges({
-        start: overflow && element.scrollLeft > 1,
-        end: overflow && element.scrollLeft + element.clientWidth < element.scrollWidth - 1,
+        start: overflow && scrolled > 1,
+        end: overflow && scrolled + element.clientWidth < element.scrollWidth - 1,
       })
     }
     const frame = requestAnimationFrame(updateEdges)
@@ -162,8 +167,9 @@ function HorizontalScrollAffordance({
       <div ref={scrollRef} className={`h-full min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}>
         {children}
       </div>
-      {edges.start && <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 z-10 w-7 bg-gradient-to-r from-[var(--pd-c-18181f)] via-[var(--pd-c-18181f)]/90 to-transparent" />}
-      {edges.end && <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-10 flex w-9 items-center justify-end bg-gradient-to-l from-[var(--pd-c-18181f)] via-[var(--pd-c-18181f)]/90 to-transparent pr-1 text-xs text-[#8d8997]">›</span>}
+      {/* pd-scroll-fade-* carry the gradient so it follows the writing direction. */}
+      {edges.start && <span aria-hidden="true" className="pd-scroll-fade-start pointer-events-none absolute inset-y-0 start-0 z-10 w-7" />}
+      {edges.end && <span aria-hidden="true" className="pd-scroll-fade-end pointer-events-none absolute inset-y-0 end-0 z-10 flex w-9 items-center justify-end pe-1 text-xs text-[#8d8997]"><span className="pd-dir-flip">›</span></span>}
     </div>
   )
 }
@@ -330,7 +336,7 @@ export function EditingContextBar() {
     resetActiveLocaleAdjust()
     setActionsOpen(false)
   }
-  const actionItemClass = 'w-full px-3 py-2 text-left text-[11px] text-[var(--pd-c-e8e8f0)] transition-colors hover:bg-[rgba(255,255,255,0.06)]'
+  const actionItemClass = 'w-full px-3 py-2 text-start text-[11px] text-[var(--pd-c-e8e8f0)] transition-colors hover:bg-[rgba(255,255,255,0.06)]'
 
   // `border-b-2 border-transparent` reserves the 2px the old inline underline
   // occupied, so removing it shifts no text.  The sliding bar overlays this strip.
@@ -396,7 +402,7 @@ export function EditingContextBar() {
         {familyFormats.map((formatId) => {
           const { width, height } = getCanvasFormat(formatId)
           return (
-            <button key={formatId} onClick={() => onSelect(formatId)} className="flex w-full items-center justify-between gap-4 px-3 py-1.5 text-left text-xs font-medium text-[#c2c2cf] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-white">
+            <button key={formatId} onClick={() => onSelect(formatId)} className="flex w-full items-center justify-between gap-4 px-3 py-1.5 text-start text-xs font-medium text-[#c2c2cf] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-white">
               <span>{getFormatLabel(formatId, settings.customFormats)}</span>
               <span className="shrink-0 font-normal tabular-nums text-[#656574]">{width} × {height}</span>
             </button>
@@ -513,7 +519,7 @@ export function EditingContextBar() {
               style={{ left: formatMenuPosition.left, top: formatMenuPosition.top }}
             >
             {dropdownOpen && (
-              <div className="absolute left-0 top-full z-50 mt-1 min-w-[250px] max-h-[min(30rem,calc(100vh-5rem))] overflow-y-auto rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] py-1 shadow-xl">
+              <div className="absolute start-0 top-full z-50 mt-1 min-w-[250px] max-h-[min(30rem,calc(100vh-5rem))] overflow-y-auto rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] py-1 shadow-xl">
                 {uncreatedFormats.length > 0 && <section aria-label="Create new layout">
                   <p className="px-3 pb-1 pt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#fbbf24]">Create new layout</p>
                   {renderFormatMenuFamilies(uncreatedFormats, (formatId) => {
@@ -532,7 +538,7 @@ export function EditingContextBar() {
                   <p className="px-3 pb-1 pt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#b7b7c5]">Add a custom canvas size</p>
                   <button
                     onClick={() => { setShowCustomInput(true); setDropdownOpen(false) }}
-                    className="w-full px-3 py-1.5 text-left text-xs text-[#a0a0b0] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]"
+                    className="w-full px-3 py-1.5 text-start text-xs text-[#a0a0b0] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]"
                   >
                     Custom size…
                   </button>
@@ -540,7 +546,7 @@ export function EditingContextBar() {
               </div>
             )}
             {showCustomInput && (
-              <div className="absolute left-0 top-full z-50 mt-1 min-w-[210px] rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] p-3 shadow-xl">
+              <div className="absolute start-0 top-full z-50 mt-1 min-w-[210px] rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] p-3 shadow-xl">
                 <p className="mb-2 text-[10px] text-[var(--pd-c-6b6b7a)]">Custom canvas format</p>
                 <input
                   type="text"
@@ -641,7 +647,7 @@ export function EditingContextBar() {
               <span className="flex items-center gap-1">Actions<Icon name="chevron-down" size={10} /></span>
             </button>
             {actionsOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1.5 w-72 overflow-hidden rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-2xl">
+              <div className="absolute end-0 top-full z-50 mt-1.5 w-72 overflow-hidden rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-2xl">
                 {isFormatScoped && <>
                   <div className="border-b border-[rgba(255,255,255,0.08)] px-3 py-2">
                     <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#fbbf24]">{formatLabel} format actions</p>

@@ -79,7 +79,7 @@ export function SlideGroupSection({
       <button
         type="button"
         onClick={onToggleCollapse}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition hover:bg-white/[0.03]"
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-start transition hover:bg-white/[0.03]"
       >
         <div className="flex items-center gap-3">
           <span className="text-[#d5d2eb]"><Icon name={collapsed ? 'chevron-right' : 'chevron-down'} size={15} /></span>
@@ -110,7 +110,7 @@ export function SlideGroupSection({
               className="grid gap-3 pr-6 pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#78798b]"
               style={{ gridTemplateColumns }}
             >
-              <div className="py-2 pl-4 pr-3 sticky left-0 z-10 bg-[var(--pd-c-18181f)]">Layer</div>
+              <div className="py-2 pl-4 pr-3 sticky start-0 z-10 bg-[var(--pd-c-18181f)]">Layer</div>
               {locales.map((locale) => (
                 <div
                   key={locale}
@@ -139,9 +139,9 @@ export function SlideGroupSection({
                     style={{ gridTemplateColumns }}
                   >
                     {/* Layer column — sticky left */}
-                    <div className="sticky left-0 z-10 flex h-full flex-col pl-4" style={{ background: '#18181f' }}>
+                    <div className="sticky start-0 z-10 flex h-full flex-col pl-4" style={{ background: '#18181f' }}>
                       <div className="flex min-h-[80px] flex-1 flex-col justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 mb-3">
-                        <div className="flex items-start gap-3" style={{ paddingLeft: row.depth * 16 }}>
+                        <div className="flex items-start gap-3" style={{ paddingInlineStart: row.depth * 16 }}>
                           <div
                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-[var(--pd-c-111118)] text-sm font-semibold mt-0.5"
                             style={{ color: row.layerType === 'text' ? '#c9c3ff' : '#d9d9e6' }}
@@ -152,7 +152,7 @@ export function SlideGroupSection({
                             <button
                               type="button"
                               onClick={() => onNavigateToLayer(row)}
-                              className="truncate font-medium text-[#d5d5df] text-sm hover:text-white transition text-left w-full"
+                              className="truncate font-medium text-[#d5d5df] text-sm hover:text-white transition text-start w-full"
                               title="Go to layer in editor"
                             >
                               {row.layerName}

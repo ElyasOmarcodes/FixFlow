@@ -220,7 +220,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
               <div
                 key={i}
                 onClick={() => selectAccent(i)}
-                className={`flex w-full cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors ${
+                className={`flex w-full cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-start text-xs transition-colors ${
                   selectedAccentIndex === i
                     ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-[var(--pd-c-e8e8f0)]'
                     : 'border-[rgba(255,255,255,0.08)] text-[#9a9aaa] hover:border-[rgba(124,110,246,0.5)] hover:bg-[rgba(255,255,255,0.04)]'
@@ -228,7 +228,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
               >
                 <button
                   type="button"
-                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                  className="flex min-w-0 flex-1 items-center gap-2 text-start"
                 >
                   <span
                     className="h-4 w-4 shrink-0 rounded-full border border-[rgba(255,255,255,0.2)]"

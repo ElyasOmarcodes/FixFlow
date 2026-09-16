@@ -1,6 +1,6 @@
 import { aiFetch } from './http'
 import { getProviderConfig } from '@/ai/providers'
-import { formatAiNetworkError } from '@/ai/errors'
+import { formatAiNetworkError, formatProviderHttpError } from '@/ai/errors'
 import { buildOpenAiCompatibleHeaders } from '@/ai/headers'
 import type { AiModel, AiProvider } from '@/ai/providers'
 
@@ -37,7 +37,7 @@ export async function listModels(provider: AiProvider, apiKey: string, baseUrlOv
     if (fallbackModels.length) return fallbackModels
     throw formatAiNetworkError(provider, 'load models', error)
   }
-  if (!res.ok) throw new Error(await readErrorMessage(res))
+  if (!res.ok) throw new Error(await readErrorMessage(res, provider))
 
   const data = await res.json()
   const remoteModels = getRemoteModels(data)
@@ -63,11 +63,14 @@ const FALLBACK_MODELS: Partial<Record<AiProvider, AiModel[]>> = {
 
 }
 
-async function readErrorMessage(res: Response): Promise<string> {
+async function readErrorMessage(res: Response, provider: AiProvider): Promise<string> {
   const fallback = `Could not load models (${res.status} ${res.statusText}).`
   try {
     const text = await res.text()
-    return text.trim() || fallback
+    if (!text.trim()) return fallback
+    // Surface the provider's own sentence plus what to do about it, rather
+    // than pasting the raw JSON body into the settings panel.
+    return formatProviderHttpError('', res.status, text, provider)
   } catch {
     return fallback
   }
@@ -131,7 +134,7 @@ async function listGoogleModels(key: string): Promise<AiModel[]> {
     } catch (error) {
       throw formatAiNetworkError('google', 'load models', error)
     }
-    if (!response.ok) throw new Error(await readErrorMessage(response))
+    if (!response.ok) throw new Error(await readErrorMessage(response, 'google'))
     const data = await response.json() as { models?: RemoteModel[]; nextPageToken?: string }
     for (const model of data.models ?? []) {
       if (!model.supportedGenerationMethods?.includes('generateContent')) continue

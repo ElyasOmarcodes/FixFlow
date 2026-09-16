@@ -49,10 +49,10 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
         borderColor: 'rgba(255,255,255,0.09)',
         boxShadow: '0 32px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(124,110,246,0.04)',
       }}
-      closeButtonClassName="absolute top-4 right-4 z-10 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-all text-base w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.07)]"
+      closeButtonClassName="absolute top-4 end-4 z-10 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-all text-base w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.07)]"
       header={(
         <header className="relative shrink-0 overflow-hidden border-b border-[rgba(255,255,255,0.07)] px-5 py-4 sm:px-6">
-          <div className="pointer-events-none absolute -top-16 left-12 h-32 w-64 rounded-full bg-[var(--pd-c-7c6ef6)] opacity-[0.08] blur-3xl" />
+          <div className="pointer-events-none absolute -top-16 start-12 h-32 w-64 rounded-full bg-[var(--pd-c-7c6ef6)] opacity-[0.08] blur-3xl" />
           <div className="relative flex items-center gap-3 pr-10">
             <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[rgba(155,143,255,0.28)] bg-[rgba(124,110,246,0.12)] text-[#b8afff] shadow-[0_8px_24px_rgba(124,110,246,0.12)]">
               <span aria-hidden="true" className="text-base">?</span>
@@ -76,7 +76,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
         <aside className="hidden w-[230px] shrink-0 flex-col border-r border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-131318)] md:flex">
           <div className="border-b border-[rgba(255,255,255,0.055)] p-3">
             <label className="relative block">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-[var(--pd-c-525260)]">⌕</span>
+              <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[12px] text-[var(--pd-c-525260)]">⌕</span>
               <input
                 type="search"
                 value={query}
@@ -112,7 +112,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                               : 'text-[var(--pd-c-777786)] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#d1d1dc]'
                           }`}
                         >
-                          {isActive && <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[#8f82ff]" />}
+                          {isActive && <span className="absolute inset-y-2 start-0 w-0.5 rounded-full bg-[#8f82ff]" />}
                           <span className={`w-5 shrink-0 text-end font-mono text-[9px] ${isActive ? 'text-[#8f82ff]' : 'text-[#444451] group-hover:text-[#666675]'}`}>
                             {String(section.number).padStart(2, '0')}
                           </span>

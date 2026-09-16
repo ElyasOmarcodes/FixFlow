@@ -73,7 +73,7 @@ export function PromoteLocaleDialog({
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--pd-c-6b6b7a)]">Translation coverage</div>
               <div className="mt-1 text-2xl font-semibold text-white">{complete}/{total}</div>
             </div>
-            <div className="text-right text-xs text-[#8d8ea0]">
+            <div className="text-end text-xs text-[#8d8ea0]">
               {isComplete ? 'Everything is translated.' : `${total - complete} layers still need review.`}
             </div>
           </div>

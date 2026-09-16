@@ -165,7 +165,7 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
   const sectionLabelCls =
     'text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider px-2 py-1 select-none'
   const itemBaseCls =
-    'w-full text-left px-3 py-1.5 text-sm text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.05)] transition-colors rounded'
+    'w-full text-start px-3 py-1.5 text-sm text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.05)] transition-colors rounded'
   const itemSelectedCls = 'bg-[rgba(124,110,246,0.15)] !text-[#c4b5fd]'
   const itemActiveCls = 'bg-[rgba(255,255,255,0.08)] outline-none'
 
@@ -202,7 +202,7 @@ function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
 
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0f0f1a] shadow-xl shadow-black/50 overflow-hidden">
+        <div className="absolute inset-x-0 top-full mt-1 z-50 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0f0f1a] shadow-xl shadow-black/50 overflow-hidden">
           {/* Sticky search input */}
           <div className="sticky top-0 bg-[#0f0f1a] border-b border-[rgba(255,255,255,0.08)] p-1.5">
             <input

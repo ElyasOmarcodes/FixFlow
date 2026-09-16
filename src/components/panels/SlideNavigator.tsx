@@ -405,7 +405,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
             value={panoSettings.gapPx}
             disabled={!hasPano}
             onChange={(e) => updatePanoSettings({ gapPx: parseInt(e.target.value, 10) || 0 })}
-            className="w-12 rounded border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-right text-[var(--pd-c-e8e8f0)] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-12 rounded border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
             title="Store preview gap shown in editor and preview"
           />
           <span>px</span>
@@ -473,7 +473,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
           ].map(({ action, label }) => (
             <button
               key={action}
-              className="w-full text-left px-3 py-2 text-xs hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              className="w-full text-start px-3 py-2 text-xs hover:bg-[rgba(255,255,255,0.06)] transition-colors"
               style={{ color: 'var(--pd-c-e8e8f0)' }}
               onClick={() => handleMenuAction(action, contextMenu.groupId)}
             >
@@ -481,7 +481,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
             </button>
           ))}
           <div className="my-1 border-t border-[rgba(255,255,255,0.08)]" />
-          <button className="w-full text-left px-3 py-2 text-xs text-[#f87171] hover:bg-[rgba(255,255,255,0.06)] transition-colors" onClick={() => handleMenuAction('delete', contextMenu.groupId)}>Delete</button>
+          <button className="w-full text-start px-3 py-2 text-xs text-[#f87171] hover:bg-[rgba(255,255,255,0.06)] transition-colors" onClick={() => handleMenuAction('delete', contextMenu.groupId)}>Delete</button>
         </div>
       )}
     </footer>

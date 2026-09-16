@@ -436,7 +436,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                         {isActive && (
                           <span
                             style={{
-                              marginLeft: 8,
+                              marginInlineStart: 8,
                               fontSize: 10,
                               background: 'rgba(124,110,246,0.35)',
                               color: '#a89cf6',

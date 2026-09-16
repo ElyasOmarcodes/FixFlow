@@ -281,6 +281,21 @@ export interface IconProps {
   title?: string
 }
 
+/**
+ * Glyphs whose meaning is "towards the start / end of the line", not "towards
+ * the left / right of the screen". In an RTL interface a back arrow has to
+ * point the other way, so these get mirrored by the `[dir='rtl']` rule on
+ * `.pd-dir-icon`. Vertical arrows and non-directional glyphs are excluded —
+ * mirroring those would only make them wrong.
+ */
+const DIRECTIONAL_ICONS: ReadonlySet<string> = new Set([
+  'chevron-left',
+  'chevron-right',
+  'arrow-left',
+  'arrow-right',
+  'corner-down-left',
+])
+
 export function Icon({
   name,
   size = 14,
@@ -290,6 +305,9 @@ export function Icon({
   title,
 }: IconProps): ReactElement {
   const solid = SOLID_ICONS.has(name)
+  const classes = [DIRECTIONAL_ICONS.has(name) ? 'pd-dir-icon' : '', className]
+    .filter(Boolean)
+    .join(' ')
   return (
     <svg
       width={size}
@@ -300,7 +318,7 @@ export function Icon({
       strokeWidth={solid ? undefined : strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      className={classes || undefined}
       style={{ flexShrink: 0, display: 'block', ...style }}
       role={title ? 'img' : undefined}
       aria-label={title}

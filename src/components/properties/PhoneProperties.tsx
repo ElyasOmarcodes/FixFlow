@@ -43,7 +43,7 @@ function LocaleScreenshotRow({
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex-1 text-left text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors"
+            className="flex-1 text-start text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors"
           >
             Change
           </button>
@@ -60,7 +60,7 @@ function LocaleScreenshotRow({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex-1 text-left text-[10px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] border border-dashed border-[rgba(255,255,255,0.1)] rounded px-2 py-1 transition-colors hover:border-[rgba(124,110,246,0.4)]"
+          className="flex-1 text-start text-[10px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] border border-dashed border-[rgba(255,255,255,0.1)] rounded px-2 py-1 transition-colors hover:border-[rgba(124,110,246,0.4)]"
         >
           + Upload for {locale}
         </button>

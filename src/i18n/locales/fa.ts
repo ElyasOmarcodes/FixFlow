@@ -253,6 +253,16 @@ export const fa: Record<TranslationKey, string> = {
   'settings.project': 'پروژه',
   'settings.title': 'تنظیمات',
 
+  // ── Templates ────────────────────────────────────────────────────────────
+  'templates.addSlides': 'افزودن اسلایدها به پروژهٔ فعلی',
+  'templates.applying': 'در حال اعمال…',
+  'templates.applyMode': 'باز کردن قالب به صورت',
+  'templates.applyModeAppend': 'افزودن به پروژهٔ فعلی',
+  'templates.applyModeAppendHint': 'اسلایدهای قالب را پس از اسلایدهای شما اضافه می‌کند. فقط زمانی استفاده کنید که اندازهٔ بوم هر دو طرح یکسان باشد.',
+  'templates.applyModeNew': 'پروژه‌ای تازه',
+  'templates.applyModeNewHint': 'ابتدا پروژهٔ فعلی ذخیره می‌شود، سپس قالب روی بوم خودش باز می‌شود.',
+  'templates.useTemplate': 'استفاده از این قالب',
+
   // ── Localization view ────────────────────────────────────────────────────
   'loc.backToEditor': 'بازگشت به ویرایشگر',
   'loc.empty': 'محتوای قابل ترجمه‌ای نیست',

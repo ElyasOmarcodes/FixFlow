@@ -53,7 +53,7 @@ export function GuideItem({ children, tone = 'purple' }: { children: ReactNode; 
   const dot = tone === 'amber' ? 'bg-[#f2b84b]' : tone === 'teal' ? 'bg-[#48c7bf]' : 'bg-[#8f82ff]'
   return (
     <li className="relative list-none pl-5">
-      <span className={`absolute left-0 top-[10px] h-1.5 w-1.5 rounded-full ${dot} shadow-[0_0_8px_currentColor]`} />
+      <span className={`absolute start-0 top-[10px] h-1.5 w-1.5 rounded-full ${dot} shadow-[0_0_8px_currentColor]`} />
       {children}
     </li>
   )

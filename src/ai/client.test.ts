@@ -87,7 +87,11 @@ describe('chat', () => {
 
     expect(error).toBeInstanceOf(AiClientError)
     expect(error).toMatchObject({ kind: 'http', status: 401 })
-    expect((error as Error).message).toContain('openai API error 401: invalid API key')
+    // The provider's own text survives, and the status carries a remedy the
+    // user can act on rather than only the raw response body.
+    expect((error as Error).message).toContain('invalid API key')
+    expect((error as Error).message).toContain('401')
+    expect((error as Error).message).toContain('The key was rejected')
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 

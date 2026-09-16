@@ -1,7 +1,7 @@
 /** Project library state and async persistence. */
 
 import { create } from 'zustand'
-import type { Project } from '@/types'
+import type { Project, Template } from '@/types'
 import {
   buildProjectExportBundle,
   collectAssetKeys,
@@ -124,6 +124,7 @@ interface ProjectsStore {
   initialize: () => Promise<void>
   saveCurrentProject: () => Promise<void>
   createProject: (name: string) => Promise<void>
+  createProjectFromTemplate: (tpl: Template) => Promise<void>
   openProject: (id: string) => Promise<void>
   deleteProject: (id: string) => Promise<void>
   renameProject: (id: string, name: string) => Promise<void>
@@ -178,6 +179,34 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
     useEditorStore.getState().setProjectName(trimmed)
     await getProjectStorage().setActiveProjectId(useEditorStore.getState().project.id)
     await useAssetStore.getState().setActiveProject(useEditorStore.getState().project.id)
+    await get().saveCurrentProject()
+  },
+
+  /**
+   * Opens a template as its own project rather than appending it to whatever
+   * is on screen. The current project is saved first, then the template
+   * becomes a brand-new library entry with its own asset bucket — so the two
+   * designs never share a canvas or an image library.
+   */
+  async createProjectFromTemplate(tpl) {
+    await get().saveCurrentProject()
+    useEditorStore.getState().importTemplateAsNewProject(tpl)
+    const newProjectId = useEditorStore.getState().project.id
+    await getProjectStorage().setActiveProjectId(newProjectId)
+    // Screenshots inlined in the template were written into the *outgoing*
+    // project's bucket by importTemplateAsNewProject; carry them over before
+    // switching, or the new project opens with missing images.
+    const inlined = { ...useAssetStore.getState().assets }
+    await useAssetStore.getState().setActiveProject(newProjectId)
+    const referenced = collectAssetKeys(useEditorStore.getState().project)
+    const carried = Object.fromEntries(
+      [...referenced]
+        .map((key) => [key, inlined[key]?.dataUrl] as const)
+        .filter((entry): entry is readonly [string, string] => typeof entry[1] === 'string'),
+    )
+    if (Object.keys(carried).length > 0) {
+      await useAssetStore.getState().hydrateProject(newProjectId, carried)
+    }
     await get().saveCurrentProject()
   },
 

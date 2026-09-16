@@ -232,7 +232,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
               className="h-full w-full object-cover"
               loading="lazy"
             />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-1.5 pb-1 pt-5 text-left text-[9px] text-white opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-1.5 pb-1 pt-5 text-start text-[9px] text-white opacity-0 transition-opacity group-hover:opacity-100">
               Drag to canvas · {primaryAction}
             </div>
           </div>
@@ -290,7 +290,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
             onClick={() => toggleFolder(group.folder, modal)}
             aria-expanded={!isCollapsed}
             aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} folder ${group.label}`}
-            className="group/folder mb-1.5 flex w-full items-center gap-1.5 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+            className="group/folder mb-1.5 flex w-full items-center gap-1.5 rounded-md px-1 py-0.5 text-start transition-colors hover:bg-[rgba(255,255,255,0.04)]"
           >
             <Chevron open={!isCollapsed} />
             {/* Folder icon */}
@@ -396,7 +396,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
       {assetsModalOpen && createPortal(
         <div className="pointer-events-none fixed inset-0 z-[1000]">
           <div
-            className="pointer-events-auto absolute bottom-24 left-60 top-14 flex w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[var(--pd-c-18181f)]/96 shadow-2xl backdrop-blur-xl"
+            className="pointer-events-auto absolute bottom-24 start-60 top-14 flex w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[var(--pd-c-18181f)]/96 shadow-2xl backdrop-blur-xl"
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/8 px-4 py-3">
               <div>

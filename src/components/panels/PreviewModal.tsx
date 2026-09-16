@@ -215,7 +215,7 @@ export function PreviewModal({
                     if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
                     e.stopPropagation()
                   }}
-                  className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-right text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
+                  className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
                 />
                 <span>px</span>
               </label>
@@ -307,7 +307,7 @@ export function PreviewModal({
 
                       {/* Slide card */}
                       <button
-                        className="group/slide shrink-0 flex flex-col gap-0 text-left"
+                        className="group/slide shrink-0 flex flex-col gap-0 text-start"
                         onClick={() => {
                           // Navigating to a slide commits the previewed format/locale
                           // (already live on the store) instead of restoring the
@@ -356,7 +356,7 @@ export function PreviewModal({
                             fontSize: 11,
                             color: isActiveGroup ? '#9b8fff' : '#5a566e',
                             marginTop: 6,
-                            paddingLeft: 2,
+                            paddingInlineStart: 2,
                             lineHeight: 1,
                           }}
                         >
