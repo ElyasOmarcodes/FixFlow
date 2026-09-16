@@ -113,6 +113,8 @@ export const ps: Record<TranslationKey, string> = {
   'toolbar.renameProject': 'د پروژې نوم بدلولو لپاره کلیک وکړه',
   'toolbar.saved': 'وساتل شو',
   'toolbar.saving': 'ساتل کیږي…',
+  'toolbar.smartSnap': 'اسنپ',
+  'toolbar.smartSnapTitle': 'سمارټ اسنپ — د کشولو پر مهال پرتونه یو له بل او کانواس سره سم کوي',
   'toolbar.settings': 'تنظیمات',
   'toolbar.settingsTitle': 'تنظیمات پرانیزه',
   'toolbar.templates': 'کينډۍ',

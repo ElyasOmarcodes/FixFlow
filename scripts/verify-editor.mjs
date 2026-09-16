@@ -182,7 +182,128 @@ try {
       expect(appended.name).toBe(after.name)
       console.log(`  templates: new-project ${before.groups}->${after.groups} groups (not ${before.groups + after.groups}); append ${after.groups}->${appended.groups}; selection cleared both times`)
 
-      // Back to a clean slate for the template screenshot sweep below.
+      // Back to a clean slate for the smart-snap check and the template sweep.
+      await page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        useEditorStore.getState().resetProject()
+      })
+      await page.waitForTimeout(600)
+
+      // ── Smart snap ────────────────────────────────────────────────────────
+      // Two shapes, one dragged towards the other by less than the magnet's
+      // reach. With snapping on it must land *exactly* aligned; with it off the
+      // same gesture must leave it where the pointer put it. Driven with a real
+      // mouse drag, because the snap lives in Konva's drag pipeline.
+      for (let i = 0; i < 2; i++) {
+        await page.getByRole('button', { name: 'New layer', exact: true }).click()
+        await page.getByRole('menuitem', { name: 'Shape', exact: true }).click()
+        await page.waitForTimeout(250)
+      }
+      const readShapes = () => page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        const group = state.project.slideGroups.find((item) => item.id === state.activeSlideGroupId)
+        return group.layers.filter((layer) => layer.type === 'shape')
+          .map((layer) => ({ id: layer.id, x: layer.x, y: layer.y, w: layer.width, h: layer.height }))
+      })
+      const [anchor, mover] = await readShapes()
+      await page.evaluate(async ([a, b]) => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        state.updateLayer(a, { x: 200, y: 400, width: 300, height: 200 })
+        state.updateLayer(b, { x: 200, y: 1400, width: 300, height: 200 })
+      }, [anchor.id, mover.id])
+      await page.waitForTimeout(250)
+
+      const canvasBox = await page.locator('.pd-editor main canvas').first().boundingBox()
+      const viewport = () => page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        return { zoom: state.zoom, vx: state.viewportX, vy: state.viewportY }
+      })
+      // Guides are Konva Lines in the accent colour; counting them proves the
+      // user is shown *why* the layer stopped, not just that it moved.
+      const guideCount = () => page.evaluate(async () => {
+        const { getStage } = await import('/src/utils/stageRegistry.ts')
+        const stage = getStage()
+        return stage ? stage.find('Line').filter((line) => line.stroke() === '#ec4899').length : -1
+      })
+      const nudge = async (dxCanvas, dyCanvas) => {
+        const { zoom, vx, vy } = await viewport()
+        const current = (await readShapes()).find((shape) => shape.id === mover.id)
+        const toScreen = (cx, cy) => ({ x: canvasBox.x + vx + cx * zoom, y: canvasBox.y + vy + cy * zoom })
+        const from = toScreen(current.x + current.w / 2, current.y + current.h / 2)
+        const to = toScreen(current.x + current.w / 2 + dxCanvas, current.y + current.h / 2 + dyCanvas)
+        await page.mouse.move(from.x, from.y)
+        await page.mouse.down()
+        await page.mouse.move((from.x + to.x) / 2, (from.y + to.y) / 2, { steps: 6 })
+        await page.mouse.move(to.x, to.y, { steps: 6 })
+        await page.waitForTimeout(150)
+        const guides = await guideCount()
+        await page.mouse.up()
+        await page.waitForTimeout(250)
+        return guides
+      }
+
+      const { zoom: snapZoom } = await viewport()
+      // Comfortably inside the magnet's reach so the test is not sensitive to
+      // the exact threshold, but far enough that "no snap" is unmistakable.
+      const offset = Math.round((7 / snapZoom) * 0.5)
+      const guidesWhileSnapping = await nudge(offset, -600)
+      const snapped = (await readShapes()).find((shape) => shape.id === mover.id)
+      expect(snapped.x).toBe(200)
+      expect(guidesWhileSnapping).toBeGreaterThan(0)
+      await page.screenshot({ path: 'test-results/editor/smart-snap.png' })
+
+      await page.locator('.pd-toolbar').getByRole('button', { name: 'Snap', exact: true }).click()
+      await page.waitForTimeout(200)
+      const guidesWithoutSnapping = await nudge(offset, -200)
+      const free = (await readShapes()).find((shape) => shape.id === mover.id)
+      expect(free.x).not.toBe(200)
+      expect(guidesWithoutSnapping).toBe(0)
+      console.log(`  smart snap: on -> x=${snapped.x} with ${guidesWhileSnapping} guide(s); off -> x=${free.x.toFixed(1)}, no guides`)
+
+      // ── Selection handle actions ──────────────────────────────────────────
+      // Four buttons ringing the selected layer's box, and they have to be the
+      // real actions, not decoration — so each is exercised through the store.
+      // The layer is enlarged first: below ~74 screen pixels the buttons would
+      // cover the artwork and the resize anchors, so they deliberately hide,
+      // and the default 300x200 at fit-zoom is under that.
+      await page.evaluate(async (id) => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        state.updateLayer(id, { x: 200, y: 400, width: 800, height: 700 })
+        state.select(id)
+      }, mover.id)
+      await page.waitForTimeout(500)
+      const handles = page.locator('.pd-handle-action')
+      await expect(handles).toHaveCount(4)
+      expect(await handles.evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')).sort()))
+        .toEqual(['Delete', 'Duplicate', 'Edit', 'Lock layer'])
+      const shapeCount = async () => (await readShapes()).length
+      const beforeDuplicate = await shapeCount()
+      await page.locator('.pd-handle-action[aria-label="Duplicate"]').click()
+      await page.waitForTimeout(350)
+      expect(await shapeCount()).toBe(beforeDuplicate + 1)
+      await page.locator('.pd-handle-action[aria-label="Delete"]').click()
+      await page.waitForTimeout(350)
+      expect(await shapeCount()).toBe(beforeDuplicate)
+      await page.screenshot({ path: 'test-results/editor/selection-handles.png' })
+
+      // The background covers the whole canvas; ringing it would strand four
+      // buttons in the corners of the viewport.
+      await page.evaluate(async () => {
+        const { useEditorStore } = await import('/src/store/index.ts')
+        const state = useEditorStore.getState()
+        const group = state.project.slideGroups.find((item) => item.id === state.activeSlideGroupId)
+        state.select(group.layers.find((layer) => layer.type === 'background').id)
+      })
+      await page.waitForTimeout(400)
+      await expect(handles).toHaveCount(0)
+      console.log('  selection handles: 4 corner actions, duplicate/delete wired, none on the background')
+
+      // Restore the default and a clean project for the template sweep.
+      await page.locator('.pd-toolbar').getByRole('button', { name: 'Snap', exact: true }).click()
       await page.evaluate(async () => {
         const { useEditorStore } = await import('/src/store/index.ts')
         useEditorStore.getState().resetProject()

@@ -1,5 +1,6 @@
 import { ExportModal } from '@/components/panels/ExportModal'
 import { SelectionActions } from '@/components/canvas/SelectionActions'
+import { SelectionHandleActions } from '@/components/canvas/SelectionHandleActions'
 import { Capacitor } from '@capacitor/core'
 import { App as NativeApp } from '@capacitor/app'
 import { useT } from '@/i18n'
@@ -317,6 +318,7 @@ export default function App() {
                 user while the exported PNGs stayed the same. */}
             <div dir="ltr" style={{ flex: 1, position: 'relative', zIndex: 0, overflow: 'hidden' }}>
               <StageCanvas stageRef={stageRef} />
+              <SelectionHandleActions onEdit={() => setMobilePanel('properties')} />
               <SelectionActions onEdit={() => setMobilePanel('properties')} />
               {(scopedEditingIndicator.isFormatScoped || scopedEditingIndicator.isLocaleScoped) && (
                 <div

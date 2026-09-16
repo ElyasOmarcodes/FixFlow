@@ -216,6 +216,9 @@ const ICONS = {
   ),
 
   // ── Domain / feature ─────────────────────────────────────────────────────
+  // Horseshoe magnet: two prongs and the arc joining them, with the pole tips
+  // left open so the shape still reads at 13px.
+  magnet: <><path d="M6 15V7a6 6 0 0 1 12 0v8" /><path d="M6 15v2a6 6 0 0 0 12 0v-2" /><path d="M6 11h4M14 11h4" /></>,
   grid: (
     <>
       <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />

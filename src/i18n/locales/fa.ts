@@ -113,6 +113,8 @@ export const fa: Record<TranslationKey, string> = {
   'toolbar.renameProject': 'برای تغییر نام پروژه کلیک کن',
   'toolbar.saved': 'ذخیره شد',
   'toolbar.saving': 'در حال ذخیره…',
+  'toolbar.smartSnap': 'چفت',
+  'toolbar.smartSnapTitle': 'چفت هوشمند — هنگام کشیدن، لایه‌ها را با یکدیگر و با بوم هم‌تراز می‌کند',
   'toolbar.settings': 'تنظیمات',
   'toolbar.settingsTitle': 'باز کردن تنظیمات',
   'toolbar.templates': 'قالب‌ها',

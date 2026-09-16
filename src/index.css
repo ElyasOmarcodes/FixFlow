@@ -747,6 +747,57 @@
 .pd-selection-actions button:hover:not(:disabled) { background: var(--pd-hover); }
 .pd-selection-actions button:active:not(:disabled) { background: var(--pd-accent-wash-strong); transform: scale(0.92); }
 
+/* ── Selection handle actions ──────────────────────────────────────────────
+   Buttons pinned just outside the corners of the selection box. The layer is a
+   transparent full-size overlay so it never intercepts a click meant for the
+   canvas; only the buttons themselves listen. */
+.pd-handle-actions {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.pd-handle-action {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 50%;
+  background: var(--pd-panel);
+  color: var(--pd-c-a0a0b0);
+  box-shadow: var(--pd-shadow-popover);
+  pointer-events: auto;
+  animation: pd-pop-in var(--pd-dur-fast) var(--pd-ease-decel) both;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-handle-action:hover {
+  background: var(--pd-accent);
+  border-color: var(--pd-accent);
+  color: #fff;
+  transform: scale(1.12);
+}
+
+.pd-handle-action:active { transform: scale(0.94); }
+
+.pd-handle-action-danger:hover {
+  background: #e5484d;
+  border-color: #e5484d;
+}
+
+/* Touch needs a bigger target and more clearance from the resize anchors — a
+   fingertip covers both at the pointer-fine size. */
+@media (pointer: coarse) {
+  .pd-handle-action { width: 34px; height: 34px; margin: -4px; }
+}
+
 .pd-rename-button {
   display: inline-grid;
   place-items: center;

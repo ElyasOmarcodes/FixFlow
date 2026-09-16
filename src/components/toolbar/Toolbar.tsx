@@ -36,10 +36,14 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
     project,
     selectedLayerIds,
     createGroup,
+    smartSnap,
+    toggleSmartSnap,
   } = useEditorStore(useShallow((s) => ({
     project: s.project,
     selectedLayerIds: s.selectedLayerIds,
     createGroup: s.createGroup,
+    smartSnap: s.smartSnap,
+    toggleSmartSnap: s.toggleSmartSnap,
   })))
 
   const { undo, redo, canUndo, canRedo } = useUndoRedo()
@@ -281,6 +285,23 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
           <Icon name="redo" size={15} />
         </button>
       </div>
+
+      <div className="h-6 w-px shrink-0 bg-[rgba(255,255,255,0.1)]" />
+
+      {/* Smart snap — a mode, so it reads as pressed rather than as a command. */}
+      <button
+        onClick={toggleSmartSnap}
+        aria-pressed={smartSnap}
+        title={`${t('toolbar.smartSnapTitle')} (Hold Alt to bypass)`}
+        className={`pd-snap-toggle flex shrink-0 items-center gap-1.5 rounded border px-2.5 py-1 text-xs transition-colors ${
+          smartSnap
+            ? 'border-[rgba(124,110,246,0.5)] bg-[rgba(124,110,246,0.18)] text-[var(--pd-c-c4b5fd)]'
+            : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:border-[rgba(255,255,255,0.2)] hover:text-[var(--pd-c-e8e8f0)]'
+        }`}
+      >
+        <Icon name="magnet" size={13} />
+        <span className="max-[1099px]:hidden">{t('toolbar.smartSnap')}</span>
+      </button>
 
       <div className="h-6 w-px shrink-0 bg-[rgba(255,255,255,0.1)]" />
 

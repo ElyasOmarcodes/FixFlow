@@ -13,6 +13,7 @@ import {
 } from '@/utils/canvasFormats'
 import type { EditorStore } from './types'
 import { newProject, touchProject } from './helpers'
+import { readSmartSnap } from './workspacePrefs'
 import { createSelectionSlice } from './slices/selectionSlice'
 import { createLocaleSlice } from './slices/localeSlice'
 import { createLocaleLayoutSlice } from './slices/localeLayoutSlice'
@@ -40,6 +41,7 @@ export const useEditorStore = create<EditorStore>()(
       viewportY: 0,
       showGrid: false,
       showSeamGuides: true,
+      smartSnap: readSmartSnap(),
       editingGroupId: null as string | null,
       selectedLayerIds: [] as string[],
       clipboard: null as Layer[] | null,

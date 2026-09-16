@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { useEditorStore } from '@/store'
 import { useAssetStore } from '@/store/assets'
 import { resolveGroupView } from '@/utils/canvasFormats'
-import { getEffectivePano } from '@/utils/panoGeometry'
+import { getEffectivePano, getPanoSlideX } from '@/utils/panoGeometry'
 import type { Layer as AppLayer, BackgroundLayer } from '@/types'
 import { CanvasTextEditor } from './CanvasTextEditor'
 import { StageLayerItem } from './stage/StageLayerItem'
@@ -15,6 +15,7 @@ import { useRubberBandSelection } from './stage/useRubberBandSelection'
 import { useSelectionTransformers } from './stage/useSelectionTransformers'
 import { useStageGeometry } from './stage/useStageGeometry'
 import { useStageViewport } from './stage/useStageViewport'
+import { useSmartSnap } from './stage/useSmartSnap'
 
 function useCtrlKey() {
   const ref = useRef(false)
@@ -39,7 +40,7 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
     startPositions: Map<string, { nodeX: number; nodeY: number; layerX: number; layerY: number }>
   } | null>(null)
   const {
-    project, activeSlideGroupId, zoom, viewportX, viewportY, showGrid, showSeamGuides,
+    project, activeSlideGroupId, zoom, viewportX, viewportY, showGrid, showSeamGuides, smartSnap,
     selection, selectedAccentIndex, select, deselect, updateLayer, addImageAt,
     editingGroupId, exitGroupEdit, setZoom, setViewportPosition, clearMultiSelection,
     selectedLayerIds, setMultiSelection, activeLocale, activeCanvasFormat, projectPano,
@@ -47,7 +48,7 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
   } = useEditorStore(useShallow((s) => ({
     project: s.project, activeSlideGroupId: s.activeSlideGroupId, zoom: s.zoom,
     viewportX: s.viewportX, viewportY: s.viewportY, showGrid: s.showGrid,
-    showSeamGuides: s.showSeamGuides, selection: s.selection,
+    showSeamGuides: s.showSeamGuides, smartSnap: s.smartSnap, selection: s.selection,
     selectedAccentIndex: s.selectedAccentIndex, select: s.select, deselect: s.deselect,
     updateLayer: s.updateLayer, addImageAt: s.addImageAt, editingGroupId: s.editingGroupId,
     exitGroupEdit: s.exitGroupEdit, setZoom: s.setZoom, setViewportPosition: s.setViewportPosition,
@@ -91,6 +92,28 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
   const {
     effectiveCompensationPx, visualGapPx, totalWidth, totalHeight, displayWidth, displayHeight,
   } = useStageGeometry(group, panoCompensate, panoCompensationPx, zoom)
+  // Each slide's leading edge, and the far edge of the last one, so a layer can
+  // be centred inside a single slide of a panorama rather than only across the
+  // whole strip.
+  const slideBoundaries = useMemo(() => {
+    if (!group) return []
+    const edges: number[] = []
+    for (let index = 0; index < group.numSlides; index++) {
+      const start = getPanoSlideX(group, index, effectiveCompensationPx)
+      edges.push(start, start + group.slideWidth / 2, start + group.slideWidth)
+    }
+    return edges
+  }, [group, effectiveCompensationPx])
+  const { guides, snapNode, clearGuides } = useSmartSnap({
+    enabled: smartSnap,
+    zoom,
+    canvasWidth: totalWidth,
+    canvasHeight: totalHeight,
+    slideBoundaries,
+  })
+  // Ids moving as one during a drag; they must not act as each other's
+  // alignment targets.
+  const movingIdsRef = useRef<ReadonlySet<string>>(new Set())
   const { transformerRef, accentTransformerRef, groupOutlineRef } = useSelectionTransformers({
     stageRef, group, selection, editingGroupId, selectedLayerIds, editingTextId,
     selectedBackgroundLayer, selectedAccentIndex,
@@ -121,6 +144,7 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
     if (!nodeId.startsWith('layer-')) return
     const layerId = nodeId.slice(6)
     const ids = useEditorStore.getState().selectedLayerIds
+    movingIdsRef.current = new Set(ids.length >= 2 && ids.includes(layerId) ? ids : [layerId])
     if (ids.length < 2 || !ids.includes(layerId)) return
     const stage = stageRef.current
     if (!stage) return
@@ -135,11 +159,17 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
     }
     multiDragRef.current = { draggingId: layerId, startX: node.x(), startY: node.y(), startPositions }
   }, [stageRef])
+
   const handleContentLayerDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
-    if (!multiDragRef.current) return
-    const drag = multiDragRef.current
     const node = e.target as Konva.Node
-    if (node.id() !== `layer-${drag.draggingId}`) return
+    if (!node.id().startsWith('layer-')) return
+
+    // Snap first, then measure: the followers in a multi-selection have to move
+    // by the corrected distance, or the selection tears apart on every snap.
+    snapNode(node, movingIdsRef.current)
+
+    const drag = multiDragRef.current
+    if (!drag || node.id() !== `layer-${drag.draggingId}`) return
     const dx = node.x() - drag.startX
     const dy = node.y() - drag.startY
     const stage = stageRef.current
@@ -148,17 +178,19 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
       const otherNode = stage.findOne(`#layer-${id}`) as Konva.Node | undefined
       if (otherNode) { otherNode.x(pos.nodeX + dx); otherNode.y(pos.nodeY + dy) }
     }
-  }, [stageRef])
+  }, [stageRef, snapNode])
+
   const handleContentLayerDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
-    if (!multiDragRef.current) return
+    clearGuides()
     const drag = multiDragRef.current
+    if (!drag) return
     const node = e.target as Konva.Node
     if (node.id() !== `layer-${drag.draggingId}`) return
     const dx = node.x() - drag.startX
     const dy = node.y() - drag.startY
     for (const [id, pos] of drag.startPositions) updateLayer(id, { x: pos.layerX + dx, y: pos.layerY + dy } as Partial<AppLayer>)
     multiDragRef.current = null
-  }, [updateLayer])
+  }, [updateLayer, clearGuides])
 
   const gridLines: React.ReactNode[] = []
   if (showGrid) {
@@ -174,6 +206,17 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
         <Layer listening={false}>{gridLines}</Layer>
         <Layer>{group.layers.filter((layer) => layer.type === 'background').map(renderStageLayerItem)}</Layer>
         <Layer listening={!selectedBackgroundLayer} onDragStart={handleContentLayerDragStart} onDragMove={handleContentLayerDragMove} onDragEnd={handleContentLayerDragEnd}>{group.layers.filter((layer) => layer.type !== 'background').map(renderStageLayerItem)}</Layer>
+        <Layer listening={false}>
+          {/* Alignment guides. Drawn above the artwork but below the
+              transformer, in canvas coordinates, with widths divided by zoom so
+              they stay hairlines at any magnification. */}
+          {guides.vertical.map((x) => (
+            <Line key={`snap-v-${x}`} points={[x, 0, x, totalHeight]} stroke="#ec4899" strokeWidth={1 / zoom} listening={false} perfectDrawEnabled={false} />
+          ))}
+          {guides.horizontal.map((y) => (
+            <Line key={`snap-h-${y}`} points={[0, y, totalWidth, y]} stroke="#ec4899" strokeWidth={1 / zoom} listening={false} perfectDrawEnabled={false} />
+          ))}
+        </Layer>
         <Layer>
           <Transformer ref={groupOutlineRef} enabledAnchors={[]} rotateEnabled={false} borderStroke="rgba(255,255,255,0.65)" borderStrokeWidth={1.5} borderDash={[6, 4]} anchorSize={0} listening={false} />
           {rbRect && rbRect.w > 2 && rbRect.h > 2 && <Rect x={rbRect.x} y={rbRect.y} width={rbRect.w} height={rbRect.h} fill="rgba(124,110,246,0.08)" stroke="rgba(124,110,246,0.7)" strokeWidth={1 / zoom} dash={[4 / zoom, 3 / zoom]} listening={false} />}

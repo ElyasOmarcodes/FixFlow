@@ -1,4 +1,5 @@
 import type { EditorStore, EditorSet, EditorGet } from '../types'
+import { persistSmartSnap } from '../workspacePrefs'
 
 export const createSelectionSlice = (
   set: EditorSet,
@@ -15,6 +16,7 @@ export const createSelectionSlice = (
   | 'setViewportPosition'
   | 'toggleGrid'
   | 'toggleSeamGuides'
+  | 'toggleSmartSnap'
   | 'startTextEdit'
   | 'stopTextEdit'
   | 'setPendingContentFocus'
@@ -65,6 +67,11 @@ export const createSelectionSlice = (
   setViewportPosition: (x, y) => set({ viewportX: x, viewportY: y }),
   toggleGrid: () => set((s) => ({ showGrid: !s.showGrid })),
   toggleSeamGuides: () => set((s) => ({ showSeamGuides: !s.showSeamGuides })),
+  toggleSmartSnap: () => set((s) => {
+    const smartSnap = !s.smartSnap
+    persistSmartSnap(smartSnap)
+    return { smartSnap }
+  }),
 
   // ─ Group editing mode
   enterGroupEdit: (groupId) => {

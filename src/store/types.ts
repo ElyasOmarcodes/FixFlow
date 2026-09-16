@@ -25,6 +25,13 @@ export interface EditorStore {
   viewportY: number  // stage y offset in screen pixels
   showGrid: boolean
   showSeamGuides: boolean
+  /**
+   * Snap a dragged layer to the edges and centres of the other layers, and to
+   * the canvas. A workspace preference rather than project data: it describes
+   * how this person likes to work, not what the design is, so it must not
+   * travel with an exported project.
+   */
+  smartSnap: boolean
   /** ID of the group currently being edited (PowerPoint-style group enter) */
   editingGroupId: string | null
   /** Multi-selection for grouping operations */
@@ -158,6 +165,7 @@ export interface EditorStore {
   setViewportPosition: (x: number, y: number) => void
   toggleGrid: () => void
   toggleSeamGuides: () => void
+  toggleSmartSnap: () => void
 
   // ─ Group actions
   createGroup: (layerIds: string[]) => void

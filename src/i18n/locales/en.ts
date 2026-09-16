@@ -118,6 +118,8 @@ export const en = {
   'toolbar.renameProject': 'Click to rename project',
   'toolbar.saved': 'Saved',
   'toolbar.saving': 'Saving…',
+  'toolbar.smartSnap': 'Snap',
+  'toolbar.smartSnapTitle': 'Smart snap — align layers to each other and to the canvas while dragging',
   'toolbar.settings': 'Settings',
   'toolbar.settingsTitle': 'Open settings',
   'toolbar.templates': 'Templates',
