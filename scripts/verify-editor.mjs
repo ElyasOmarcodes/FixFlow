@@ -117,7 +117,9 @@ try {
       }
       await page.locator('.pd-toolbar').getByTitle(lang === 'ps' ? 'مرسته او د کیبورډ لنډ لارې' : 'راهنما و کلیدهای میان‌بر').click()
       await expect(page.getByRole('dialog', { name: title })).toBeVisible()
-      if (width < 1024) await page.getByRole('dialog').locator('select').selectOption('ai-features')
+      // Help switches navigation at md (768px), independently of the editor shell.
+      const chapterSelect = page.getByRole('dialog').locator('select')
+      if (await chapterSelect.isVisible()) await chapterSelect.selectOption('ai-features')
       else await page.getByRole('dialog').getByRole('button', { name: new RegExp(aiTitle) }).click()
       await expect(page.getByRole('heading', { name: aiTitle })).toBeVisible()
       await page.screenshot({ path: `test-results/editor/guide-${lang}-${width}.png` })
