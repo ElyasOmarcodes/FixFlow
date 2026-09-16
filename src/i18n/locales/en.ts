@@ -170,6 +170,8 @@ export const en = {
   'slides.addGroup': 'Add slide group',
   'slides.compensate': 'Compensate',
   'slides.gap': 'Gap',
+  'slides.count': 'Slides per canvas',
+  'slides.options': 'Slide options',
   'slides.preview': 'Preview Slides',
   'slides.single': 'Single',
   'slides.title': 'Slides',

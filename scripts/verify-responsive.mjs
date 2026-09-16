@@ -44,6 +44,84 @@ try {
       await expect(page.locator('#mobile-properties')).toBeVisible()
       await page.locator('#mobile-properties .pd-panel-close').click()
     }
+    // ── Slide options ─────────────────────────────────────────────────────
+    // On a desktop these are a labelled column; on a phone they are the first
+    // card in the slide strip. Either way the surface they open has to fit and
+    // has to close — the old compact form was a floating panel over the canvas
+    // that answered neither Escape nor a press outside it.
+    if (width < 1024) {
+      const optionsCard = page.locator('.pd-slide-options-card')
+      await expect(optionsCard).toHaveCount(1)
+      const strip = await page.locator('.pd-slide-thumbnails').boundingBox()
+      const cardBox = await optionsCard.boundingBox()
+      // It rides inside the strip, like the slide cards beside it.
+      expect(cardBox.y).toBeGreaterThanOrEqual(strip.y - 2)
+      expect(cardBox.y + cardBox.height).toBeLessThanOrEqual(strip.y + strip.height + 2)
+
+      await optionsCard.click()
+      const popover = page.locator('.pd-slide-options-popover')
+      await expect(popover).toBeVisible()
+      const popBox = await popover.boundingBox()
+      expect(popBox.x).toBeGreaterThanOrEqual(0)
+      expect(popBox.y).toBeGreaterThanOrEqual(0)
+      expect(popBox.x + popBox.width).toBeLessThanOrEqual(width + 1)
+      expect(popBox.y + popBox.height).toBeLessThanOrEqual(height + 1)
+      await page.keyboard.press('Escape')
+      await expect(popover).toHaveCount(0)
+      await optionsCard.click()
+      await expect(popover).toBeVisible()
+      await page.mouse.click(Math.round(width / 2), 120)
+      await expect(popover).toHaveCount(0)
+    } else {
+      await expect(page.locator('.pd-slide-options')).toHaveCount(1)
+      await expect(page.locator('.pd-slide-options-card')).toHaveCount(0)
+    }
+
+    // ── Canvas-format menu ────────────────────────────────────────────────
+    // It lists every preset family, so its natural height is ~1000px. It must
+    // be clamped to the viewport and scroll, not run off the bottom — when the
+    // clamp was invalid CSS the last entries, including "Custom size…" and the
+    // whole custom-size dialog behind it, were simply unreachable (the body
+    // does not scroll).
+    await page.getByTitle('Add a canvas format').click()
+    const formatMenu = page.locator('[aria-label="Create new layout"]').locator('..')
+    await expect(formatMenu).toBeVisible()
+    const menuMetrics = await formatMenu.evaluate((node) => {
+      const rect = node.getBoundingClientRect()
+      return {
+        top: rect.top,
+        bottom: rect.bottom,
+        right: rect.right,
+        left: rect.left,
+        scrollable: node.scrollHeight > node.clientHeight + 1,
+      }
+    })
+    expect(menuMetrics.top).toBeGreaterThanOrEqual(0)
+    expect(menuMetrics.bottom).toBeLessThanOrEqual(height + 1)
+    expect(menuMetrics.left).toBeGreaterThanOrEqual(0)
+    expect(menuMetrics.right).toBeLessThanOrEqual(width + 1)
+    expect(menuMetrics.scrollable).toBe(true)
+    // The last item is reachable by scrolling the menu itself.
+    const customSize = page.getByRole('button', { name: 'Custom size…', exact: true })
+    await customSize.scrollIntoViewIfNeeded()
+    await customSize.click()
+    const dpi = page.getByLabel('DPI')
+    await expect(dpi).toBeVisible()
+    const dpiBox = await dpi.boundingBox()
+    expect(dpiBox.y).toBeGreaterThanOrEqual(0)
+    expect(dpiBox.y + dpiBox.height).toBeLessThanOrEqual(height + 1)
+    expect(dpiBox.x + dpiBox.width).toBeLessThanOrEqual(width + 1)
+    await page.screenshot({ path: `test-results/responsive/format-menu-${width}x${height}.png` })
+    // Escape must shut it — every other dismissible surface in the editor
+    // answers Escape, and these menus used to ignore it entirely.
+    await page.keyboard.press('Escape')
+    await expect(page.getByLabel('DPI')).toHaveCount(0)
+    // And so must a press outside it.
+    await page.getByTitle('Add a canvas format').click()
+    await expect(formatMenu).toBeVisible()
+    await page.mouse.click(width - 6, height - 6)
+    await expect(formatMenu).toHaveCount(0)
+
     await page.screenshot({ path: `test-results/responsive/${width}x${height}.png` })
     await page.locator(width < 1024 ? '.pd-mobile-header' : '.pd-toolbar').getByRole('button', { name: 'Export', exact: true }).click()
     const dialog = page.getByRole('dialog')

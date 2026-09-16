@@ -165,6 +165,8 @@ export const fa: Record<TranslationKey, string> = {
   'slides.addGroup': 'گروه اسلاید جدید',
   'slides.compensate': 'جبران',
   'slides.gap': 'فاصله',
+  'slides.count': 'اسلایدها در هر بوم',
+  'slides.options': 'گزینه‌های اسلاید',
   'slides.preview': 'پیش‌نمایش اسلایدها',
   'slides.single': 'تک',
   'slides.title': 'اسلایدها',

@@ -694,13 +694,6 @@
 .pd-mobile-header { display: none; }
 .pd-mobile-nav, .pd-panel-close { display: none; }
 
-.pd-slide-options summary {
-  font-size: 10px;
-  color: #8f90a3;
-  list-style: none;
-  pointer-events: none;
-}
-
 /* ── Floating canvas controls ──────────────────────────────────────────────
    Two clusters share the bottom of the stage: the zoom pill and, when
    something is selected, the action toolbar. On a desktop canvas they sit
@@ -1318,6 +1311,81 @@
   .pd-more-exiting .pd-more-sheet { animation: pd-pop-out var(--pd-dur-fast) var(--pd-ease-accel) both; }
 }
 
+
+/* ── Slide options card ────────────────────────────────────────────────────
+   The compact form of the slide-count controls: a card the size of a slide
+   thumbnail at the head of the strip, opening a popover *upward* so it never
+   lands off the bottom of the screen. */
+.pd-slide-options-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 46px;
+  padding: 4px 8px;
+  border: 1px dashed var(--pd-field-border-hover);
+  border-radius: 8px;
+  background: var(--pd-c-0f0f13);
+  color: var(--pd-c-a0a0b0);
+  font-size: 10px;
+  font-weight: 600;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-slide-options-card:hover,
+.pd-slide-options-card[aria-expanded='true'] {
+  border-color: var(--pd-accent);
+  border-style: solid;
+  color: var(--pd-c-c4b5fd);
+  background: var(--pd-accent-wash);
+}
+
+.pd-slide-options-card:active { transform: scale(0.94); }
+
+.pd-slide-options-popover {
+  position: fixed;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(240px, calc(100vw - 16px));
+  padding: 12px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 14px;
+  background: var(--pd-panel);
+  box-shadow: var(--pd-shadow-popover);
+  transform-origin: bottom center;
+  animation: pd-pop-in var(--pd-dur-fast) var(--pd-ease-decel) both;
+}
+
+.pd-slide-options-popover header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pd-c-a0a0b0);
+}
+
+.pd-slide-options-popover header button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: -6px;
+  border-radius: 50%;
+  color: var(--pd-c-6b6b7a);
+  transition: background-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-slide-options-popover header button:active { background: var(--pd-hover); }
+
 /* ─── 7. Writing direction ─────────────────────────────────────────────────
    Everything above uses logical properties, so this section only has to
    handle what CSS cannot express logically: transforms, physical gradients
@@ -1538,38 +1606,9 @@
     background: var(--pd-panel);
   }
 
-  .pd-slide-thumbnails { grid-column: 1 / -1; grid-row: 1; min-height: 42px; max-height: 54px; }
-
-  .pd-slide-options {
-    display: flex !important;
-    grid-column: 1 / -1;
-    width: auto;
-    border: 0;
-    padding: 0;
-    min-width: 0;
-  }
-
-  .pd-slide-options summary {
-    pointer-events: auto;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .pd-slide-options:not([open]) > :not(summary) { display: none; }
-  .pd-slide-options[open] > :not(summary) { position: relative; padding: 6px; background: var(--pd-panel); }
-  .pd-slide-options[open] {
-    position: absolute;
-    bottom: 0;
-    inset-inline-start: 8px;
-    z-index: 25;
-    border: 1px solid var(--pd-field-border-hover);
-    border-radius: 8px;
-    padding: 8px;
-    background: var(--pd-panel);
-    animation: pd-pop-in var(--pd-dur-fast) var(--pd-ease-decel) both;
-  }
+  /* One row now: the options card rides at the head of the strip. */
+  .pd-slides { grid-template-columns: minmax(0, 1fr); }
+  .pd-slide-thumbnails { grid-column: 1 / -1; grid-row: 1; min-height: 42px; max-height: 58px; }
 
   /* The selection toolbar is nearly as wide as the canvas here, so side by
      side is not an option — it rides above the zoom pill instead. */

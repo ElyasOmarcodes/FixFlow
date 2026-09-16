@@ -31,6 +31,15 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Icon } from '@/components/ui/Icon'
 import { useT } from '@/i18n'
 
+/**
+ * Closes a popover on a press outside it or on Escape.
+ *
+ * `pointerdown` rather than `mousedown`: touch browsers synthesise mouse events
+ * only after the gesture finishes, and not at all when the tap is consumed, so
+ * a menu could be left open by a tap that clearly meant to dismiss it. Escape
+ * is handled here too — every other dismissible surface in the editor answers
+ * it, and these menus did not.
+ */
 function useDismissOnOutsideClick(
   open: boolean,
   refs: React.RefObject<HTMLDivElement | null> | React.RefObject<HTMLDivElement | null>[],
@@ -38,12 +47,24 @@ function useDismissOnOutsideClick(
 ) {
   useEffect(() => {
     if (!open) return
-    const handlePointerDown = (event: MouseEvent) => {
+    const handlePointerDown = (event: PointerEvent) => {
       const targets = Array.isArray(refs) ? refs : [refs]
       if (!targets.some((ref) => ref.current?.contains(event.target as Node))) close()
     }
-    document.addEventListener('mousedown', handlePointerDown)
-    return () => document.removeEventListener('mousedown', handlePointerDown)
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      // Stop the editor's own Escape handling (exit group edit, clear
+      // selection) from also firing behind a menu the user only meant to shut.
+      event.stopPropagation()
+      close()
+    }
+    document.addEventListener('pointerdown', handlePointerDown)
+    // Capture phase, so this runs before the window-level editor shortcut.
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
   }, [open, refs, close])
 }
 
@@ -233,6 +254,14 @@ export function EditingContextBar() {
   const [customH, setCustomH] = useState('')
   const [customDpi, setCustomDpi] = useState('96')
   const [formatMenuPosition, setFormatMenuPosition] = useState({ left: 0, top: 0 })
+  /**
+   * How tall the format menu may grow before it runs off the bottom of the
+   * screen. Derived from where it opens rather than hard-coded, because the
+   * editing bar sits at a different height on a phone than on a desktop.
+   * `dvh` rather than `vh`: on Android the URL bar makes `vh` taller than what
+   * is actually visible, which is exactly the case this guards against.
+   */
+  const formatMenuMaxHeight = `calc(100dvh - ${Math.round(formatMenuPosition.top) + 16}px)`
   const dropdownRef = useRef<HTMLDivElement>(null)
   const formatMenuRef = useRef<HTMLDivElement>(null)
   const actionsRef = useRef<HTMLDivElement>(null)
@@ -322,7 +351,8 @@ export function EditingContextBar() {
   }
   const openFormatMenu = () => {
     const rect = dropdownRef.current?.getBoundingClientRect()
-    if (rect) setFormatMenuPosition({ left: Math.max(8, Math.min(rect.left, window.innerWidth - 290)), top: rect.bottom + 4 })
+    const menuWidth = Math.min(280, window.innerWidth - 16)
+    if (rect) setFormatMenuPosition({ left: Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8)), top: rect.bottom + 4 })
     setDropdownOpen((open) => !open)
   }
   const runFormatAction = (action: (format: CanvasFormatId) => void) => {
@@ -519,7 +549,10 @@ export function EditingContextBar() {
               style={{ left: formatMenuPosition.left, top: formatMenuPosition.top }}
             >
             {dropdownOpen && (
-              <div className="absolute start-0 top-full z-50 mt-1 min-w-[250px] max-h-[min(30rem,calc(100vh-5rem))] overflow-y-auto rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] py-1 shadow-xl">
+              <div
+                className="z-50 mt-1 w-[min(280px,calc(100vw-16px))] overflow-y-auto overscroll-contain rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] py-1 shadow-xl"
+                style={{ maxHeight: formatMenuMaxHeight }}
+              >
                 {uncreatedFormats.length > 0 && <section aria-label="Create new layout">
                   <p className="px-3 pb-1 pt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#fbbf24]">Create new layout</p>
                   {renderFormatMenuFamilies(uncreatedFormats, (formatId) => {
@@ -546,7 +579,10 @@ export function EditingContextBar() {
               </div>
             )}
             {showCustomInput && (
-              <div className="absolute start-0 top-full z-50 mt-1 min-w-[210px] rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] p-3 shadow-xl">
+              <div
+                className="z-50 mt-1 w-[min(260px,calc(100vw-16px))] overflow-y-auto overscroll-contain rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#1e1e2a] p-3 shadow-xl"
+                style={{ maxHeight: formatMenuMaxHeight }}
+              >
                 <p className="mb-2 text-[10px] text-[var(--pd-c-6b6b7a)]">Custom canvas format</p>
                 <input
                   type="text"

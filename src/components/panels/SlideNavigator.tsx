@@ -9,11 +9,11 @@ import { CSS } from '@dnd-kit/utilities'
 import { useEditorStore } from '@/store'
 import { fillToCss } from '@/utils/gradients'
 import { BASE_CANVAS_FORMAT, getFormatCanvasDims, getProjectBaseFormat, selectFormatViewGroups } from '@/utils/canvasFormats'
-import { MAX_PANO_COMPENSATION_PX } from '@/utils/panoGeometry'
+import { SlideOptionsCard, SlideOptionsControls } from '@/components/panels/slides/SlideOptionsCard'
 import type { BackgroundLayer, SlideGroup } from '@/types'
 import type { ThumbnailMap } from '@/hooks/useThumbnails'
 import { Icon } from '@/components/ui/Icon'
-import { useT, type TranslationKey } from '@/i18n'
+import { useT } from '@/i18n'
 
 interface ContextMenu {
   groupId: string
@@ -27,12 +27,6 @@ interface SlideNavigatorProps {
   stageRef: React.RefObject<Konva.Stage | null>
   onCaptureThumbnail: (groupId: string) => void
 }
-
-const NUM_SLIDES_OPTIONS: { value: number; labelKey: TranslationKey; suffix?: string }[] = [
-  { value: 1, labelKey: 'slides.single' },
-  { value: 2, labelKey: 'slides.title', suffix: '×2' },
-  { value: 3, labelKey: 'slides.title', suffix: '×3' },
-]
 
 type FlatSlide = {
   group: SlideGroup
@@ -216,7 +210,6 @@ function SortableGroupItem({
 
 export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }: SlideNavigatorProps) {
   const compact = useCompactLayout()
-  const [slideOptionsOpen, setSlideOptionsOpen] = useState(false)
   const t = useT()
   const {
     project,
@@ -364,55 +357,35 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
       style={{ background: 'var(--pd-c-18181f)', borderColor }}
     >
       {/* Width follows the responsive LayersPanel width, less this footer's 12px inset. */}
-      <details open={!compact || slideOptionsOpen} className="pd-slide-options flex w-[196px] shrink-0 flex-col gap-1.5 border-r border-[rgba(255,255,255,0.06)] pr-3 min-[1440px]:w-[212px]">
-        <summary onClick={(event) => { event.preventDefault(); if (compact) setSlideOptionsOpen(!slideOptionsOpen) }}>{t('slides.title')}</summary>
-        {activeGroup && (
-          <div className="flex items-center gap-1.5">
-            {NUM_SLIDES_OPTIONS.map(({ value, labelKey, suffix }) => (
-              <button
-                key={value}
-                onClick={() => updateSlideGroup(activeGroup.id, { numSlides: value })}
-                className={`text-[11px] px-2 py-1 rounded border transition-colors ${
-                  activeGroup.numSlides === value
-                    ? 'bg-[var(--pd-c-7c6ef6)] border-[var(--pd-c-7c6ef6)] text-white'
-                    : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.15)]'
-                }`}
-              >
-                {suffix ?? t(labelKey)}
-              </button>
-            ))}
-          </div>
-        )}
-        {/* Always rendered (even with no pano groups) so this column's height never
-            shifts the numSlides buttons when switching between Single/Pano/Strip. */}
-        <label
-          className={`flex items-center gap-1.5 text-[10px] ${hasPano ? 'text-[var(--pd-c-6b6b7a)]' : 'text-[#4a4a57]'}`}
+      {/* Desktop keeps the labelled column; a phone gets the card in the strip
+          below, because this column has nowhere to go at that width. */}
+      {!compact && (
+        <section
+          aria-label={t('slides.options')}
+          className="pd-slide-options flex w-[196px] shrink-0 flex-col gap-1.5 border-e border-[rgba(255,255,255,0.06)] pe-3 min-[1440px]:w-[212px]"
         >
-          <input
-            type="checkbox"
-            checked={hasPano && panoSettings.compensate}
-            disabled={!hasPano}
-            onChange={(e) => updatePanoSettings({ compensate: e.target.checked })}
-            className="h-3 w-3 accent-[var(--pd-c-7c6ef6)] disabled:opacity-40 disabled:cursor-not-allowed"
-            title="When enabled, export/preview skip this gap between slides"
+          <p className="text-[10px] text-[#8f90a3]">{t('slides.title')}</p>
+          <SlideOptionsControls
+            activeGroup={activeGroup}
+            hasPano={hasPano}
+            panoSettings={panoSettings}
+            onSetNumSlides={(value) => activeGroup && updateSlideGroup(activeGroup.id, { numSlides: value })}
+            onUpdatePano={updatePanoSettings}
           />
-          <span>{t('slides.compensate')}</span>
-          <span className="ms-1">{t('slides.gap')}</span>
-          <input
-            type="number"
-            min={0}
-            max={MAX_PANO_COMPENSATION_PX}
-            value={panoSettings.gapPx}
-            disabled={!hasPano}
-            onChange={(e) => updatePanoSettings({ gapPx: parseInt(e.target.value, 10) || 0 })}
-            className="w-12 rounded border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Store preview gap shown in editor and preview"
-          />
-          <span>px</span>
-        </label>
-      </details>
+        </section>
+      )}
 
       <div className="pd-slide-thumbnails flex items-center gap-2 flex-1 overflow-x-auto min-w-0">
+        {compact && (
+          <SlideOptionsCard
+            activeGroup={activeGroup}
+            hasPano={hasPano}
+            panoSettings={panoSettings}
+            thumbHeight={THUMB_H}
+            onSetNumSlides={(value) => activeGroup && updateSlideGroup(activeGroup.id, { numSlides: value })}
+            onUpdatePano={updatePanoSettings}
+          />
+        )}
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={visibleGroups.map((g) => g.id)} strategy={horizontalListSortingStrategy}>
             {visibleGroups.map((group, groupIdx) => {

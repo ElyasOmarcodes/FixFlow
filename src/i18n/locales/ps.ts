@@ -165,6 +165,8 @@ export const ps: Record<TranslationKey, string> = {
   'slides.addGroup': 'د سلایډ نوې ډله',
   'slides.compensate': 'جبران',
   'slides.gap': 'واټن',
+  'slides.count': 'په یوه کانواس کې سلایډونه',
+  'slides.options': 'د سلایډ اختیارونه',
   'slides.preview': 'سلایډونه وګوره',
   'slides.single': 'یوازینی',
   'slides.title': 'سلایډونه',
