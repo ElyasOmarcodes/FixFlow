@@ -387,6 +387,37 @@ jobs:
       - name: List what will be published
         run: ls -lh artifacts/
 
+      # Every release carries exactly what this run built, and nothing else.
+      #
+      # action-gh-release overwrites an asset of the same name but leaves any
+      # other file already attached, so re-running a release accumulated the
+      # previous version's installers beside the new ones — v0.10.0 went out
+      # with three v0.9.0 files on it. Clearing first makes the asset list a
+      # statement about this build rather than a pile of everything ever
+      # uploaded under that tag.
+      #
+      # A no-op on a first release: there is no release yet, and `gh` exiting
+      # non-zero for "not found" must not fail the job.
+      - name: Remove any assets already on this tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "No existing release for $TAG — nothing to clear."
+            exit 0
+          fi
+          mapfile -t stale < <(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
+          if [ ${#stale[@]} -eq 0 ]; then
+            echo "$TAG has no assets — nothing to clear."
+            exit 0
+          fi
+          for asset in "${stale[@]}"; do
+            echo "Deleting stale asset: $asset"
+            gh release delete-asset "$TAG" "$asset" --repo "$GITHUB_REPOSITORY" --yes
+          done
+
       - uses: softprops/action-gh-release@v2
         with:
           # Empty on a tag push, where the action reads the tag from the ref.

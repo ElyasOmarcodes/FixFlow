@@ -7,6 +7,28 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.11.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.11.0) - 2026-09-17
+
+### Added
+
+- **The whole Google icon catalogue.** The online tab searched a hand-picked list of 159 names; it now carries all 4,403 Material Symbols from fonts.google.com/icons, in the three styles Google draws them in (outlined, rounded, sharp), across the fill axis and the seven weights. The names are bundled — Google's metadata endpoint sends no CORS header, so a browser cannot read it and a search box backed by it would always be empty — and they load as their own lazy chunk, so the main bundle grows by 6 KB rather than 74. Only the geometry of the icon you actually pick is fetched. Search ranks an exact name first, then a match at the start of a word, then one buried inside one, so "car" offers `car` and `car_rental` before `scorecard`.
+- **Android hardware integration.** Back unwinds the surface stack in the order you opened things; pressing a control answers in the hand; the status bar follows the app's theme; the keyboard's height is published to the layout so sheets sit above it rather than under it.
+- **A written answer to "what does an API key get me".** The AI help chapter now covers each feature, how to choose a provider, what it costs, and what every error the app can show actually means — in English, Pashto and Persian.
+
+### Changed
+
+- **A chip's icon side is an explicit left or right.** It was `start`/`end`, which reads as writing-direction relative and never was: the design canvas is pinned left-to-right so the exported PNG does not change with the interface language. Projects that stored the old values are migrated on load.
+- **The format-scoped warning is shown once.** The yellow frame around the canvas and the banner under the toolbar reappeared on every switch away from Base. Each kind of scoping now announces itself the first time and then stays quiet.
+- **Launch order is splash → projects page, always.** The start screen is a lazy chunk and the splash did not wait for it, so on a slow connection the editor showed through in between. It is preloaded under the splash instead.
+- **Slide thumbnails in the navigator are real buttons** — as bare `div`s the primary way to move between slides was invisible to the keyboard and to a screen reader.
+
+### Fixed
+
+- **Dialogs no longer open behind the mobile panels.** `ModalShell` defaulted to `z-50` while the side sheets are `z-60`, so the icon picker opened from the properties sheet was underneath it and the sheet had to be closed to reach it. Other dialogs had papered over the same clash with `z-[9999]`, which is why some opened correctly and some did not. There is now one z-index scale in the design tokens and nothing outside it.
+- **Controls that broke in the light theme.** Style › Shadow's switch was a white knob on a near-white track: the component took six styling props and every call site passed its own, so they had drifted — one knob stopped short of the track end, and the Shadow one was a bespoke 44×24 built from hardcoded dark-theme colours. The switch is now closed and sized by a prop. The same hardcoded-dark problem left the gradient colour block a black hole in the middle of a light panel and the Help chapter's bold text a pale grey on white; translucent hairlines, fills, text colours and the semantic colours are all tokens that invert with the theme.
+- **Releases no longer accumulate old installers.** The Cargo cache covers `src-tauri/target`, which is also where the bundler writes, so a restored cache carried the previous release's `bundle/` directory and the collect step picked up both versions — v0.10.0 published with three v0.9.0 files attached. The bundle directory is cleared before each build, collection asserts every file carries the current version, and the release job removes any asset already on the tag before uploading, so a release is exactly what that run produced.
+- **Web behaviours that gave the WebView away**: long-press raising the browser's own menu over the app's, a stray file drop navigating the editor away, a pinch scaling the page under the canvas, and focusing a field zooming the viewport to a scale the app could not undo.
+
 ## [0.10.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.10.0) - 2026-09-17
 
 ### Added
