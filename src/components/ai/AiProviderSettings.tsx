@@ -7,7 +7,7 @@ import type { AiModel, AiProvider } from '@/ai/providers'
 import { Icon } from '@/components/ui/Icon'
 
 const inputCls =
-  'bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-3 py-2 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
+  'bg-[var(--pd-c-0f0f13)] border border-[var(--pd-line)] rounded px-3 py-2 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[var(--pd-accent-soft)]'
 const monoInputCls = `${inputCls} font-mono`
 const labelCls = 'text-[11px] text-[var(--pd-c-6b6b7a)] mb-1 block uppercase tracking-[0.08em]'
 
@@ -150,8 +150,8 @@ export function AiProviderSettings() {
               }}
               className={`rounded-lg border px-2 py-2 text-xs transition-colors text-start ${
                 provider === item.id
-                  ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-                  : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]'
+                  ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+                  : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)]'
               }`}
             >
               <span className="block font-medium">{item.shortLabel}</span>
@@ -204,7 +204,7 @@ export function AiProviderSettings() {
           type="button"
           onClick={() => void runConnectionTest()}
           disabled={!hasActiveKey || !activeModel || visibleTestState === 'testing'}
-          className="rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] disabled:opacity-40 disabled:cursor-not-allowed"
+          className="rounded-md border border-[var(--pd-line-strong)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {visibleTestState === 'testing' ? 'Testing…' : 'Test Connection'}
         </button>
@@ -218,11 +218,11 @@ export function AiProviderSettings() {
         )}
         {visibleTestState === 'error' && (
           <div className="mt-2 rounded-lg border border-[rgba(248,113,113,0.25)] bg-[rgba(248,113,113,0.08)] px-3 py-3">
-            <p className="text-xs text-[#fca5a5] leading-relaxed">{testError}</p>
+            <p className="text-xs text-[var(--pd-danger-soft)] leading-relaxed">{testError}</p>
             <button
               type="button"
               onClick={() => void runConnectionTest()}
-              className="mt-3 rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]"
+              className="mt-3 rounded-md border border-[var(--pd-line-strong)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)]"
             >
               Retry
             </button>
@@ -230,13 +230,13 @@ export function AiProviderSettings() {
         )}
       </div>
 
-      <div className="mb-4 rounded-xl border border-[rgba(255,255,255,0.08)] p-3 bg-[rgba(255,255,255,0.02)]">
+      <div className="mb-4 rounded-xl border border-[var(--pd-line-soft)] p-3 bg-[var(--pd-fill)]">
         <div className="flex items-center justify-between gap-3 mb-2">
           <label className={labelCls + ' !mb-0'}>Model</label>
           <span className="text-[10px] text-[var(--pd-c-6b6b7a)]">{modelStatus}</span>
         </div>
         {!hasActiveKey ? (
-          <p className="rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
+          <p className="rounded-lg border border-[var(--pd-line-soft)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
             Add an API key to connect to {activeProvider.label}. PixelDeck will load the model list from the provider after the connection is available.
           </p>
         ) : (
@@ -250,19 +250,19 @@ export function AiProviderSettings() {
               autoComplete="off"
             />
             {loadingModels ? (
-              <p className="rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
+              <p className="rounded-lg border border-[var(--pd-line-soft)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
                 Connecting to {activeProvider.label} and loading models…
               </p>
             ) : activeModelError ? (
               <div className="rounded-lg border border-[rgba(248,113,113,0.25)] bg-[rgba(248,113,113,0.08)] px-3 py-3">
-                <p className="text-xs text-[#fca5a5] leading-relaxed">
+                <p className="text-xs text-[var(--pd-danger-soft)] leading-relaxed">
                   Could not load models from {activeProvider.label}: {activeModelError}
                 </p>
                 <p className="mt-1 text-[11px] text-[#9ca3af]">No hardcoded fallback models are shown. Check the key/provider and retry.</p>
                 <button
                   type="button"
                   onClick={() => setModelLoadNonce((value) => value + 1)}
-                  className="mt-3 rounded-md border border-[rgba(255,255,255,0.12)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)]"
+                  className="mt-3 rounded-md border border-[var(--pd-line-strong)] px-3 py-1.5 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)]"
                 >
                   Retry connection
                 </button>
@@ -276,16 +276,16 @@ export function AiProviderSettings() {
                   placeholder="Search models from this provider…"
                   className={`${inputCls} mb-2`}
                 />
-                <div className="max-h-48 overflow-y-auto rounded-lg border border-[rgba(255,255,255,0.08)]">
+                <div className="max-h-48 overflow-y-auto rounded-lg border border-[var(--pd-line-soft)]">
                   {filteredModels.length ? filteredModels.map((model) => (
                     <button
                       key={model.id}
                       type="button"
                       onClick={() => setModel(provider, model.id)}
-                      className={`block w-full text-start px-3 py-2 border-b border-[rgba(255,255,255,0.06)] last:border-b-0 transition-colors ${
+                      className={`block w-full text-start px-3 py-2 border-b border-[var(--pd-line-subtle)] last:border-b-0 transition-colors ${
                         activeModel === model.id
                           ? 'bg-[rgba(124,110,246,0.16)] text-[#c4b5fd]'
-                          : 'text-[#b8b8c8] hover:bg-[rgba(255,255,255,0.05)]'
+                          : 'text-[#b8b8c8] hover:bg-[var(--pd-fill-soft)]'
                       }`}
                     >
                       <span className="block text-xs font-medium">{model.name}</span>

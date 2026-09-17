@@ -10,7 +10,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { Icon } from '@/components/ui/Icon'
 
 const inputCls =
-  'bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
+  'bg-[var(--pd-c-0f0f13)] border border-[var(--pd-line)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[var(--pd-accent-soft)]'
 const labelCls = 'text-[11px] text-[var(--pd-c-6b6b7a)] mb-1 block uppercase tracking-[0.08em]'
 const rowCls = 'flex gap-2 mb-3'
 const fieldCls = 'flex-1 min-w-0'
@@ -176,7 +176,7 @@ export function ColorField({
             className={`w-5 h-5 rounded-full border-2 transition-all ${
               activeBrand?.id === bc.id
                 ? 'border-[var(--pd-c-7c6ef6)] scale-110'
-                : 'border-[rgba(255,255,255,0.2)] hover:border-[rgba(255,255,255,0.5)]'
+                : 'border-[var(--pd-line-loud)] hover:border-[var(--pd-line)]'
             }`}
             style={{ background: bc.value }}
           />
@@ -186,7 +186,7 @@ export function ColorField({
             type="button"
             title="Clear brand binding"
             onClick={() => onChange(safeValue)}
-            className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.4)] text-[#9d90f8] hover:text-white hover:border-[var(--pd-c-7c6ef6)] transition-colors"
+            className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] hover:border-[var(--pd-c-7c6ef6)] transition-colors"
           >
             <Icon name="close" size={10} strokeWidth={2.4} /> {activeBrand.name}
           </button>
@@ -203,7 +203,7 @@ export function ColorField({
             onChange(e.target.value)
             scheduleEnd()
           }}
-          className="h-8 w-8 rounded-md cursor-pointer border border-[rgba(255,255,255,0.1)] bg-transparent"
+          className="h-8 w-8 rounded-md cursor-pointer border border-[var(--pd-line)] bg-transparent"
         />
         <input
           type="text"
@@ -290,7 +290,7 @@ function AddBrandColorButton({ currentColor }: { currentColor: string }) {
         type="button"
         title="Save as brand color"
         onClick={() => { setAdding(true); setName('') }}
-        className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-dashed border-[rgba(255,255,255,0.2)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.4)] transition-colors"
+        className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-dashed border-[var(--pd-line-loud)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[var(--pd-line)] transition-colors"
       >
         <Icon name="plus" size={10} strokeWidth={2.4} /> Brand
       </button>
@@ -312,7 +312,7 @@ function AddBrandColorButton({ currentColor }: { currentColor: string }) {
           e.stopPropagation()
         }}
         placeholder="Name…"
-        className="w-20 rounded border border-[rgba(124,110,246,0.5)] bg-[var(--pd-c-0f0f13)] px-1.5 py-0.5 text-[10px] text-[var(--pd-c-e8e8f0)] outline-none"
+        className="w-20 rounded border border-[var(--pd-accent-soft)] bg-[var(--pd-c-0f0f13)] px-1.5 py-0.5 text-[10px] text-[var(--pd-c-e8e8f0)] outline-none"
       />
       <button
         type="button"
@@ -445,10 +445,10 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
           { value: 'radial', label: 'Radial' },
         ]}
         onChange={switchMode}
-        className="grid grid-cols-3 gap-1 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#121219] p-1"
+        className="grid grid-cols-3 gap-1 rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-1"
         optionClassName="rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors"
         activeClassName="bg-[var(--pd-c-7c6ef6)] text-white shadow-[0_8px_24px_rgba(124,110,246,0.35)]"
-        inactiveClassName="text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]"
+        inactiveClassName="text-[var(--pd-c-6b6b7a)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-e8e8f0)]"
       />
 
       {/* ── Swatches tray (all modes) ── */}
@@ -472,7 +472,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                         title={bc.name}
                         onClick={() => onChange(toBrandToken(bc.id))}
                         className={`w-5 h-5 rounded-full border-2 transition-all ${
-                          isActive ? 'border-[var(--pd-c-7c6ef6)] scale-110' : 'border-[rgba(255,255,255,0.2)] hover:border-[rgba(255,255,255,0.5)]'
+                          isActive ? 'border-[var(--pd-c-7c6ef6)] scale-110' : 'border-[var(--pd-line-loud)] hover:border-[var(--pd-line)]'
                         }`}
                         style={{ background: resolveBrandColor(bc.value, brandColors) }}
                       />
@@ -491,14 +491,14 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                         type="button"
                         title={color}
                         onClick={() => onChange(color)}
-                        className="h-5 w-5 rounded border border-[rgba(255,255,255,0.12)] hover:border-[rgba(124,110,246,0.6)] transition-all hover:scale-105"
+                        className="h-5 w-5 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
                         style={{ background: color }}
                       />
                       <button
                         type="button"
                         title="Remove"
                         onClick={() => updateProject({ savedGradients: savedGradients.filter((g) => g !== color) })}
-                        className="absolute -top-1 -right-1 hidden group-hover:flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1a1a2e] border border-[rgba(255,255,255,0.2)] text-[8px] text-[#f87171] hover:text-white leading-none"
+                        className="absolute -top-1 -right-1 hidden group-hover:flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--pd-panel)] border border-[var(--pd-line-loud)] text-[8px] text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] leading-none"
                       >
                         ×
                       </button>
@@ -522,7 +522,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 if (typeof fill === 'string') return
                 updateProject({ savedGradients: [...savedGradients, fill] })
               }}
-              className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
+              className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] hover:border-[var(--pd-accent)]"
             >
               + Save
             </button>
@@ -535,7 +535,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 type="button"
                 title={p.label}
                 onClick={() => onChange(p.fill)}
-                className="h-5 w-9 rounded border border-[rgba(255,255,255,0.12)] hover:border-[rgba(124,110,246,0.6)] transition-all hover:scale-105"
+                className="h-5 w-9 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
                 style={{ background: fillToCss(p.fill) }}
               />
             ))}
@@ -554,14 +554,14 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                     type="button"
                     title="Apply saved gradient"
                     onClick={() => onChange(g)}
-                    className="h-5 w-9 rounded border border-[rgba(255,255,255,0.12)] hover:border-[rgba(124,110,246,0.6)] transition-all hover:scale-105"
+                    className="h-5 w-9 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
                     style={{ background: fillToCss(g) }}
                   />
                   <button
                     type="button"
                     title="Remove"
                     onClick={() => updateProject({ savedGradients: savedGradients.filter((sg) => sg !== g) })}
-                    className="absolute -top-1 -right-1 hidden group-hover:flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1a1a2e] border border-[rgba(255,255,255,0.2)] text-[8px] text-[#f87171] hover:text-white leading-none"
+                    className="absolute -top-1 -right-1 hidden group-hover:flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--pd-panel)] border border-[var(--pd-line-loud)] text-[8px] text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] leading-none"
                   >
                     ×
                   </button>
@@ -582,7 +582,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 type="button"
                 title={p.label}
                 onClick={() => onChange(p.color)}
-                className="h-5 w-5 rounded border border-[rgba(255,255,255,0.12)] hover:border-[rgba(124,110,246,0.6)] transition-all hover:scale-105"
+                className="h-5 w-5 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
                 style={{ background: p.color }}
               />
             ))}
@@ -605,7 +605,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 if (savedGradients.includes(fill)) return
                 updateProject({ savedGradients: [...savedGradients, fill] })
               }}
-              className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
+              className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] hover:border-[var(--pd-accent)]"
             >
               + Save color
             </button>
@@ -618,7 +618,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
             <button
               type="button"
               onClick={addStop}
-              className="text-[11px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors px-1.5 py-0.5 rounded border border-[rgba(124,110,246,0.3)] hover:border-[rgba(124,110,246,0.6)]"
+              className="text-[11px] text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] hover:border-[var(--pd-accent)]"
             >
               + Add stop
             </button>
@@ -669,7 +669,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
             {/* Bar is inset 7px each side to match marker range — barRef drives offset calculation */}
             <div
               ref={barRef}
-              className="absolute bottom-0 h-4 rounded-full border border-[rgba(255,255,255,0.12)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              className="absolute bottom-0 h-4 rounded-full border border-[var(--pd-line-strong)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
               style={{ left: 7, right: 7, background: fillToCss({
                 ...gradient,
                 stops: gradient.stops.map((s) => ({ ...s, color: resolveBrandColor(s.color, brandColors) })),
@@ -677,7 +677,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
             />
           </div>
 
-          <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#101017] p-3 space-y-3">
+          <div className="rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-3 space-y-3">
             <div>
               <label className={labelCls}>Color</label>
               <ColorField
@@ -717,14 +717,14 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
               <button
                 type="button"
                 onClick={deleteStop}
-                className="text-xs text-[#f0b4b4] hover:text-[#ffd0d0] transition-colors"
+                className="text-xs text-[var(--pd-danger)] hover:text-[var(--pd-danger-soft)] transition-colors"
               >
                 Delete stop ×
               </button>
             )}
 
             {isEndStop(selectedStop) && (
-              <p className="text-[10px] text-[#525261]">Fixed stop — position locked</p>
+              <p className="text-[10px] text-[var(--pd-c-6b6b7a)]">Fixed stop — position locked</p>
             )}
           </div>
 
@@ -851,7 +851,7 @@ export function SliderField({
             const v = Number(e.target.value)
             if (!isNaN(v)) onChange(v)
           }}
-          className="w-14 shrink-0 bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-1.5 py-1 text-xs text-[var(--pd-c-e8e8f0)] text-end focus:outline-none focus:border-[rgba(124,110,246,0.5)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-14 shrink-0 bg-[var(--pd-c-0f0f13)] border border-[var(--pd-line)] rounded px-1.5 py-1 text-xs text-[var(--pd-c-e8e8f0)] text-end focus:outline-none focus:border-[var(--pd-accent-soft)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
     </div>

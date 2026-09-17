@@ -17,14 +17,14 @@ describe('layoutChip', () => {
     expect(chip.width).toBe(100 + 28 + 10 + 24 * 2)
   })
 
-  it('puts a start icon before the label', () => {
-    const chip = layoutChip({ ...base, iconSize: 28, iconGap: 10, iconPosition: 'start' })
+  it('puts a left icon before the label', () => {
+    const chip = layoutChip({ ...base, iconSize: 28, iconGap: 10, iconPosition: 'left' })
     expect(chip.iconX).toBe(24)
     expect(chip.textX).toBe(24 + 28 + 10)
   })
 
-  it('puts an end icon after the label', () => {
-    const chip = layoutChip({ ...base, iconSize: 28, iconGap: 10, iconPosition: 'end' })
+  it('puts a right icon after the label', () => {
+    const chip = layoutChip({ ...base, iconSize: 28, iconGap: 10, iconPosition: 'right' })
     expect(chip.textX).toBe(24)
     expect(chip.iconX).toBe(24 + 100 + 10)
   })

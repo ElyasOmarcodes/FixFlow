@@ -38,10 +38,10 @@ export function SortableLayer({
       onContextMenu={(e) => onContextMenu(e, layer.id)}
       className={`group relative flex items-center gap-1 px-2 py-1.5 border-l-2 transition-colors ${
         isSelected
-          ? 'bg-[rgba(124,110,246,0.15)] border-[var(--pd-c-7c6ef6)]'
+          ? 'bg-[var(--pd-accent-wash)] border-[var(--pd-c-7c6ef6)]'
           : isMultiSelected
-            ? 'bg-[rgba(124,110,246,0.06)] border-[rgba(124,110,246,0.4)]'
-            : 'border-transparent hover:bg-[rgba(255,255,255,0.04)]'
+            ? 'bg-[rgba(124,110,246,0.06)] border-[var(--pd-accent-soft)]'
+            : 'border-transparent hover:bg-[var(--pd-fill-subtle)]'
       }`}
       onClick={(e) => { if (e.ctrlKey || e.metaKey) onCtrlSelect(layer.id); else onSelect(layer.id) }}
     >
@@ -49,14 +49,14 @@ export function SortableLayer({
         {...attributes} {...listeners}
         aria-label={`Drag ${layer.name}`}
         style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: 'var(--pd-c-6b6b7a)' }}
-        className="w-4 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
+        className="w-4 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100"
         onClick={(e) => e.stopPropagation()}
       ><Icon name="grip" size={12} /></button>
 
       <button
         aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
         onClick={(e) => { e.stopPropagation(); onVisibilityToggle(layer.id, !layer.visible) }}
-        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0"
+        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0"
         style={{ color: layer.visible ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-3a3a4a)' }}
       >{layer.visible ? <Icon name="eye" size={13} /> : <Icon name="eye-off" size={13} />}</button>
 
@@ -72,14 +72,14 @@ export function SortableLayer({
       <button
         aria-label={layer.locked ? `Unlock ${layer.name}` : `Lock ${layer.name}`}
         onClick={(e) => { e.stopPropagation(); onLockToggle(layer.id, !layer.locked) }}
-        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
+        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100"
         style={{ color: layer.locked ? 'var(--pd-c-e8e8f0)' : '#6b6b7a' }}
       >{layer.locked ? <Icon name="lock" size={12} /> : <Icon name="unlock" size={12} />}</button>
 
       <button
         aria-label={`Open ${layer.name} layer menu`}
         onClick={(e) => { e.stopPropagation(); onMenuOpen(e, layer.id) }}
-        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]"
+        className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]"
       ><Icon name="more-vertical" size={13} /></button>
     </div>
   )
@@ -107,7 +107,7 @@ export function SortableChild({ child, groupId, isSelected, onSelect, onRename }
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
       className={`group/child relative flex items-center gap-1 py-1.5 pr-2 rounded-md transition-colors ${
-        isSelected ? 'bg-[rgba(124,110,246,0.15)]' : 'hover:bg-[rgba(255,255,255,0.04)]'
+        isSelected ? 'bg-[var(--pd-accent-wash)]' : 'hover:bg-[var(--pd-fill-subtle)]'
       }`}
       onClick={(e) => { e.stopPropagation(); onSelect() }}
     >
@@ -119,7 +119,7 @@ export function SortableChild({ child, groupId, isSelected, onSelect, onRename }
         {...attributes} {...listeners}
         aria-label={`Drag ${child.name}`}
         style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: 'var(--pd-c-6b6b7a)' }}
-        className="w-3 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover/child:opacity-100 shrink-0 ml-0.5 rounded hover:bg-[rgba(255,255,255,0.08)]"
+        className="w-3 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover/child:opacity-100 shrink-0 ml-0.5 rounded hover:bg-[var(--pd-fill-strong)]"
         onClick={(e) => e.stopPropagation()}
       ><Icon name="grip" size={12} /></button>
 
@@ -181,9 +181,9 @@ export function SortableGroup({
       onContextMenu={(e) => onContextMenu(e, layer.id)}
       className={`relative border-l-2 transition-colors ${
         isSelected
-          ? 'bg-[rgba(124,110,246,0.15)] border-[var(--pd-c-7c6ef6)]'
+          ? 'bg-[var(--pd-accent-wash)] border-[var(--pd-c-7c6ef6)]'
           : isMultiSelected
-            ? 'bg-[rgba(124,110,246,0.06)] border-[rgba(124,110,246,0.4)]'
+            ? 'bg-[rgba(124,110,246,0.06)] border-[var(--pd-accent-soft)]'
             : 'bg-[rgba(124,110,246,0.06)] border-[rgba(124,110,246,0.28)] hover:bg-[rgba(124,110,246,0.1)]'
       }`}
     >
@@ -196,14 +196,14 @@ export function SortableGroup({
           {...attributes} {...listeners}
           aria-label={`Drag ${layer.name}`}
           style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', color: '#8d84f8' }}
-          className="w-4 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
+          className="w-4 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100"
           onClick={(e) => e.stopPropagation()}
         ><Icon name="grip" size={12} /></button>
 
         <button
           aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
           onClick={(e) => { e.stopPropagation(); onVisibilityToggle(layer.id, !layer.visible) }}
-          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0"
+          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0"
           style={{ color: layer.visible ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-3a3a4a)' }}
         >{layer.visible ? <Icon name="eye" size={13} /> : <Icon name="eye-off" size={13} />}</button>
 
@@ -211,7 +211,7 @@ export function SortableGroup({
           aria-label={isCollapsed ? `Expand ${layer.name}` : `Collapse ${layer.name}`}
           onClick={(e) => { e.stopPropagation(); onToggleCollapse() }}
           title={isCollapsed ? 'Expand group' : 'Collapse group'}
-          className="w-5 h-5 flex items-center justify-center text-[10px] rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 text-[#d8d2ff]"
+          className="w-5 h-5 flex items-center justify-center text-[10px] rounded hover:bg-[var(--pd-fill-strong)] shrink-0 text-[#d8d2ff]"
           style={{ transition: 'transform 0.15s', transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}
         ><Icon name="chevron-down" size={12} /></button>
 
@@ -224,21 +224,21 @@ export function SortableGroup({
           style={{ color: isSelected ? 'var(--pd-c-e8e8f0)' : '#d8d2ff', cursor: 'text' }}
         />
 
-        <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none border border-[rgba(124,110,246,0.28)] bg-[rgba(124,110,246,0.12)] text-[#b6adff]">
+        <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none border border-[rgba(124,110,246,0.28)] bg-[var(--pd-accent-wash)] text-[#b6adff]">
           {layer.children.length}
         </span>
 
         <button
           aria-label={layer.locked ? `Unlock ${layer.name}` : `Lock ${layer.name}`}
           onClick={(e) => { e.stopPropagation(); onLockToggle(layer.id, !layer.locked) }}
-          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100"
+          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100"
           style={{ color: layer.locked ? 'var(--pd-c-e8e8f0)' : '#8a84b6' }}
         >{layer.locked ? <Icon name="lock" size={12} /> : <Icon name="unlock" size={12} />}</button>
 
         <button
           aria-label={`Open ${layer.name} layer menu`}
           onClick={(e) => { e.stopPropagation(); onMenuOpen(e, layer.id) }}
-          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0 opacity-0 group-hover:opacity-100 text-[#8a84b6] hover:text-[var(--pd-c-e8e8f0)]"
+          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100 text-[#8a84b6] hover:text-[var(--pd-c-e8e8f0)]"
         ><Icon name="more-vertical" size={13} /></button>
       </div>
 

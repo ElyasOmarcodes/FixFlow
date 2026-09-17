@@ -22,6 +22,7 @@ import { useEditorStore, useUndoRedo } from '@/store'
 import { resolveGroupView } from '@/utils/canvasFormats'
 import { registerStage } from '@/utils/stageRegistry'
 import { getScopedEditingIndicator } from '@/utils/scopedEditingIndicator'
+import { useScopedNoticesSeen } from '@/utils/scopedEditingNotice'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { useProjectsStore } from '@/store/projects'
 import { shouldShowStartScreenOnLaunch } from '@/utils/startScreenPreference'
@@ -31,10 +32,11 @@ const LocalizationView = lazy(() =>
   import('@/pages/LocalizationView').then((m) => ({ default: m.LocalizationView })),
 )
 
-// Lazy too: after the first launch it may never be opened again.
-const StartScreen = lazy(() =>
-  import('@/pages/StartScreen').then((m) => ({ default: m.StartScreen })),
-)
+// Lazy, but preloaded during the splash whenever it is going to be shown:
+// the launch order has to be splash → projects page, and a chunk that is
+// still in flight when the splash lifts shows the editor in between.
+const loadStartScreen = () => import('@/pages/StartScreen').then((m) => ({ default: m.StartScreen }))
+const StartScreen = lazy(loadStartScreen)
 
 const INITIAL_SPLASH_MIN_MS = 450
 
@@ -80,7 +82,16 @@ export default function App() {
       exitGroupEdit: s.exitGroupEdit,
       editingGroupId: s.editingGroupId,
     })))
-  const scopedEditingIndicator = getScopedEditingIndicator(project, activeLocale, activeCanvasFormat)
+  const rawScopedIndicator = getScopedEditingIndicator(project, activeLocale, activeCanvasFormat)
+  // The frame around the canvas teaches the same thing the banner does, so it
+  // keeps the same first-time-only rule rather than walling the work in on
+  // every visit to a non-Base format.
+  const scopedNoticesSeen = useScopedNoticesSeen()
+  const scopedEditingIndicator = {
+    ...rawScopedIndicator,
+    isFormatScoped: rawScopedIndicator.isFormatScoped && !scopedNoticesSeen.has('format'),
+    isLocaleScoped: rawScopedIndicator.isLocaleScoped && !scopedNoticesSeen.has('locale'),
+  }
   const { undo, redo } = useUndoRedo()
   const [view, setView] = useState<'editor' | 'localization'>('editor')
   const [exportOpen, setExportOpen] = useState(false)
@@ -89,6 +100,9 @@ export default function App() {
   const [previewLocale, setPreviewLocale] = useState<string | undefined>(undefined)
   const [previewReturnTo, setPreviewReturnTo] = useState<'localization' | null>(null)
   const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState(false)
+  // The splash may not lift until the start screen's chunk has arrived, or
+  // the editor flashes between the two.
+  const [startScreenReady, setStartScreenReady] = useState(!shouldShowStartScreenOnLaunch())
   const [hasMetMinimumSplashTime, setHasMetMinimumSplashTime] = useState(false)
   const {
     thumbnails,
@@ -114,8 +128,17 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (startScreenReady) return
+    let cancelled = false
+    // A failed chunk must not strand the app behind the splash forever.
+    void loadStartScreen().finally(() => { if (!cancelled) setStartScreenReady(true) })
+    return () => { cancelled = true }
+  }, [startScreenReady])
+
+  useEffect(() => {
     if (hasCompletedInitialLoad) return
     if (!hasMetMinimumSplashTime) return
+    if (!startScreenReady) return
 
     // Only the visible group gates first paint; background thumbnails precache at idle.
     if (project.slideGroups.length > 0) {
@@ -124,7 +147,7 @@ export default function App() {
 
     const timeoutId = window.setTimeout(() => setHasCompletedInitialLoad(true), 0)
     return () => window.clearTimeout(timeoutId)
-  }, [hasCompletedInitialLoad, hasMetMinimumSplashTime, project.slideGroups.length, activeSlideGroupId, thumbnails])
+  }, [hasCompletedInitialLoad, hasMetMinimumSplashTime, startScreenReady, project.slideGroups.length, activeSlideGroupId, thumbnails])
   useEffect(() => {
     if (project.slideGroups.length === 0) return
     const groupExists = project.slideGroups.some((g) => g.id === activeSlideGroupId)
@@ -384,7 +407,7 @@ export default function App() {
         cancelCapture={cancelPreviewCapture}
         initialLocale={previewLocale}
       />
-      {startOpen && hasCompletedInitialLoad && (
+      {startOpen && (
         <Suspense>
           <StartScreen onClose={() => setStartOpen(false)} />
         </Suspense>

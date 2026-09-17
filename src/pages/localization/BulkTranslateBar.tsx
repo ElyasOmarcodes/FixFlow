@@ -29,11 +29,11 @@ export function BulkTranslateBar({
   if (nonDefaultLocales.length === 0) return null
 
   return (
-    <section className="border-b border-white/6 bg-[var(--pd-c-111118)]/70 px-8 py-3 backdrop-blur-xl shrink-0">
+    <section className="border-b border-[var(--pd-line-subtle)] bg-[var(--pd-c-111118)]/70 px-8 py-3 backdrop-blur-xl shrink-0">
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="text-xs text-[var(--pd-c-6b6b7a)]">Bulk AI translate:</span>
-          <span className="text-xs text-[#9d90f8]">{bulkEligibleCount} cells</span>
+          <span className="text-xs text-[var(--pd-c-9b8fff)]">{bulkEligibleCount} cells</span>
         </div>
 
         <label className="flex items-center gap-1.5 cursor-pointer">
@@ -52,12 +52,12 @@ export function BulkTranslateBar({
           disabled={!hasApiKey || isBulkRunning || bulkEligibleCount === 0}
           className={`rounded-lg border px-4 py-1.5 text-xs font-medium transition ${
             !hasApiKey
-              ? 'border-white/8 text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
+              ? 'border-[var(--pd-line-soft)] text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
               : isBulkRunning
-                ? 'border-[rgba(124,110,246,0.3)] text-[#9d90f8] cursor-wait'
+                ? 'border-[var(--pd-accent-soft)] text-[var(--pd-c-9b8fff)] cursor-wait'
                 : bulkEligibleCount === 0
-                  ? 'border-white/8 text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
-                  : 'border-[rgba(124,110,246,0.5)] bg-[rgba(124,110,246,0.12)] text-[#c5befd] hover:bg-[rgba(124,110,246,0.22)] hover:text-white'
+                  ? 'border-[var(--pd-line-soft)] text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
+                  : 'border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] text-[#c5befd] hover:bg-[rgba(124,110,246,0.22)] hover:text-[var(--pd-c-f0eff8)]'
           }`}
           title={!hasApiKey ? 'Configure an AI API key in AI Settings' : undefined}
         >
@@ -73,7 +73,7 @@ export function BulkTranslateBar({
           <button
             type="button"
             onClick={onOpenAiSettings}
-            className="text-xs text-[#f59e0b] hover:text-white underline underline-offset-2 transition"
+            className="text-xs text-[var(--pd-warn-strong)] hover:text-[var(--pd-c-f0eff8)] underline underline-offset-2 transition"
           >
             No API key — open AI Settings
           </button>
@@ -83,7 +83,7 @@ export function BulkTranslateBar({
           <button
             type="button"
             onClick={() => { bulkCancelRef.current = true }}
-            className="text-xs text-[#f87171] hover:text-white transition"
+            className="text-xs text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] transition"
           >
             Stop
           </button>

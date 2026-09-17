@@ -25,14 +25,14 @@ export function LayerContextMenu({ contextMenu, layers, clipboard, onMenuAction 
 
   return (
     <div
-      role="menu" className="pd-layer-context fixed z-50 py-1 rounded shadow-2xl border"
+      role="menu" className="pd-layer-context fixed z-[var(--pd-z-popover)] py-1 rounded shadow-2xl border"
       style={{ left: Math.max(8, Math.min(contextMenu.x, window.innerWidth - 208)), top: Math.max(8, Math.min(contextMenu.y, window.innerHeight - 370)), background: 'var(--pd-c-18181f)', borderColor: 'rgba(255,255,255,0.08)', width: 200, maxHeight: 'calc(100dvh - 16px)', overflowY: 'auto' }}
       onClick={(e) => e.stopPropagation()}
     >
       {menuItems.map(({ action, label }) => (
         <button
           role="menuitem" key={action}
-          className="w-full text-start px-3 py-2 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+          className="w-full text-start px-3 py-2 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] transition-colors"
           style={action === 'delete' ? { color: '#f87171' } : undefined}
           onClick={() => onMenuAction(action, contextMenu.layerId)}
         >{label}</button>

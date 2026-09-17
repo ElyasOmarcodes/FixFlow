@@ -47,7 +47,7 @@ export function SlideOptionsControls({
               className={`rounded border px-2 py-1 text-[11px] transition-colors ${
                 activeGroup.numSlides === value
                   ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
-                  : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:border-[rgba(255,255,255,0.15)] hover:text-[var(--pd-c-e8e8f0)]'
+                  : 'border-[var(--pd-line-soft)] text-[#8f90a3] hover:border-[var(--pd-line)] hover:text-[var(--pd-c-e8e8f0)]'
               }`}
             >
               {suffix ?? t(labelKey)}
@@ -77,7 +77,7 @@ export function SlideOptionsControls({
           value={panoSettings.gapPx}
           disabled={!hasPano}
           onChange={(event) => onUpdatePano({ gapPx: parseInt(event.target.value, 10) || 0 })}
-          className="w-12 rounded border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+          className="w-12 rounded border border-[var(--pd-line)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
           title="Store preview gap shown in editor and preview"
         />
         <span>px</span>

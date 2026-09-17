@@ -6,29 +6,30 @@ interface ToggleSwitchProps {
   ariaLabel?: string
   id?: string
   disabled?: boolean
-  className?: string
-  knobClassName?: string
-  checkedClassName?: string
-  uncheckedClassName?: string
-  checkedKnobClassName?: string
-  uncheckedKnobClassName?: string
+  /** `md` is the default; `lg` is for a section header where it is the only control. */
+  size?: 'md' | 'lg'
   variant?: 'switch' | 'checkbox'
   checkboxClassName?: string
   checkboxProps?: Omit<InputHTMLAttributes<HTMLInputElement>, 'checked' | 'onChange' | 'type'>
 }
 
+/**
+ * The app's switch.
+ *
+ * Deliberately closed: it used to take className, knobClassName,
+ * checkedClassName, uncheckedClassName and two more for the knob's travel, and
+ * every call site passed its own. They drifted — one shipped a knob that
+ * stopped 2px short of the track end, another built a bespoke 44×24 switch
+ * with a white knob on a near-white track that was invisible in light theme.
+ * Geometry and colour now live here, and a caller chooses a size.
+ */
 export function ToggleSwitch({
   checked,
   onChange,
   ariaLabel,
   id,
   disabled,
-  className = 'relative h-5 w-9 rounded-full transition-colors',
-  knobClassName = 'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform',
-  checkedClassName = 'bg-[var(--pd-c-7c6ef6)]',
-  uncheckedClassName = 'bg-[rgba(255,255,255,0.12)]',
-  checkedKnobClassName = 'translate-x-[18px]',
-  uncheckedKnobClassName = 'translate-x-0',
+  size = 'md',
   variant = 'switch',
   checkboxClassName = 'accent-[var(--pd-c-7c6ef6)]',
   checkboxProps,
@@ -57,9 +58,10 @@ export function ToggleSwitch({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`${className} ${checked ? checkedClassName : uncheckedClassName}`}
+      className="pd-switch"
+      data-size={size}
     >
-      <span className={`${knobClassName} ${checked ? checkedKnobClassName : uncheckedKnobClassName}`} />
+      <span className="pd-switch-knob" />
     </button>
   )
 }

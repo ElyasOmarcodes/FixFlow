@@ -45,7 +45,7 @@ export function LocaleBar({
 }: LocaleBarProps) {
   const t = useT()
   return (
-    <section className="border-b border-white/8 bg-[var(--pd-c-18181f)]/86 px-8 py-4 backdrop-blur-xl shrink-0">
+    <section className="border-b border-[var(--pd-line-soft)] bg-[var(--pd-c-18181f)]/86 px-8 py-4 backdrop-blur-xl shrink-0">
       <div className="flex flex-wrap items-start gap-3">
         <div className="pt-2 text-xs font-medium uppercase tracking-[0.22em] text-[var(--pd-c-6b6b7a)] shrink-0">Languages</div>
         <div className="flex flex-1 flex-wrap gap-2 items-center">
@@ -83,7 +83,7 @@ export function LocaleBar({
                       setShowAddLocale(false)
                       setShowDefaultLocalePicker((open) => !open)
                     }}
-                    className="rounded-full border border-[var(--pd-c-7c6ef6)]/30 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-2 text-xs font-medium text-[#d8d2ff] transition hover:border-[var(--pd-c-7c6ef6)]/60 hover:bg-[var(--pd-c-7c6ef6)]/18 hover:text-white"
+                    className="rounded-full border border-[var(--pd-c-7c6ef6)]/30 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-2 text-xs font-medium text-[#d8d2ff] transition hover:border-[var(--pd-c-7c6ef6)]/60 hover:bg-[var(--pd-c-7c6ef6)]/18 hover:text-[var(--pd-c-f0eff8)]"
                     title="Change default language"
                   >
                     Change default
@@ -92,7 +92,7 @@ export function LocaleBar({
                   <button
                     type="button"
                     onClick={() => handleRemoveLocale(locale)}
-                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#1a1a24] border border-white/10 text-[9px] text-[var(--pd-c-6b6b7a)] hover:text-[#f87171] hover:border-[rgba(239,68,68,0.4)] opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
+                    className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[var(--pd-panel)] border border-[var(--pd-line)] text-[9px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-danger)] hover:border-[rgba(239,68,68,0.4)] opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
                     title={`Remove ${getLanguageName(locale)}`}
                   >
                     ×
@@ -110,7 +110,7 @@ export function LocaleBar({
                 setShowDefaultLocalePicker(false)
                 setShowAddLocale((open) => !open)
               }}
-              className="rounded-full border border-dashed border-white/12 bg-white/2 px-4 py-2 text-sm font-medium text-[#b7b7c7] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white"
+              className="rounded-full border border-dashed border-[var(--pd-line-strong)] bg-[var(--pd-fill)] px-4 py-2 text-sm font-medium text-[#b7b7c7] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
             >
               + Add language
             </button>
@@ -123,7 +123,7 @@ export function LocaleBar({
                 type="button"
                 onClick={() => onPreview(activeLocale)}
                 title={`Preview slides in ${getLanguageName(activeLocale)}`}
-                className="flex items-center gap-2 rounded-full border border-[var(--pd-c-7c6ef6)]/40 bg-[var(--pd-c-7c6ef6)]/10 px-4 py-2 text-sm font-medium text-[#cbbfff] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/20 hover:text-white"
+                className="flex items-center gap-2 rounded-full border border-[var(--pd-c-7c6ef6)]/40 bg-[var(--pd-c-7c6ef6)]/10 px-4 py-2 text-sm font-medium text-[#cbbfff] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/20 hover:text-[var(--pd-c-f0eff8)]"
               >
                 <Icon name="play" size={12} />
                 {t('loc.preview')}
@@ -132,7 +132,7 @@ export function LocaleBar({
             <button
               type="button"
               onClick={onBack}
-              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-5 py-2 text-sm font-medium text-[#d7d7e3] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white"
+              className="flex items-center gap-2 rounded-full border border-[var(--pd-line)] bg-[var(--pd-line-subtle)] px-5 py-2 text-sm font-medium text-[#d7d7e3] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
             >
               <Icon name="arrow-left" size={14} />
               {t('loc.backToEditor')}

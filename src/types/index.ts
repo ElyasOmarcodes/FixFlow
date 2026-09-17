@@ -474,8 +474,15 @@ export interface ChipLayer extends BaseLayer {
   iconSize: number;
   /** Space between icon and label. */
   iconGap: number;
-  /** Which side of the label the icon sits on, in reading order. */
-  iconPosition: 'start' | 'end';
+  /**
+   * Which side of the label the glyph sits on, physically.
+   *
+   * Not 'start'/'end': the design canvas is pinned left-to-right so the
+   * exported PNG is identical whatever the interface language, and a chip on
+   * a Pashto screenshot with the icon on the left has to stay on the left.
+   * Old projects stored 'start'/'end' and are migrated on load.
+   */
+  iconPosition: 'left' | 'right';
   iconColor?: string;
   stroke?: string;
   strokeWidth?: number;

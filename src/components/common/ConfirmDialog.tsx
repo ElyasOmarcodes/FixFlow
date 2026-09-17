@@ -47,7 +47,7 @@ export function ConfirmDialog({
     <>
       <div
         onClick={onCancel}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 210 }}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 'var(--pd-z-confirm)' }}
       />
       <div
         role="dialog"
@@ -65,7 +65,7 @@ export function ConfirmDialog({
           border: '1px solid rgba(255,255,255,0.12)',
           borderRadius: 10,
           padding: 24,
-          zIndex: 211,
+          zIndex: 'var(--pd-z-confirm)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
         }}
         onClick={(e) => e.stopPropagation()}

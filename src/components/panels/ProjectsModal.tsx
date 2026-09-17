@@ -182,7 +182,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
           else onClose()
         }}
         maxWidth="max-w-lg"
-        backdropClassName="fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-sm"
+        backdropClassName="fixed inset-0 flex items-center justify-center backdrop-blur-sm"
         panelStyle={{ background: 'var(--pd-c-18181f)', borderColor: 'rgba(255,255,255,0.1)', maxHeight: '75vh', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
         showCloseButton={false}
         header={<div

@@ -67,7 +67,7 @@ export function TextOverrideCell({
   if (!isDefaultLocale && isSkipped) {
     return (
       <div className="min-h-[80px] rounded-xl border border-dashed border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.04)] px-4 py-3 flex items-center justify-center mb-3">
-        <span className="text-xs text-[#f87171]">— skipped —</span>
+        <span className="text-xs text-[var(--pd-danger)]">— skipped —</span>
       </div>
     )
   }
@@ -75,9 +75,9 @@ export function TextOverrideCell({
   // Translating / queued state
   if (!isDefaultLocale && (cellStatus === 'translating' || cellStatus === 'queued')) {
     return (
-      <div className="min-h-[80px] rounded-xl border border-[rgba(124,110,246,0.3)] bg-[rgba(124,110,246,0.06)] px-4 py-3 flex items-center justify-center gap-2 mb-3">
+      <div className="min-h-[80px] rounded-xl border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.06)] px-4 py-3 flex items-center justify-center gap-2 mb-3">
         <span className="text-[var(--pd-c-7c6ef6)] animate-spin text-sm">⟳</span>
-        <span className="text-xs text-[#9d90f8]">{cellStatus === 'queued' ? 'Queued…' : 'Translating…'}</span>
+        <span className="text-xs text-[var(--pd-c-9b8fff)]">{cellStatus === 'queued' ? 'Queued…' : 'Translating…'}</span>
       </div>
     )
   }
@@ -86,16 +86,16 @@ export function TextOverrideCell({
   if (!isDefaultLocale && cellStatus === 'error') {
     return (
       <div className="min-h-[80px] rounded-xl border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.06)] px-4 py-3 space-y-2 mb-3">
-        <div className="flex items-center gap-1.5 text-xs text-[#f87171]"><Icon name="alert-triangle" size={12} />{t('loc.translationFailed')}</div>
+        <div className="flex items-center gap-1.5 text-xs text-[var(--pd-danger)]"><Icon name="alert-triangle" size={12} />{t('loc.translationFailed')}</div>
         {cellError && (
-          <div className="text-[10px] text-[#f87171]/70 truncate" title={cellError}>
+          <div className="text-[10px] text-[var(--pd-danger)]/70 truncate" title={cellError}>
             {cellError}
           </div>
         )}
         <button
           type="button"
           onClick={onAiTranslate}
-          className="text-xs text-[#f87171] hover:text-white border border-[rgba(239,68,68,0.3)] rounded px-2 py-0.5 transition"
+          className="text-xs text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] border border-[rgba(239,68,68,0.3)] rounded px-2 py-0.5 transition"
         >
           Retry
         </button>
@@ -119,7 +119,7 @@ export function TextOverrideCell({
           <button
             type="button"
             onClick={() => setLocaleContent(row.slideGroupId, row.layerId, locale, { text: '' })}
-            className="rounded-lg border border-[rgba(255,255,255,0.12)] px-2.5 py-1 text-xs text-[var(--pd-c-a0a0b0)] hover:border-[rgba(255,255,255,0.22)] hover:text-white transition"
+            className="rounded-lg border border-[var(--pd-line-strong)] px-2.5 py-1 text-xs text-[var(--pd-c-a0a0b0)] hover:border-[var(--pd-line)] hover:text-[var(--pd-c-f0eff8)] transition"
           >
             + Manual
           </button>
@@ -127,7 +127,7 @@ export function TextOverrideCell({
             <button
               type="button"
               onClick={onAiTranslate}
-              className="rounded-lg border border-[rgba(124,110,246,0.4)] bg-[rgba(124,110,246,0.1)] px-2.5 py-1 text-xs text-[#c5befd] hover:bg-[rgba(124,110,246,0.2)] transition"
+              className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-2.5 py-1 text-xs text-[#c5befd] hover:bg-[var(--pd-accent-wash-strong)] transition"
             >
               <span className="flex items-center gap-1"><Icon name="sparkles" size={11} />{t('loc.translateAi')}</span>
             </button>
@@ -180,8 +180,8 @@ export function TextOverrideCell({
         {/* Problem visibility: formatting state */}
         {(formattingLostByAi || formattingMissing) && (
           <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.07)] px-2 py-1.5">
-            <Icon name="alert-triangle" size={11} className="mt-0.5 text-[#fbbf24]" />
-            <span className="text-[10px] leading-relaxed text-[#fbbf24]">
+            <Icon name="alert-triangle" size={11} className="mt-0.5 text-[var(--pd-warn)]" />
+            <span className="text-[10px] leading-relaxed text-[var(--pd-warn)]">
               {formattingLostByAi
                 ? 'AI could not preserve the source formatting — click the text and re-apply it'
                 : 'The source has styled words not applied here — click the text to style it'}
@@ -198,7 +198,7 @@ export function TextOverrideCell({
             <button
               type="button"
               onClick={onAiTranslate}
-              className="text-[10px] text-[#9d90f8] hover:text-white transition"
+              className="text-[10px] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] transition"
               title="Re-translate with AI"
             >
               <span className="flex items-center gap-1"><Icon name="sparkles" size={10} />{t('loc.translateRetry')}</span>
@@ -208,7 +208,7 @@ export function TextOverrideCell({
             <button
               type="button"
               onClick={() => clearLocaleContent(row.slideGroupId, row.layerId, locale)}
-              className="ml-auto text-xs font-medium text-[#b9b6c9] transition hover:text-white"
+              className="ml-auto text-xs font-medium text-[#b9b6c9] transition hover:text-[var(--pd-c-f0eff8)]"
             >
               × Clear
             </button>

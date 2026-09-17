@@ -490,7 +490,7 @@ export const createLayerSlice = (
       paddingY: 18 * factor,
       iconSize: 30 * factor,
       iconGap: 12 * factor,
-      iconPosition: 'start',
+      iconPosition: 'left',
     }
     get().addLayer(seedLocaleContent(chip, settings.defaultLocale))
     // A new chip is an empty pill until it has a label, so open the panel on

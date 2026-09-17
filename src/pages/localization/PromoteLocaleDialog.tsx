@@ -37,13 +37,13 @@ export function PromoteLocaleDialog({
       title="Promote language to default"
       maxWidth="max-w-2xl"
       bodyClassName="px-6 py-5"
-      footerClassName="flex items-center justify-end gap-3 border-t border-white/8 bg-[#14141b] px-6 py-4"
+      footerClassName="flex items-center justify-end gap-3 border-t border-[var(--pd-line-soft)] bg-[var(--pd-c-15151b)] px-6 py-4"
       footer={(
         <>
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm font-medium text-[#c9c9d5] transition hover:border-white/20 hover:text-white"
+            className="rounded-full border border-[var(--pd-line)] bg-[var(--pd-line-subtle)] px-4 py-2 text-sm font-medium text-[#c9c9d5] transition hover:border-[var(--pd-line-loud)] hover:text-[var(--pd-c-f0eff8)]"
           >
             Cancel
           </button>
@@ -67,7 +67,7 @@ export function PromoteLocaleDialog({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-[#13131a] p-4">
+        <div className="rounded-2xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-131318)] p-4">
           <div className="flex items-end justify-between gap-4">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--pd-c-6b6b7a)]">Translation coverage</div>
@@ -77,7 +77,7 @@ export function PromoteLocaleDialog({
               {isComplete ? 'Everything is translated.' : `${total - complete} layers still need review.`}
             </div>
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/6">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--pd-line-subtle)]">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -91,7 +91,7 @@ export function PromoteLocaleDialog({
         {!isComplete && (
           <div className="rounded-2xl border border-[rgba(245,158,11,0.35)] bg-[rgba(245,158,11,0.08)] p-4">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 text-[#f59e0b]"><Icon name="alert-triangle" size={15} /></div>
+              <div className="mt-0.5 text-[var(--pd-warn-strong)]"><Icon name="alert-triangle" size={15} /></div>
               <div className="space-y-3">
                 <div>
                   <div className="text-sm font-semibold text-[#fde68a]">Some layers are still incomplete</div>
@@ -100,12 +100,12 @@ export function PromoteLocaleDialog({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-white/8 bg-[var(--pd-c-111118)] px-3 py-3">
+                <div className="rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-111118)] px-3 py-3">
                   <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d8ea0]">Affected layers</div>
                   <ul className="space-y-2 text-sm text-[#d9d9e6]">
                     {incompleteLabels.map((label) => (
                       <li key={label} className="flex gap-2">
-                        <span className="mt-1.5 text-[#f59e0b]"><Icon name="bullet" size={5} /></span>
+                        <span className="mt-1.5 text-[var(--pd-warn-strong)]"><Icon name="bullet" size={5} /></span>
                         <span>{label}</span>
                       </li>
                     ))}

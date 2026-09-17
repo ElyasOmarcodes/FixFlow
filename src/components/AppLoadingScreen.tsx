@@ -23,7 +23,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
       role="status"
       aria-live="polite"
       aria-label="Loading PixelDeck"
-      className={`fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-[var(--pd-c-0f0f13)] transition-opacity duration-200 ease-out ${
+      className={`fixed inset-0 z-[var(--pd-z-splash)] flex items-center justify-center overflow-hidden bg-[var(--pd-c-0f0f13)] transition-opacity duration-200 ease-out ${
         visible ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
     >
@@ -37,7 +37,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
       />
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(255,255,255,0.025)]"
+        className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--pd-line)]"
       />
 
       <div className="relative flex -translate-y-2 flex-col items-center">

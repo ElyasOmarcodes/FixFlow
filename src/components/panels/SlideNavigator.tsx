@@ -370,7 +370,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
       {!compact && (
         <section
           aria-label={t('slides.options')}
-          className="pd-slide-options flex w-[196px] shrink-0 flex-col gap-1.5 border-e border-[rgba(255,255,255,0.06)] pe-3 min-[1440px]:w-[212px]"
+          className="pd-slide-options flex w-[196px] shrink-0 flex-col gap-1.5 border-e border-[var(--pd-line-subtle)] pe-3 min-[1440px]:w-[212px]"
         >
           <p className="text-[10px] text-[#8f90a3]">{t('slides.title')}</p>
           <SlideOptionsControls
@@ -429,7 +429,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
           onClick={addSlideGroup}
           title={t('slides.addGroup')}
           aria-label={t('slides.addGroup')}
-          className="shrink-0 w-8 h-8 flex items-center justify-center text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] rounded border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] transition-colors ml-1"
+          className="shrink-0 w-8 h-8 flex items-center justify-center text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] rounded border border-[var(--pd-line-soft)] hover:border-[var(--pd-line-loud)] transition-colors ml-1"
         >
           <Icon name="plus" size={15} strokeWidth={2.2} />
         </button>
@@ -438,7 +438,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
       {/* Context menu */}
       {contextMenu && (
         <div
-          className="fixed z-50 py-1 rounded shadow-2xl border"
+          className="fixed z-[var(--pd-z-popover)] py-1 rounded shadow-2xl border"
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
@@ -454,15 +454,15 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
           ].map(({ action, label }) => (
             <button
               key={action}
-              className="w-full text-start px-3 py-2 text-xs hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              className="w-full text-start px-3 py-2 text-xs hover:bg-[var(--pd-fill)] transition-colors"
               style={{ color: 'var(--pd-c-e8e8f0)' }}
               onClick={() => handleMenuAction(action, contextMenu.groupId)}
             >
               {label}
             </button>
           ))}
-          <div className="my-1 border-t border-[rgba(255,255,255,0.08)]" />
-          <button className="w-full text-start px-3 py-2 text-xs text-[#f87171] hover:bg-[rgba(255,255,255,0.06)] transition-colors" onClick={() => handleMenuAction('delete', contextMenu.groupId)}>Delete</button>
+          <div className="my-1 border-t border-[var(--pd-line-soft)]" />
+          <button className="w-full text-start px-3 py-2 text-xs text-[var(--pd-danger)] hover:bg-[var(--pd-fill)] transition-colors" onClick={() => handleMenuAction('delete', contextMenu.groupId)}>Delete</button>
         </div>
       )}
     </footer>

@@ -59,8 +59,8 @@ function LanguageSettingsContent() {
               aria-pressed={selected}
               className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-start transition-colors ${
                 selected
-                  ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)]'
-                  : 'border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] hover:bg-[rgba(255,255,255,0.04)]'
+                  ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)]'
+                  : 'border-[var(--pd-line-soft)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-subtle)]'
               }`}
             >
               <span
@@ -81,7 +81,7 @@ function LanguageSettingsContent() {
                 </span>
                 <span className="block text-[11px] text-[var(--pd-c-6b6b7a)]">{lang.label}</span>
               </span>
-              <span className="shrink-0 rounded-full border border-[rgba(255,255,255,0.1)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--pd-c-6b6b7a)]">
+              <span className="shrink-0 rounded-full border border-[var(--pd-line)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--pd-c-6b6b7a)]">
                 {lang.dir}
               </span>
             </button>
@@ -134,7 +134,7 @@ function PanoSettingsContent() {
 
       <div className="space-y-5">
         {/* Gap input */}
-        <div className="rounded-xl border border-[rgba(255,255,255,0.08)] p-4 bg-[rgba(255,255,255,0.02)]">
+        <div className="rounded-xl border border-[var(--pd-line-soft)] p-4 bg-[var(--pd-fill)]">
           <label className={labelCls}>{t('settings.gapTitle')}</label>
           <p className="text-[11px] text-[var(--pd-c-4a4a5a)] mb-3 leading-relaxed">
             {t('settings.gapHint')}
@@ -147,7 +147,7 @@ function PanoSettingsContent() {
               onValueChange={(value) =>
                 updatePanoSettings({ gapPx: Math.max(0, Math.min(300, value)) })
               }
-              className="bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-3 py-2 text-sm text-[var(--pd-c-e8e8f0)] w-24 focus:outline-none focus:border-[rgba(124,110,246,0.5)]"
+              className="bg-[var(--pd-c-0f0f13)] border border-[var(--pd-line)] rounded px-3 py-2 text-sm text-[var(--pd-c-e8e8f0)] w-24 focus:outline-none focus:border-[var(--pd-accent-soft)]"
             />
             <span className="text-xs text-[var(--pd-c-6b6b7a)]">px</span>
             <input
@@ -162,7 +162,7 @@ function PanoSettingsContent() {
         </div>
 
         {/* Compensate checkbox */}
-        <div className="rounded-xl border border-[rgba(255,255,255,0.08)] p-4 bg-[rgba(255,255,255,0.02)]">
+        <div className="rounded-xl border border-[var(--pd-line-soft)] p-4 bg-[var(--pd-fill)]">
           <div className="flex items-start gap-3">
             <ToggleSwitch
               variant="checkbox"
@@ -186,7 +186,7 @@ function PanoSettingsContent() {
         </div>
 
         {/* Status summary */}
-        <div className="rounded-lg border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] px-4 py-3">
+        <div className="rounded-lg border border-[var(--pd-fill-soft)] bg-[var(--pd-fill)] px-4 py-3">
           <p className="text-[11px] text-[var(--pd-c-6b6b7a)] leading-relaxed">
             <span className="text-[#c4b5fd]">{t('settings.current')}</span>{' '}
             {panoSettings.gapPx ?? 24}px{' '}
@@ -218,7 +218,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       closeLabel={translate('common.close')}
       maxWidth="max-w-5xl"
       panelClassName="pd-settings relative rounded-2xl border shadow-2xl w-full mx-4 h-[85vh] flex flex-col overflow-hidden"
-      footerClassName="shrink-0 px-5 py-2.5 border-t border-[rgba(255,255,255,0.06)] flex items-center gap-3"
+      footerClassName="shrink-0 px-5 py-2.5 border-t border-[var(--pd-line-subtle)] flex items-center gap-3"
       footer={(
         <>
           <span className="text-[11px] text-[var(--pd-c-4a4a5a)] font-mono select-all">v{__APP_VERSION__}</span>
@@ -233,7 +233,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
         <div className="pd-settings-body flex flex-1 min-h-0">
           {/* Sidebar */}
           <nav
-            className="pd-settings-tabs w-44 shrink-0 border-r border-[rgba(255,255,255,0.06)] p-3 overflow-y-auto"
+            className="pd-settings-tabs w-44 shrink-0 border-r border-[var(--pd-line-subtle)] p-3 overflow-y-auto"
             style={{ background: 'rgba(0,0,0,0.15)' }}
           >
             {sections.map((section) => (
@@ -248,8 +248,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                     onClick={() => setTab(tabMeta.id)}
                     className={`w-full px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 text-start ${
                       tab === tabMeta.id
-                        ? 'bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-                        : 'text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.05)]'
+                        ? 'bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+                        : 'text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-soft)]'
                     }`}
                   >
                     <Icon name={tabMeta.icon} size={14} />

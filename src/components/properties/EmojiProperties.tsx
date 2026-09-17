@@ -25,7 +25,7 @@ export function EmojiProperties({ layer }: { layer: EmojiLayer }) {
           type="text"
           value={layer.emoji}
           onChange={(e) => upd({ emoji: e.target.value })}
-          className="w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-3 py-2 text-2xl text-center text-[var(--pd-c-e8e8f0)] outline-none focus:border-[var(--pd-c-7c6ef6)] transition-colors"
+          className="w-full rounded-lg border border-[var(--pd-line)] bg-[var(--pd-fill-soft)] px-3 py-2 text-2xl text-center text-[var(--pd-c-e8e8f0)] outline-none focus:border-[var(--pd-c-7c6ef6)] transition-colors"
           placeholder="Type or paste an emoji"
           maxLength={8}
         />
@@ -55,7 +55,7 @@ export function EmojiProperties({ layer }: { layer: EmojiLayer }) {
                 type="button"
                 onClick={() => upd({ emoji })}
                 title={emoji}
-                className={`flex items-center justify-center w-full aspect-square text-xl rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.1)] ${layer.emoji === emoji ? 'bg-[rgba(124,110,246,0.2)] ring-1 ring-[var(--pd-c-7c6ef6)]' : ''}`}
+                className={`flex items-center justify-center w-full aspect-square text-xl rounded-lg transition-colors hover:bg-[var(--pd-fill-strong)] ${layer.emoji === emoji ? 'bg-[var(--pd-accent-wash-strong)] ring-1 ring-[var(--pd-c-7c6ef6)]' : ''}`}
               >
                 {emoji}
               </button>

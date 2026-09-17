@@ -28,10 +28,30 @@ try {
     const page = await context.newPage()
     const errors = []
     page.on('pageerror', (error) => errors.push(error.message))
+    // Sampled from navigation so the handoff can be asserted, not assumed.
+    const launchOrder = []
+    const sample = setInterval(() => {
+      page.evaluate(() => {
+        const splash = document.querySelector('[class*="pd-z-splash"]')
+        const splashUp = splash ? getComputedStyle(splash).opacity !== '0' : false
+        const startUp = !!document.querySelector('.pd-start')
+        if (splashUp) return 'splash'
+        if (startUp) return 'start'
+        // Before the bundle runs there is nothing at all, which is not the
+        // editor showing through — only a live canvas with neither the splash
+        // nor the start screen over it counts as the flash being tested for.
+        return document.querySelector('.pd-editor canvas') ? 'editor-only' : 'blank'
+      }).then((step) => launchOrder.push(step)).catch(() => {})
+    }, 60)
     await page.goto('http://127.0.0.1:4174')
 
     const start = page.getByRole('dialog', { name: 'PixelDeck', exact: true })
     await expect(start).toBeVisible({ timeout: 15000 })
+
+    // Launch order is splash → projects page, with no editor in between. The
+    // start screen is a lazy chunk, so it is preloaded *under* the splash;
+    // without that the splash lifts onto a bare editor for a frame or two.
+    expect(launchOrder.filter((step, i) => step !== launchOrder[i - 1])).not.toContain('editor-only')
 
     // Nothing may run off the side, at any width.
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
@@ -69,8 +89,9 @@ try {
       await expect(start).toBeHidden()
     }
 
+    clearInterval(sample)
     expect(errors).toEqual([])
-    console.log(`PASS ${width}x${height}: start screen, dismissal, live editor`)
+    console.log(`PASS ${width}x${height}: splash→start order, dismissal, live editor`)
     await context.close()
   }
 

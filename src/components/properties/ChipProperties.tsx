@@ -163,11 +163,28 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
           <>
             <div className="mt-3">
               <label className={labelCls}>{t('chip.iconSide')}</label>
+              {/* Physical left/right, not before/after: the design canvas is
+                  pinned left-to-right, so a chip with its glyph on the left
+                  stays on the left in a Pashto or Persian project too. */}
               <SegmentedControl
                 value={layer.iconPosition}
                 options={[
-                  { value: 'start' as const, label: t('chip.iconStart') },
-                  { value: 'end' as const, label: t('chip.iconEnd') },
+                  {
+                    value: 'left' as const,
+                    label: (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Icon name="align-left" size={13} />{t('chip.iconLeft')}
+                      </span>
+                    ),
+                  },
+                  {
+                    value: 'right' as const,
+                    label: (
+                      <span className="flex items-center justify-center gap-1.5">
+                        {t('chip.iconRight')}<Icon name="align-right" size={13} />
+                      </span>
+                    ),
+                  },
                 ]}
                 onChange={(iconPosition) => upd({ iconPosition })}
               />

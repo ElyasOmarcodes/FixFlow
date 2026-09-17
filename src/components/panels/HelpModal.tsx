@@ -41,7 +41,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
       title={t('help.title')}
       closeLabel={t('common.close')}
       maxWidth="max-w-[1120px]"
-      backdropClassName="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5"
+      backdropClassName="fixed inset-0 flex items-center justify-center p-3 sm:p-5"
       backdropStyle={{ background: 'rgba(4,4,7,0.72)', backdropFilter: 'blur(6px)' }}
       panelClassName="relative w-full h-[92vh] sm:h-[88vh] flex flex-col overflow-hidden rounded-2xl border shadow-2xl"
       panelStyle={{
@@ -49,12 +49,12 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
         borderColor: 'rgba(255,255,255,0.09)',
         boxShadow: '0 32px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(124,110,246,0.04)',
       }}
-      closeButtonClassName="absolute top-4 end-4 z-10 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-all text-base w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.07)]"
+      closeButtonClassName="absolute top-4 end-4 z-10 text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] transition-all text-base w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--pd-fill)]"
       header={(
-        <header className="relative shrink-0 overflow-hidden border-b border-[rgba(255,255,255,0.07)] px-5 py-4 sm:px-6">
+        <header className="relative shrink-0 overflow-hidden border-b border-[var(--pd-line)] px-5 py-4 sm:px-6">
           <div className="pointer-events-none absolute -top-16 start-12 h-32 w-64 rounded-full bg-[var(--pd-c-7c6ef6)] opacity-[0.08] blur-3xl" />
           <div className="relative flex items-center gap-3 pr-10">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[rgba(155,143,255,0.28)] bg-[rgba(124,110,246,0.12)] text-[#b8afff] shadow-[0_8px_24px_rgba(124,110,246,0.12)]">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[rgba(155,143,255,0.28)] bg-[var(--pd-accent-wash)] text-[#b8afff] shadow-[0_8px_24px_rgba(124,110,246,0.12)]">
               <span aria-hidden="true" className="text-base">?</span>
             </div>
             <div>
@@ -65,7 +65,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                 {t('help.subtitle')}
               </p>
             </div>
-            <span className="ml-auto hidden rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)] px-2.5 py-1 text-[10px] font-medium tracking-wide text-[var(--pd-c-6b6b7a)] sm:block">
+            <span className="ml-auto hidden rounded-full border border-[var(--pd-line)] bg-[var(--pd-fill)] px-2.5 py-1 text-[10px] font-medium tracking-wide text-[var(--pd-c-6b6b7a)] sm:block">
               {chapters.length} {t('help.sections')}
             </span>
           </div>
@@ -73,8 +73,8 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
       )}
     >
       <div className="flex min-h-0 flex-1">
-        <aside className="hidden w-[230px] shrink-0 flex-col border-r border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-131318)] md:flex">
-          <div className="border-b border-[rgba(255,255,255,0.055)] p-3">
+        <aside className="hidden w-[230px] shrink-0 flex-col border-r border-[var(--pd-line-subtle)] bg-[var(--pd-c-131318)] md:flex">
+          <div className="border-b border-[var(--pd-line)] p-3">
             <label className="relative block">
               <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-[12px] text-[var(--pd-c-525260)]">⌕</span>
               <input
@@ -83,7 +83,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={t('help.search')}
                 aria-label={t('help.search')}
-                className="h-9 w-full rounded-lg border border-[rgba(255,255,255,0.075)] bg-[var(--pd-c-0f0f13)] pl-8 pr-3 text-[11px] text-[var(--pd-c-d8d8e2)] outline-none transition placeholder:text-[#4a4a57] focus:border-[rgba(124,110,246,0.52)] focus:ring-2 focus:ring-[rgba(124,110,246,0.08)]"
+                className="h-9 w-full rounded-lg border border-[var(--pd-line)] bg-[var(--pd-c-0f0f13)] pl-8 pr-3 text-[11px] text-[var(--pd-c-d8d8e2)] outline-none transition placeholder:text-[#4a4a57] focus:border-[rgba(124,110,246,0.52)] focus:ring-2 focus:ring-[rgba(124,110,246,0.08)]"
               />
             </label>
           </div>
@@ -108,8 +108,8 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                           aria-current={isActive ? 'page' : undefined}
                           className={`group relative flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-start text-[11px] transition-all ${
                             isActive
-                              ? 'bg-[rgba(124,110,246,0.14)] text-[#d4ceff]'
-                              : 'text-[var(--pd-c-777786)] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#d1d1dc]'
+                              ? 'bg-[var(--pd-accent-wash)] text-[#d4ceff]'
+                              : 'text-[var(--pd-c-777786)] hover:bg-[var(--pd-fill-subtle)] hover:text-[#d1d1dc]'
                           }`}
                         >
                           {isActive && <span className="absolute inset-y-2 start-0 w-0.5 rounded-full bg-[#8f82ff]" />}
@@ -130,19 +130,19 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
               </div>
             )}
           </nav>
-          <div className="border-t border-[rgba(255,255,255,0.055)] px-5 py-3 text-[10px] text-[#454552]">
+          <div className="border-t border-[var(--pd-line)] px-5 py-3 text-[10px] text-[#454552]">
             {t('help.jump')}
           </div>
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col bg-[var(--pd-c-18181f)]">
-          <div className="shrink-0 border-b border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-15151b)] px-4 py-2.5 md:hidden">
+          <div className="shrink-0 border-b border-[var(--pd-line-subtle)] bg-[var(--pd-c-15151b)] px-4 py-2.5 md:hidden">
             <label className="flex items-center gap-3">
               <span className="text-[10px] font-semibold tracking-[0.12em] text-[#575765]">{t('help.sections')}</span>
               <select
                 value={activeId}
                 onChange={(event) => selectSection(event.target.value as HelpSectionId)}
-                className="min-w-0 flex-1 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[var(--pd-c-0f0f13)] px-3 py-2 text-[11px] text-[var(--pd-c-d8d8e2)] outline-none focus:border-[rgba(124,110,246,0.5)]"
+                className="min-w-0 flex-1 rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] px-3 py-2 text-[11px] text-[var(--pd-c-d8d8e2)] outline-none focus:border-[var(--pd-accent-soft)]"
                 aria-label={t('help.choose')}
               >
                 {chapters.map((section) => (
@@ -156,7 +156,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
 
           <div ref={contentRef} className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
             <article className="mx-auto max-w-[760px] px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-10">
-              <div className="mb-7 flex items-start gap-4 border-b border-[rgba(255,255,255,0.065)] pb-6">
+              <div className="mb-7 flex items-start gap-4 border-b border-[var(--pd-line)] pb-6">
                 <span className="mt-0.5 font-mono text-[11px] font-medium tracking-[0.12em] text-[#8f82ff]">
                   {String(activeSection.number).padStart(2, '0')}
                 </span>
@@ -174,12 +174,12 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                 <HelpMarkdown source={activeSection.body} />
               </div>
 
-              <div className="mt-10 flex items-center justify-between gap-3 border-t border-[rgba(255,255,255,0.06)] pt-5">
+              <div className="mt-10 flex items-center justify-between gap-3 border-t border-[var(--pd-line-subtle)] pt-5">
                 <button
                   type="button"
                   disabled={activeIndex === 0}
                   onClick={() => selectSection(chapters[activeIndex - 1].id)}
-                  className="flex items-center gap-1.5 rounded-lg border border-[rgba(255,255,255,0.08)] px-3 py-2 text-[11px] text-[#858594] transition hover:border-[rgba(255,255,255,0.15)] hover:text-[#e0e0e9] disabled:pointer-events-none disabled:opacity-0"
+                  className="flex items-center gap-1.5 rounded-lg border border-[var(--pd-line-soft)] px-3 py-2 text-[11px] text-[#858594] transition hover:border-[var(--pd-line)] hover:text-[#e0e0e9] disabled:pointer-events-none disabled:opacity-0"
                 >
                   <Icon name="chevron-left" size={12} />
                   {t('help.previous')}
@@ -189,7 +189,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                   type="button"
                   disabled={activeIndex === chapters.length - 1}
                   onClick={() => selectSection(chapters[activeIndex + 1].id)}
-                  className="flex items-center gap-1.5 rounded-lg border border-[rgba(124,110,246,0.22)] bg-[rgba(124,110,246,0.07)] px-3 py-2 text-[11px] text-[#aaa1f5] transition hover:border-[rgba(124,110,246,0.42)] hover:bg-[rgba(124,110,246,0.12)] disabled:pointer-events-none disabled:opacity-0"
+                  className="flex items-center gap-1.5 rounded-lg border border-[rgba(124,110,246,0.22)] bg-[rgba(124,110,246,0.07)] px-3 py-2 text-[11px] text-[#aaa1f5] transition hover:border-[rgba(124,110,246,0.42)] hover:bg-[var(--pd-accent-wash)] disabled:pointer-events-none disabled:opacity-0"
                 >
                   {t('help.next')}
                   <Icon name="chevron-right" size={12} />

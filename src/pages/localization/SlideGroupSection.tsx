@@ -73,7 +73,7 @@ export function SlideGroupSection({
 
   return (
     <section
-      className="overflow-hidden rounded-[24px] border border-white/8 bg-[var(--pd-c-18181f)] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
+      className="overflow-hidden rounded-[24px] border border-[var(--pd-line-soft)] bg-[var(--pd-c-18181f)] shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
     >
       {/* Section header */}
       <button
@@ -93,14 +93,14 @@ export function SlideGroupSection({
             </div>
           </div>
         </div>
-        <div className="rounded-full border border-white/8 bg-white/4 px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#8d8ea3]">
+        <div className="rounded-full border border-[var(--pd-line-soft)] bg-[var(--pd-line-subtle)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#8d8ea3]">
           {slideGroup.slideWidth} × {slideGroup.slideHeight}
         </div>
       </button>
 
       {!collapsed && (
         <div
-          className="overflow-x-auto border-t border-white/8 pr-4 py-4"
+          className="overflow-x-auto border-t border-[var(--pd-line-soft)] pr-4 py-4"
           ref={scrollContainerRef}
           onScroll={(e) => onHorizontalScroll(e.currentTarget.scrollLeft)}
         >
@@ -140,10 +140,10 @@ export function SlideGroupSection({
                   >
                     {/* Layer column — sticky left */}
                     <div className="sticky start-0 z-10 flex h-full flex-col pl-4" style={{ background: '#18181f' }}>
-                      <div className="flex min-h-[80px] flex-1 flex-col justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 mb-3">
+                      <div className="flex min-h-[80px] flex-1 flex-col justify-between rounded-xl border border-[var(--pd-line-soft)] bg-white/[0.02] px-4 py-3 mb-3">
                         <div className="flex items-start gap-3" style={{ paddingInlineStart: row.depth * 16 }}>
                           <div
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-[var(--pd-c-111118)] text-sm font-semibold mt-0.5"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--pd-line)] bg-[var(--pd-c-111118)] text-sm font-semibold mt-0.5"
                             style={{ color: row.layerType === 'text' ? '#c9c3ff' : '#d9d9e6' }}
                           >
                             <Icon name={row.layerType === 'text' ? 'text' : row.layerType === 'phone' ? 'phone' : 'image'} size={15} />
@@ -152,7 +152,7 @@ export function SlideGroupSection({
                             <button
                               type="button"
                               onClick={() => onNavigateToLayer(row)}
-                              className="truncate font-medium text-[#d5d5df] text-sm hover:text-white transition text-start w-full"
+                              className="truncate font-medium text-[#d5d5df] text-sm hover:text-[var(--pd-c-f0eff8)] transition text-start w-full"
                               title="Go to layer in editor"
                             >
                               {row.layerName}
@@ -172,12 +172,12 @@ export function SlideGroupSection({
                                 </span>
                               )}
                               {mode === 'skip' && (
-                                <span className="text-[9px] px-1.5 py-0.5 rounded border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)] text-[#fca5a5]">
+                                <span className="text-[9px] px-1.5 py-0.5 rounded border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)] text-[var(--pd-danger-soft)]">
                                   skip
                                 </span>
                               )}
                               {mode === 'manual' && row.layerType === 'text' && (
-                                <span className="text-[9px] px-1.5 py-0.5 rounded border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.08)] text-[#fbbf24]">
+                                <span className="text-[9px] px-1.5 py-0.5 rounded border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.08)] text-[var(--pd-warn)]">
                                   manual
                                 </span>
                               )}

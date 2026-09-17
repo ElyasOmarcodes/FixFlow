@@ -51,11 +51,11 @@ export function ImageOverrideCell({
       >
         {previewSrc ? (
           <div className="flex items-center gap-3">
-            <img src={previewSrc} alt="base" className="h-12 w-9 rounded-lg border border-white/10 object-cover shrink-0" />
+            <img src={previewSrc} alt="base" className="h-12 w-9 rounded-lg border border-[var(--pd-line)] object-cover shrink-0" />
             <div className="min-w-0 flex-1">
               <div className="truncate text-xs text-[#ecebfa]">{getFileLabel(row.defaultImageRef)}</div>
               <div className="mt-1.5 flex items-center justify-between gap-2">
-                <button type="button" onClick={onUpload} className="text-[10px] text-[#9d90f8] hover:text-white transition">
+                <button type="button" onClick={onUpload} className="text-[10px] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] transition">
                   Change
                 </button>
                 <span className="text-[10px] text-[var(--pd-c-6b6b7a)]">Base image</span>
@@ -67,7 +67,7 @@ export function ImageOverrideCell({
             <button
               type="button"
               onClick={onUpload}
-              className="rounded-lg border border-[rgba(124,110,246,0.4)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[#c5befd] transition hover:bg-[rgba(124,110,246,0.2)]"
+              className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[#c5befd] transition hover:bg-[var(--pd-accent-wash-strong)]"
             >
               + Upload
             </button>
@@ -81,7 +81,7 @@ export function ImageOverrideCell({
   if (isSkipped) {
     return (
       <div className="min-h-[80px] rounded-xl border border-dashed border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.04)] px-4 py-3 flex items-center justify-center mb-3">
-        <span className="text-xs text-[#f87171]">— skipped —</span>
+        <span className="text-xs text-[var(--pd-danger)]">— skipped —</span>
       </div>
     )
   }
@@ -103,7 +103,7 @@ export function ImageOverrideCell({
           <img
             src={previewSrc}
             alt={`${row.layerName} ${locale}`}
-            className="h-12 w-9 rounded-lg border border-white/10 object-cover shrink-0"
+            className="h-12 w-9 rounded-lg border border-[var(--pd-line)] object-cover shrink-0"
           />
           <div className="min-w-0 flex-1">
             <div className="truncate text-xs text-[#ecebfa]">
@@ -112,10 +112,10 @@ export function ImageOverrideCell({
                 : getFileLabel(override?.src)}
             </div>
             <div className="flex gap-2 mt-1.5">
-              <button type="button" onClick={onUpload} className="text-[10px] text-[#9d90f8] hover:text-white transition">
+              <button type="button" onClick={onUpload} className="text-[10px] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] transition">
                 Change
               </button>
-              <button type="button" onClick={onClear} className="text-[10px] text-[#f87171] hover:text-white transition">
+              <button type="button" onClick={onClear} className="text-[10px] text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] transition">
                 × Clear
               </button>
             </div>
@@ -126,7 +126,7 @@ export function ImageOverrideCell({
           <button
             type="button"
             onClick={onUpload}
-            className="rounded-lg border border-[rgba(124,110,246,0.4)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[#c5befd] transition hover:bg-[rgba(124,110,246,0.2)]"
+            className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[#c5befd] transition hover:bg-[var(--pd-accent-wash-strong)]"
           >
             + Upload
           </button>

@@ -22,7 +22,7 @@ export interface ChipLayoutInput {
   /** Omit for a label-only chip. */
   iconSize?: number
   iconGap?: number
-  iconPosition?: 'start' | 'end'
+  iconPosition?: 'left' | 'right'
 }
 
 export interface ChipLayout {
@@ -61,7 +61,7 @@ export function layoutChip(input: ChipLayoutInput): ChipLayout {
     paddingY,
     iconSize = 0,
     iconGap = 0,
-    iconPosition = 'start',
+    iconPosition = 'left',
   } = input
 
   const hasIcon = iconSize > 0
@@ -84,7 +84,7 @@ export function layoutChip(input: ChipLayoutInput): ChipLayout {
 
   if (!hasIcon) {
     textX = paddingX
-  } else if (iconPosition === 'start') {
+  } else if (iconPosition === 'left') {
     iconX = paddingX
     textX = paddingX + iconSize + gap
   } else {

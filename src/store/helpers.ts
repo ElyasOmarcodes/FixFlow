@@ -33,6 +33,20 @@ export const LOCALE_ADJUST_SCHEMA_VERSION = 2
 
 export const SLIDE_KEY_SCHEMA_VERSION = 3
 
+/**
+ * Chips stored their glyph's side as 'start'/'end', which reads as
+ * writing-direction-relative and is not: the design canvas is pinned
+ * left-to-right. See migrateChipIconSide().
+ */
+export const CHIP_ICON_SIDE_SCHEMA_VERSION = 4
+
+/**
+ * What migrateProject() brings a project up to. Named separately so adding a
+ * migration means bumping one constant rather than hunting for every place
+ * that happened to reference the previously-latest one.
+ */
+export const CURRENT_SCHEMA_VERSION = CHIP_ICON_SIDE_SCHEMA_VERSION
+
 export { findLayerInTree, mapLayerTree, updateLayerInTree } from '@/utils/layerTree'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -547,6 +561,22 @@ export function normalizeGroupFamilies<T extends Project>(project: T): T {
  * → BackgroundLayer, and legacy TextLayer.spans → marks. Shared by import and
  * localStorage hydration so both paths produce the same shape.
  */
+/** 'start'/'end' meant physically left/right all along; say so. */
+export function migrateChipIconSide(project: Project): Project {
+  return {
+    ...project,
+    slideGroups: project.slideGroups.map((group) => ({
+      ...group,
+      layers: mapLayerTree(group.layers, (layer) => {
+        if (layer.type !== 'chip') return layer
+        const side = layer.iconPosition as unknown as string
+        if (side !== 'start' && side !== 'end') return layer
+        return { ...layer, iconPosition: side === 'start' ? 'left' : 'right' } as Layer
+      }),
+    })),
+  }
+}
+
 export function migrateProject(raw: Project): Project {
   const project = normalizeGroupFamilies(normalizeProjectFormats(raw))
   for (const sg of project.slideGroups) {
@@ -573,6 +603,10 @@ export function migrateProject(raw: Project): Project {
   if ((project.settings.schemaVersion ?? 0) < SLIDE_KEY_SCHEMA_VERSION) {
     project.slideGroups = migrateProjectSlideKeys(project).slideGroups
     project.settings = { ...project.settings, schemaVersion: SLIDE_KEY_SCHEMA_VERSION }
+  }
+  if ((project.settings.schemaVersion ?? 0) < CHIP_ICON_SIDE_SCHEMA_VERSION) {
+    project.slideGroups = migrateChipIconSide(project).slideGroups
+    project.settings = { ...project.settings, schemaVersion: CHIP_ICON_SIDE_SCHEMA_VERSION }
   }
   return project
 }

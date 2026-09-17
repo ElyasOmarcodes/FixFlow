@@ -16,7 +16,7 @@ export function GroupProperties({ layer }: { layer: GroupLayer }) {
       {/* Enter hint */}
       <div className="rounded-xl border border-[rgba(124,110,246,0.25)] bg-[rgba(124,110,246,0.08)] p-3">
         <p className="text-xs font-semibold text-[#c4b5fd] mb-1">Group selected</p>
-        <p className="text-xs text-[#9d90f8]">
+        <p className="text-xs text-[var(--pd-c-9b8fff)]">
           <strong>Double-click</strong> the canvas to enter and edit inner layers.
         </p>
       </div>
@@ -38,7 +38,7 @@ export function GroupProperties({ layer }: { layer: GroupLayer }) {
             {layer.children.map((child) => (
               <div
                 key={child.id}
-                className="flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[#101017] px-2 py-1.5"
+                className="flex items-center gap-2 rounded-lg border border-[var(--pd-line-subtle)] bg-[var(--pd-c-0f0f13)] px-2 py-1.5"
               >
                 <span className="flex w-4 justify-center text-[#8a86a0] shrink-0">
                   <Icon name={LAYER_ICON[child.type] ?? 'shape'} size={13} />

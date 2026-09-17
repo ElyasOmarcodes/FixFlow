@@ -3,7 +3,7 @@ import type { BackgroundLayer, GroupLayer, ImageLayer, Layer, PhoneLayer, Projec
 import {
   assertProjectShape,
   LOCALE_ADJUST_SCHEMA_VERSION,
-  SLIDE_KEY_SCHEMA_VERSION,
+  CURRENT_SCHEMA_VERSION,
   migrateProject,
   migrateProjectSlideKeys,
   patchLayerForLocale,
@@ -354,8 +354,8 @@ describe('foldLayerToSymmetric / localeContent migration', () => {
 
     const current = migrateProject(currentProject)
 
-    expect(legacy.settings.schemaVersion).toBe(SLIDE_KEY_SCHEMA_VERSION)
-    expect(current.settings.schemaVersion).toBe(SLIDE_KEY_SCHEMA_VERSION)
+    expect(legacy.settings.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
+    expect(current.settings.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
   })
 
   it('migrates legacy locale override spans to marks before folding content', () => {

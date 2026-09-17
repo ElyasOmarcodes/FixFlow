@@ -28,17 +28,12 @@ export function ShadowControls({ layer }: { layer: Layer }) {
               upd({ shadow: { color: '#000000', blur: 20, offsetX: 0, offsetY: 4, opacity: 0.5 } })
             }
           }}
-          className="relative h-6 w-11 rounded-full border transition-colors"
-          knobClassName="absolute top-0.5 h-4.5 w-4.5 rounded-full bg-white transition-all"
-          checkedClassName="border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)]"
-          uncheckedClassName="border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)]"
-          checkedKnobClassName="left-[22px]"
-          uncheckedKnobClassName="left-0.5"
+          size="lg"
         />
       </div>
 
       {layer.shadow && (
-        <div className="space-y-3 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] p-3">
+        <div className="space-y-3 rounded-lg border border-[var(--pd-line-subtle)] bg-[var(--pd-fill-subtle)] p-3">
           <div>
             <label className={labelCls}>Color</label>
             <ColorField value={layer.shadow.color} onChange={(value) => upd({ shadow: { ...layer.shadow!, color: value } })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />

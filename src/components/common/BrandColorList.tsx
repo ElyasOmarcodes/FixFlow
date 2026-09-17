@@ -4,7 +4,7 @@ import { useBrandColors } from '@/hooks/useBrandColors'
 import type { BrandColor } from '@/types'
 import { Icon } from '@/components/ui/Icon'
 
-const inputCls = 'bg-[var(--pd-c-0f0f13)] border border-[rgba(255,255,255,0.1)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[rgba(124,110,246,0.5)]'
+const inputCls = 'bg-[var(--pd-c-0f0f13)] border border-[var(--pd-line)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[var(--pd-accent-soft)]'
 
 interface BrandColorListProps {
   /** If true, shows a compact layout suitable for popovers/toolbars */
@@ -42,7 +42,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
         <button
           type="button"
           onClick={() => { setAdding((v) => !v); setEditingId(null) }}
-          className={`flex items-center gap-1 text-xs text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors ${compact ? '' : 'ml-auto'}`}
+          className={`flex items-center gap-1 text-xs text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors ${compact ? '' : 'ml-auto'}`}
         >
           <Icon name={adding ? 'close' : 'plus'} size={12} strokeWidth={2.2} />
           {adding ? '' : 'Add'}
@@ -51,7 +51,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
 
       {/* Add form */}
       {adding && (
-        <div className="mb-3 space-y-2 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-0f0f13)] p-2">
+        <div className="mb-3 space-y-2 rounded-lg border border-[var(--pd-line-subtle)] bg-[var(--pd-c-0f0f13)] p-2">
           <input
             type="text"
             value={newName}
@@ -66,7 +66,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
               type="color"
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
-              className="h-8 w-8 rounded-md cursor-pointer border border-[rgba(255,255,255,0.1)] bg-transparent shrink-0"
+              className="h-8 w-8 rounded-md cursor-pointer border border-[var(--pd-line)] bg-transparent shrink-0"
             />
             <input
               type="text"
@@ -78,7 +78,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
           <button
             type="button"
             onClick={handleAdd}
-            className="w-full text-xs text-[var(--pd-c-7c6ef6)] border border-[rgba(124,110,246,0.4)] rounded py-1.5 hover:bg-[rgba(124,110,246,0.15)] transition-colors"
+            className="w-full text-xs text-[var(--pd-c-7c6ef6)] border border-[var(--pd-accent-soft)] rounded py-1.5 hover:bg-[var(--pd-accent-wash)] transition-colors"
           >
             Add Color
           </button>
@@ -97,11 +97,11 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
         {brandColors.map((bc: BrandColor) => (
           <div key={bc.id}>
             <div
-              className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[rgba(255,255,255,0.04)] cursor-pointer transition-colors"
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[var(--pd-fill-subtle)] cursor-pointer transition-colors"
               onClick={() => setEditingId(editingId === bc.id ? null : bc.id)}
             >
               <div
-                className="w-5 h-5 rounded-full border border-[rgba(255,255,255,0.2)] shrink-0"
+                className="w-5 h-5 rounded-full border border-[var(--pd-line-loud)] shrink-0"
                 style={{ background: bc.value }}
               />
               <span className="text-xs text-[var(--pd-c-e8e8f0)] flex-1 truncate">{bc.name}</span>
@@ -109,14 +109,14 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); removeBrandColor(bc.id) }}
-                className="text-xs text-[var(--pd-c-4a4a5a)] hover:text-[#f87171] transition-colors shrink-0 ml-1"
+                className="text-xs text-[var(--pd-c-4a4a5a)] hover:text-[var(--pd-danger)] transition-colors shrink-0 ml-1"
                 aria-label={`Delete brand color ${bc.name}`}
               >
                 <Icon name="close" size={12} strokeWidth={2.2} />
               </button>
             </div>
             {editingId === bc.id && (
-              <div className="mb-1 rounded-lg border border-[rgba(255,255,255,0.06)] bg-[var(--pd-c-0f0f13)] p-2 space-y-2">
+              <div className="mb-1 rounded-lg border border-[var(--pd-line-subtle)] bg-[var(--pd-c-0f0f13)] p-2 space-y-2">
                 <input
                   type="text"
                   value={bc.name}
@@ -130,7 +130,7 @@ export function BrandColorList({ compact = false }: BrandColorListProps) {
                     type="color"
                     value={bc.value}
                     onChange={(e) => updateBrandColor(bc.id, { value: e.target.value })}
-                    className="h-8 w-8 rounded-md cursor-pointer border border-[rgba(255,255,255,0.1)] bg-transparent shrink-0"
+                    className="h-8 w-8 rounded-md cursor-pointer border border-[var(--pd-line)] bg-transparent shrink-0"
                   />
                   <input
                     type="text"

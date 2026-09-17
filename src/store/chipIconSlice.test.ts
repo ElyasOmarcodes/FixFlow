@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { useEditorStore } from './index'
 import { useAssetStore } from '@/store/assets'
 import { getLocalizableLayers } from '@/utils/locale'
-import type { ChipLayer, IconLayer } from '@/types'
+import { migrateProject } from '@/store/helpers'
+import type { ChipLayer, IconLayer, Project } from '@/types'
 
 function lastLayer() {
   const { project, activeSlideGroupId } = useEditorStore.getState()
@@ -79,5 +80,36 @@ describe('addIcon', () => {
     expect(lastLayer().type).toBe('icon')
     useEditorStore.temporal.getState().undo()
     expect(lastLayer().type).not.toBe('icon')
+  })
+})
+
+describe('chip icon side', () => {
+  it('defaults a new chip to a left-hand glyph', () => {
+    useEditorStore.getState().addChip()
+    expect((lastLayer() as ChipLayer).iconPosition).toBe('left')
+  })
+
+  it('migrates a project that stored start/end', () => {
+    // 'start'/'end' read as writing-direction-relative but always meant
+    // physically left/right, because the design canvas is pinned LTR.
+    useEditorStore.getState().addChip()
+    const { project } = useEditorStore.getState()
+    const group = project.slideGroups.find((g) => g.id === useEditorStore.getState().activeSlideGroupId)!
+    const legacy = {
+      ...project,
+      settings: { ...project.settings, schemaVersion: 3 },
+      slideGroups: project.slideGroups.map((g) => g.id !== group.id ? g : {
+        ...g,
+        layers: g.layers.map((layer) => layer.type !== 'chip'
+          ? layer
+          : ({ ...layer, iconPosition: 'end' } as unknown as typeof layer)),
+      }),
+    } as Project
+
+    const migrated = migrateProject(JSON.parse(JSON.stringify(legacy)) as Project)
+    const chip = migrated.slideGroups
+      .flatMap((g) => g.layers)
+      .find((layer) => layer.type === 'chip') as ChipLayer
+    expect(chip.iconPosition).toBe('right')
   })
 })

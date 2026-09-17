@@ -117,7 +117,7 @@ function AlignmentSection({
     }
   }
 
-  const btnCls = 'flex items-center justify-center rounded border border-[rgba(255,255,255,0.1)] p-1.5 text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.04)] transition-colors'
+  const btnCls = 'flex items-center justify-center rounded border border-[var(--pd-line)] p-1.5 text-[#8f90a3] hover:border-[var(--pd-accent-soft)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-subtle)] transition-colors'
 
   // SVG icons for alignment axes
   const icons: Record<AlignAxis, React.ReactNode> = {
@@ -157,7 +157,7 @@ function AlignmentSection({
         ))}
       </div>
       {isMulti && (
-        <p className="mt-1.5 text-[10px] text-[#525261]">Aligns selected layers to each other</p>
+        <p className="mt-1.5 text-[10px] text-[var(--pd-c-6b6b7a)]">Aligns selected layers to each other</p>
       )}
     </div>
   )
@@ -240,9 +240,9 @@ function LayoutTab({ layer }: { layer: Layer }) {
                 onClick={() => upd({ visible: !layer.visible })}
                 className={`h-[30px] w-[30px] flex items-center justify-center rounded border text-sm transition-colors ${
                   layer.visible
-                    ? 'border-[rgba(255,255,255,0.12)] text-[var(--pd-c-e8e8f0)]'
-                    : 'border-[rgba(255,255,255,0.06)] text-[#3a3a4a]'
-                } hover:border-[rgba(255,255,255,0.22)]`}
+                    ? 'border-[var(--pd-line-strong)] text-[var(--pd-c-e8e8f0)]'
+                    : 'border-[var(--pd-line-subtle)] text-[#3a3a4a]'
+                } hover:border-[var(--pd-line)]`}
               >
                 <Icon name={layer.visible ? 'eye' : 'eye-off'} size={14} />
               </button>
@@ -253,8 +253,8 @@ function LayoutTab({ layer }: { layer: Layer }) {
                 className={`h-[30px] w-[30px] flex items-center justify-center rounded border text-xs transition-colors ${
                   layer.locked
                     ? 'border-[var(--pd-c-7c6ef6)] text-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.1)]'
-                    : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)]'
-                } hover:border-[rgba(255,255,255,0.22)]`}
+                    : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)]'
+                } hover:border-[var(--pd-line)]`}
               >
                 <Icon name={layer.locked ? 'lock' : 'unlock'} size={13} />
               </button>
@@ -279,8 +279,8 @@ function LayoutTab({ layer }: { layer: Layer }) {
                   onClick={() => setLayerFormatVisibility(layer.id, fmtId, isVisible ? false : undefined)}
                   className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
                     isVisible
-                      ? 'border-[rgba(255,255,255,0.15)] text-[var(--pd-c-e8e8f0)] bg-[rgba(255,255,255,0.06)]'
-                      : 'border-[rgba(255,255,255,0.06)] text-[#555665] line-through'
+                      ? 'border-[var(--pd-line)] text-[var(--pd-c-e8e8f0)] bg-[var(--pd-fill)]'
+                      : 'border-[var(--pd-line-subtle)] text-[#555665] line-through'
                   }`}
                 >
                   {getFormatLabel(fmtId, project.settings.customFormats)}
@@ -316,8 +316,8 @@ function LayoutTab({ layer }: { layer: Layer }) {
                       onClick={() => upd({ height: undefined } as Partial<Layer>)}
                       className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
                         (layer as TextLayer).height == null
-                          ? 'border-[var(--pd-c-7c6ef6)] text-[#9d90f8] bg-[rgba(124,110,246,0.12)] cursor-default'
-                          : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
+                          ? 'border-[var(--pd-c-7c6ef6)] text-[var(--pd-c-9b8fff)] bg-[var(--pd-accent-wash)] cursor-default'
+                          : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                       }`}
                     >
                       <span className="flex items-center gap-1">
@@ -559,7 +559,7 @@ export function PropertiesPanel() {
                 type="button"
                 title="Copy style (Ctrl+Alt+C)"
                 onClick={() => copyLayerStyle(selectedLayer!.id)}
-                className="text-[10px] px-2 py-1 rounded border border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.2)] transition-colors"
+                className="text-[10px] px-2 py-1 rounded border border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[var(--pd-line-loud)] transition-colors"
               >
                 {t('props.copyStyle')}
               </button>
@@ -577,8 +577,8 @@ export function PropertiesPanel() {
                   disabled={styleClipboard.layerType !== selectedLayer.type}
                   className={`text-[10px] px-2 py-1 rounded border transition-colors ${
                     styleClipboard.layerType === selectedLayer.type
-                      ? 'border-[rgba(124,110,246,0.4)] text-[#9d90f8] hover:text-white hover:border-[var(--pd-c-7c6ef6)] hover:bg-[rgba(124,110,246,0.15)]'
-                      : 'border-[rgba(255,255,255,0.06)] text-[#3a3a4a] cursor-not-allowed'
+                      ? 'border-[var(--pd-accent-soft)] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] hover:border-[var(--pd-c-7c6ef6)] hover:bg-[var(--pd-accent-wash)]'
+                      : 'border-[var(--pd-line-subtle)] text-[#3a3a4a] cursor-not-allowed'
                   }`}
                 >
                   Paste Style
@@ -589,7 +589,7 @@ export function PropertiesPanel() {
         </div>
 
         {selectedLayer && !isBackgroundSelected && (
-          <div className="mt-3 flex gap-4 border-b border-[rgba(255,255,255,0.06)]">
+          <div className="mt-3 flex gap-4 border-b border-[var(--pd-line-subtle)]">
             {([
               ['layout', t('props.tabLayout')],
               ['style', t('props.tabStyle')],
@@ -614,21 +614,21 @@ export function PropertiesPanel() {
         ) : (
           <>
             {editingGroupId && selection?.layerId && (
-              <div className="mb-4 flex items-center gap-2 rounded-xl border border-[rgba(124,110,246,0.3)] bg-[rgba(124,110,246,0.14)] px-3 py-2 text-xs text-[#c4b5fd]">
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] px-3 py-2 text-xs text-[#c4b5fd]">
                 <Icon name="group" size={13} />
                 {t('props.editingInsideGroup')}
               </div>
             )}
 
             {rawSelectedLayer && !isBaseFormat && rawSelectedLayer.ownerFormat === activeCanvasFormat && (
-              <div className="mb-3 rounded-lg border border-[rgba(124,110,246,0.3)] bg-[rgba(124,110,246,0.08)] px-3 py-2">
+              <div className="mb-3 rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.08)] px-3 py-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-[#c4b5fd]">
                     Only in {activeFormatInfo.label} · Added specifically for this format
                   </span>
                   <button
                     onClick={() => makeLayerShared(rawSelectedLayer!.id)}
-                    className="text-[10px] text-[#c4b5fd] hover:text-white underline shrink-0"
+                    className="text-[10px] text-[#c4b5fd] hover:text-[var(--pd-c-f0eff8)] underline shrink-0"
                   >
                     Make shared
                   </button>
@@ -639,12 +639,12 @@ export function PropertiesPanel() {
             {rawSelectedLayer && !isBaseFormat && !rawSelectedLayer.ownerFormat && selectedHasFormatOverride && (
               <div className="mb-3 rounded-lg border border-[rgba(245,158,11,0.25)] bg-[rgba(245,158,11,0.06)] px-3 py-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-[#fbbf24]">
+                  <span className="text-[10px] text-[var(--pd-warn)]">
                     {Object.keys(rawSelectedLayer.formatOverrides?.[activeCanvasFormat] ?? {}).length} layout adjustments for {activeFormatInfo.label}
                   </span>
                   <div className="flex gap-1.5">
-                    <button onClick={() => clearLayerFormatOverride(rawSelectedLayer!.id)} className="text-[10px] text-[#fbbf24] hover:text-white underline">Reset</button>
-                    <button onClick={() => syncLayerFormatToShared(rawSelectedLayer!.id)} className="text-[10px] text-[#fbbf24] hover:text-white underline">Share</button>
+                    <button onClick={() => clearLayerFormatOverride(rawSelectedLayer!.id)} className="text-[10px] text-[var(--pd-warn)] hover:text-[var(--pd-c-f0eff8)] underline">Reset</button>
+                    <button onClick={() => syncLayerFormatToShared(rawSelectedLayer!.id)} className="text-[10px] text-[var(--pd-warn)] hover:text-[var(--pd-c-f0eff8)] underline">Share</button>
                   </div>
                 </div>
               </div>
@@ -664,7 +664,7 @@ export function PropertiesPanel() {
                   </span>
                   <button
                     onClick={() => clearLayerLocaleAdjust(rawSelectedLayer!.id, activeLocale, activeCanvasFormat)}
-                    className="shrink-0 text-[10px] underline hover:text-white"
+                    className="shrink-0 text-[10px] underline hover:text-[var(--pd-c-f0eff8)]"
                     style={{ color: isBaseFormat ? '#9d90f8' : '#22d3ee' }}
                   >
                     Reset

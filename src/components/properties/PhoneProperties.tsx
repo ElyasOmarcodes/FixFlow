@@ -39,11 +39,11 @@ function LocaleScreenshotRow({
       <span className="text-[10px] text-[var(--pd-c-6b6b7a)] uppercase w-8 shrink-0 font-mono">{locale}</span>
       {previewSrc ? (
         <>
-          <img src={previewSrc} alt={locale} className="h-8 w-5 rounded object-cover border border-[rgba(255,255,255,0.12)] shrink-0" />
+          <img src={previewSrc} alt={locale} className="h-8 w-5 rounded object-cover border border-[var(--pd-line-strong)] shrink-0" />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex-1 text-start text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[#9d90f8] transition-colors"
+            className="flex-1 text-start text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors"
           >
             Change
           </button>
@@ -51,7 +51,7 @@ function LocaleScreenshotRow({
             type="button"
             onClick={onClear}
             aria-label="Clear screenshot"
-            className="text-[#f87171] hover:text-[#fca5a5] transition-colors shrink-0"
+            className="text-[var(--pd-danger)] hover:text-[var(--pd-danger-soft)] transition-colors shrink-0"
           >
             <Icon name="close" size={12} strokeWidth={2.2} />
           </button>
@@ -60,7 +60,7 @@ function LocaleScreenshotRow({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex-1 text-start text-[10px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] border border-dashed border-[rgba(255,255,255,0.1)] rounded px-2 py-1 transition-colors hover:border-[rgba(124,110,246,0.4)]"
+          className="flex-1 text-start text-[10px] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] border border-dashed border-[var(--pd-line)] rounded px-2 py-1 transition-colors hover:border-[var(--pd-accent-soft)]"
         >
           + Upload for {locale}
         </button>
@@ -173,7 +173,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
                   key={preset.label}
                   type="button"
                   onClick={() => upd(preset.patch)}
-                  className="flex flex-col items-center gap-0.5 rounded border border-[rgba(255,255,255,0.1)] px-1 py-1.5 text-[10px] text-[#8f90a3] hover:border-[rgba(124,110,246,0.5)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.04)] transition-colors leading-tight text-center"
+                  className="flex flex-col items-center gap-0.5 rounded border border-[var(--pd-line)] px-1 py-1.5 text-[10px] text-[#8f90a3] hover:border-[var(--pd-accent-soft)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-subtle)] transition-colors leading-tight text-center"
                 >
                   {preset.icon && <Icon name={preset.icon} size={12} />}
                   {preset.label}
@@ -260,7 +260,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
           variant="dropzone"
           accept="image/*"
           ariaLabel="Upload screenshot"
-          className="rounded-xl border border-dashed border-[rgba(255,255,255,0.14)] bg-[var(--pd-c-0f0f13)] p-4 text-center transition-colors hover:border-[rgba(124,110,246,0.55)] cursor-pointer"
+          className="rounded-xl border border-dashed border-[var(--pd-line-strong)] bg-[var(--pd-c-0f0f13)] p-4 text-center transition-colors hover:border-[rgba(124,110,246,0.55)] cursor-pointer"
           onFiles={async (files) => {
             const file = files[0]
             if (!file) return

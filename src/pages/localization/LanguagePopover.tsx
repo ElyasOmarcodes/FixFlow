@@ -47,8 +47,8 @@ function LanguageCombobox({
   }
 
   return (
-    <div className="relative z-50 w-72 rounded-2xl border border-white/12 bg-[#1a1a24] shadow-2xl">
-      <div className="p-2 border-b border-white/8">
+    <div className="relative z-[var(--pd-z-popover)] w-72 rounded-2xl border border-[var(--pd-line-strong)] bg-[var(--pd-panel)] shadow-2xl">
+      <div className="p-2 border-b border-[var(--pd-line-soft)]">
         <input
           ref={inputRef}
           value={query}
@@ -59,7 +59,7 @@ function LanguageCombobox({
             if (e.key === 'Enter' && filtered.length === 0 && customCodeValid) handleSelect(customCodeValid)
           }}
           placeholder="Search language or type code…"
-          className="w-full rounded-lg border border-white/10 bg-[var(--pd-c-0f0f13)] px-3 py-2 text-sm text-white outline-none placeholder:text-[var(--pd-c-6b6b7a)] focus:border-[var(--pd-c-7c6ef6)]"
+          className="w-full rounded-lg border border-[var(--pd-line)] bg-[var(--pd-c-0f0f13)] px-3 py-2 text-sm text-white outline-none placeholder:text-[var(--pd-c-6b6b7a)] focus:border-[var(--pd-c-7c6ef6)]"
         />
       </div>
       <div className="max-h-56 overflow-y-auto py-1">
@@ -76,12 +76,12 @@ function LanguageCombobox({
                 disabled
                   ? 'cursor-default text-[var(--pd-c-4a4a5a)]'
                   : already
-                    ? 'text-[#d9d9e6] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white'
-                  : 'text-[#d9d9e6] hover:bg-white/6 hover:text-white'
+                    ? 'text-[#d9d9e6] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]'
+                  : 'text-[#d9d9e6] hover:bg-[var(--pd-line-subtle)] hover:text-[var(--pd-c-f0eff8)]'
               }`}
             >
               <span>{lang.name}</span>
-              <span className={`text-xs font-mono ${disabled ? 'text-[#3a3a4a]' : already ? 'text-[#9d90f8]' : 'text-[var(--pd-c-6b6b7a)]'}`}>
+              <span className={`text-xs font-mono ${disabled ? 'text-[#3a3a4a]' : already ? 'text-[var(--pd-c-9b8fff)]' : 'text-[var(--pd-c-6b6b7a)]'}`}>
                 <span className="flex items-center gap-1">{already && <Icon name="check" size={10} strokeWidth={2.4} />}{lang.code}</span>
               </span>
             </button>
@@ -91,7 +91,7 @@ function LanguageCombobox({
           <button
             type="button"
             onClick={() => handleSelect(customCodeValid)}
-            className="flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-[#9d90f8] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-white transition"
+            className="flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-[var(--pd-c-9b8fff)] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)] transition"
           >
             <span className="text-[var(--pd-c-7c6ef6)]"><Icon name="plus" size={12} strokeWidth={2.4} /></span>
             Use custom code: <span className="font-mono">{customCodeValid}</span>
@@ -103,11 +103,11 @@ function LanguageCombobox({
           </div>
         )}
       </div>
-      <div className="border-t border-white/8 p-2">
+      <div className="border-t border-[var(--pd-line-soft)] p-2">
         <button
           type="button"
           onClick={onCancel}
-          className="w-full rounded-lg px-3 py-1.5 text-xs text-[var(--pd-c-6b6b7a)] hover:text-white transition"
+          className="w-full rounded-lg px-3 py-1.5 text-xs text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-f0eff8)] transition"
         >
           Cancel
         </button>
@@ -173,7 +173,7 @@ export function LanguagePopover({
   if (!open || !position || typeof document === 'undefined') return null
 
   return createPortal(
-    <div className="fixed inset-0 z-[100]" onMouseDown={onCancel}>
+    <div className="fixed inset-0 z-[var(--pd-z-popover)]" onMouseDown={onCancel}>
       <div
         className="fixed"
         style={{ left: position.left, top: position.top }}
@@ -186,7 +186,7 @@ export function LanguagePopover({
           onCancel={onCancel}
         />
         {note && (
-          <div className="mt-2 w-72 rounded-xl border border-white/8 bg-[var(--pd-c-111118)] px-3 py-2 text-[10px] leading-relaxed text-[#7f8094] shadow-xl">
+          <div className="mt-2 w-72 rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-111118)] px-3 py-2 text-[10px] leading-relaxed text-[#7f8094] shadow-xl">
             {note}
           </div>
         )}

@@ -154,11 +154,11 @@ function Dot({
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute start-0 top-5 z-50 rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-xl py-1 min-w-[130px]"
+          className="absolute start-0 top-5 z-[var(--pd-z-popover)] rounded-lg border border-[var(--pd-line-strong)] bg-[var(--pd-panel)] shadow-xl py-1 min-w-[130px]"
         >
           <button
             type="button"
-            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] transition-colors"
             onClick={() => {
               onReset()
               setMenuOpen(false)
@@ -199,7 +199,7 @@ function FormatOverrideDot({
       <button
         type="button"
         title="Format override — click to manage"
-        className="cursor-pointer ml-1 leading-none text-[#f59e0b] hover:text-[#fbbf24] transition-colors"
+        className="cursor-pointer ml-1 leading-none text-[var(--pd-warn-strong)] hover:text-[var(--pd-warn)] transition-colors"
         onClick={(e) => {
           e.stopPropagation()
           setMenuOpen((prev) => !prev)
@@ -210,11 +210,11 @@ function FormatOverrideDot({
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute start-0 top-5 z-50 rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1c1c26] shadow-xl py-1 min-w-[130px]"
+          className="absolute start-0 top-5 z-[var(--pd-z-popover)] rounded-lg border border-[var(--pd-line-strong)] bg-[var(--pd-panel)] shadow-xl py-1 min-w-[130px]"
         >
           <button
             type="button"
-            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] transition-colors"
             onClick={() => {
               onResetToAuto()
               setMenuOpen(false)
@@ -224,7 +224,7 @@ function FormatOverrideDot({
           </button>
           <button
             type="button"
-            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+            className="w-full text-start px-3 py-1.5 text-[11px] text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] transition-colors"
             onClick={() => {
               onUseAsShared()
               setMenuOpen(false)

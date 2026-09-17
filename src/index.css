@@ -74,6 +74,32 @@
   --pd-panel: #18181f;
   --pd-workspace: #111118;
 
+  /* ── Hairlines and fills ───────────────────────────────────────────────
+     The chrome is separated by translucent lines rather than solid ones, so
+     a panel reads as one surface. Written as tokens because the alpha has to
+     invert with the theme: white at 8% over a near-black panel and white at
+     8% over a white one are a visible border and nothing at all. This is
+     what made Style › Shadow's off-state a white knob on a white track. */
+  --pd-line-subtle: rgba(255,255,255,0.06);
+  --pd-line-soft: rgba(255,255,255,0.08);
+  --pd-line: rgba(255,255,255,0.1);
+  --pd-line-strong: rgba(255,255,255,0.12);
+  --pd-line-loud: rgba(255,255,255,0.2);
+  --pd-fill-subtle: rgba(255,255,255,0.03);
+  --pd-fill-soft: rgba(255,255,255,0.05);
+  --pd-fill: rgba(255,255,255,0.06);
+  --pd-fill-strong: rgba(255,255,255,0.08);
+
+  /* Semantic colours, so a warning is one value rather than eight hexes. */
+  --pd-danger: #f87171;
+  --pd-danger-soft: #fca5a5;
+  --pd-warn: #fbbf24;
+  --pd-warn-strong: #f59e0b;
+  --pd-ok: #6ee7b7;
+  --pd-info: #22d3c5;
+  /* Text that sits on top of a filled accent, never on a panel. */
+  --pd-on-accent: #ffffff;
+
   /* Tinted washes, derived once so hover/press states stay consistent. */
   --pd-accent-wash: rgba(124,110,246,0.14);
   --pd-accent-wash-strong: rgba(124,110,246,0.24);
@@ -103,6 +129,26 @@
   --pd-dur-base: 200ms;
   --pd-dur-slow: 280ms;
   --pd-dur-sheet: 340ms;
+
+  /* ── Stacking order ────────────────────────────────────────────────────
+     One scale, so a surface's height is decided here rather than by whoever
+     last lost a fight with `z-50`. Values are spaced by 100 so a new layer
+     can slot between two without renumbering.
+
+     The bug this replaces: modals defaulted to `z-50` while the mobile side
+     panels are `z-60`, so opening the icon picker from the properties sheet
+     put the picker *behind* the sheet. Other modals had worked around the
+     same clash with `z-[9999]`, which is why some opened correctly and some
+     did not. Nothing outside this block may invent a z-index. */
+  --pd-z-canvas: 5;         /* selection grips, guides, zoom pill */
+  --pd-z-sheet: 60;         /* side panels, once they become bottom sheets */
+  --pd-z-popover: 120;      /* menus and popovers anchored to the chrome */
+  --pd-z-start: 200;        /* the launch screen, over the editor */
+  --pd-z-more-sheet: 300;   /* the mobile "more tools" sheet */
+  --pd-z-modal: 400;        /* every dialog — above every panel and sheet */
+  --pd-z-confirm: 500;      /* a confirmation asked *by* a dialog */
+  --pd-z-drag: 700;         /* drag ghosts, which must clear everything */
+  --pd-z-splash: 800;       /* the loading screen owns the top */
 
   /* Chrome metrics, shared between the shell and the media queries so a
      bottom sheet can never overlap the bar it is supposed to sit above. */
@@ -151,6 +197,21 @@
   --pd-shadow-popover: 0 10px 30px rgba(28,35,54,0.14), 0 2px 6px rgba(28,35,54,0.08);
   --pd-shadow-modal: 0 26px 70px rgba(28,35,54,0.22), 0 4px 14px rgba(28,35,54,0.1);
   --pd-shadow-sheet: 0 -12px 40px rgba(28,35,54,0.16);
+  --pd-line-subtle: rgba(20,24,40,0.07);
+  --pd-line-soft: rgba(20,24,40,0.1);
+  --pd-line: rgba(20,24,40,0.13);
+  --pd-line-strong: rgba(20,24,40,0.16);
+  --pd-line-loud: rgba(20,24,40,0.28);
+  --pd-fill-subtle: rgba(20,24,40,0.03);
+  --pd-fill-soft: rgba(20,24,40,0.05);
+  --pd-fill: rgba(20,24,40,0.06);
+  --pd-fill-strong: rgba(20,24,40,0.09);
+  --pd-danger: #d13b3b;
+  --pd-danger-soft: #b83232;
+  --pd-warn: #a06a06;
+  --pd-warn-strong: #8a5b04;
+  --pd-ok: #0f8a5f;
+  --pd-info: #0f7f78;
 }
 
 /* ─── 2. Native-control base layer ─────────────────────────────────────────
@@ -722,7 +783,7 @@
   border-radius: 12px;
   background: var(--pd-panel);
   box-shadow: var(--pd-shadow-popover);
-  z-index: 5;
+  z-index: var(--pd-z-canvas);
   animation: pd-pop-in-centred var(--pd-dur-base) var(--pd-ease-decel) both;
 }
 
@@ -747,7 +808,7 @@
 .pd-handle-actions {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: calc(var(--pd-z-canvas) + 1);
   pointer-events: none;
 }
 
@@ -840,6 +901,7 @@
 /* ─── 6. Panels, sheets and popovers ─────────────────────────────────────── */
 
 .pd-modal-backdrop {
+  z-index: var(--pd-z-modal);
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   animation: pd-fade-in var(--pd-dur-fast) var(--pd-ease-standard) both;
@@ -1034,7 +1096,7 @@
   border-radius: 14px;
   background: var(--pd-panel);
   box-shadow: var(--pd-shadow-popover);
-  z-index: 90;
+  z-index: var(--pd-z-popover);
   transform-origin: bottom center;
   animation: pd-pop-in var(--pd-dur-fast) var(--pd-ease-decel) both;
 }
@@ -1067,7 +1129,7 @@
 .pd-mobile-text-editor {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  z-index: var(--pd-z-modal);
   background: var(--pd-panel);
   color: var(--pd-text);
   overflow-y: auto;
@@ -1110,7 +1172,7 @@
 .pd-more-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  z-index: var(--pd-z-more-sheet);
   display: flex;
   align-items: flex-end;
   background: rgba(0,0,0,0.5);
@@ -1349,7 +1411,7 @@
 
 .pd-slide-options-popover {
   position: fixed;
-  z-index: 120;
+  z-index: var(--pd-z-popover);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1386,6 +1448,59 @@
 
 .pd-slide-options-popover header button:active { background: var(--pd-hover); }
 
+/* ── Switch ────────────────────────────────────────────────────────────────
+   One switch, sized by a data attribute. The off state needs a track the
+   knob can be seen against in *both* themes, which is why the knob is a
+   surface colour rather than plain white: white on a white track is what
+   made Style › Shadow's off state look broken. */
+.pd-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--pd-line-strong);
+  background: var(--pd-fill-strong);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-switch[data-size='lg'] { width: 44px; height: 24px; }
+
+.pd-switch[aria-checked='true'] {
+  background: var(--pd-accent);
+  border-color: var(--pd-accent);
+}
+
+.pd-switch:disabled { opacity: 0.45; }
+
+.pd-switch-knob {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--pd-panel);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: transform var(--pd-dur-fast) var(--pd-ease-standard), background-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-switch[data-size='lg'] .pd-switch-knob { width: 18px; height: 18px; }
+
+/* Translated rather than repositioned, so it animates on the compositor —
+   and mirrored under RTL, where the "on" end of the track is the left. */
+.pd-switch[aria-checked='true'] .pd-switch-knob {
+  background: #fff;
+  transform: translateX(16px);
+}
+
+.pd-switch[data-size='lg'][aria-checked='true'] .pd-switch-knob { transform: translateX(20px); }
+
+[dir='rtl'] .pd-switch[aria-checked='true'] .pd-switch-knob { transform: translateX(-16px); }
+[dir='rtl'] .pd-switch[data-size='lg'][aria-checked='true'] .pd-switch-knob { transform: translateX(-20px); }
+
 /* ── Start screen ──────────────────────────────────────────────────────────
    The launch page. It covers the editor rather than replacing it, so it is a
    full-bleed layer with its own scroll; the editor underneath keeps its stage
@@ -1393,7 +1508,7 @@
 .pd-start {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: var(--pd-z-start);
   overflow-y: auto;
   overscroll-behavior: contain;
   background:
@@ -1971,7 +2086,7 @@
     width: 100%;
     height: 100%;
     max-height: 100%;
-    z-index: 60;
+    z-index: var(--pd-z-sheet);
     border-radius: var(--pd-radius-sheet) var(--pd-radius-sheet) 0 0;
     background: var(--pd-panel);
     box-shadow: var(--pd-shadow-sheet);

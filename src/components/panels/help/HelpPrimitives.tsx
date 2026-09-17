@@ -4,7 +4,7 @@ type ShortcutRow = { keys: ReactNode; desc: string }
 
 export function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-flex min-h-6 items-center whitespace-nowrap rounded-md border border-[rgba(255,255,255,0.13)] bg-[#20202a] px-1.5 font-mono text-[10px] font-medium text-[#c8c8d8] shadow-[inset_0_-1px_0_rgba(255,255,255,0.06)]">
+    <kbd className="inline-flex min-h-6 items-center whitespace-nowrap rounded-md border border-[var(--pd-line)] bg-[var(--pd-c-1e1e28)] px-1.5 font-mono text-[10px] font-medium text-[#c8c8d8] shadow-[inset_0_-1px_0_rgba(255,255,255,0.06)]">
       {children}
     </kbd>
   )
@@ -12,7 +12,7 @@ export function Kbd({ children }: { children: ReactNode }) {
 
 export function SectionHeader({ children }: { children: ReactNode }) {
   return (
-    <div className="mb-2.5 mt-7 border-b border-[rgba(255,255,255,0.06)] pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f82ff] first:mt-0">
+    <div className="mb-2.5 mt-7 border-b border-[var(--pd-line-subtle)] pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f82ff] first:mt-0">
       {children}
     </div>
   )
@@ -20,12 +20,12 @@ export function SectionHeader({ children }: { children: ReactNode }) {
 
 export function ShortcutTable({ rows }: { rows: ShortcutRow[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-[rgba(255,255,255,0.07)]">
+    <div className="overflow-hidden rounded-xl border border-[var(--pd-line)]">
       <table className="w-full border-collapse text-[12px]">
         <tbody>
           {rows.map((row, index) => (
-            <tr key={index} className={index % 2 === 0 ? 'bg-[rgba(255,255,255,0.022)]' : 'bg-transparent'}>
-              <td className="w-[46%] border-r border-[rgba(255,255,255,0.045)] px-3 py-2.5 text-[var(--pd-c-777786)] sm:w-[42%]">
+            <tr key={index} className={index % 2 === 0 ? 'bg-[var(--pd-fill)]' : 'bg-transparent'}>
+              <td className="w-[46%] border-r border-[var(--pd-line)] px-3 py-2.5 text-[var(--pd-c-777786)] sm:w-[42%]">
                 <span className="flex flex-wrap items-center gap-1">{row.keys}</span>
               </td>
               <td className="px-3 py-2.5 text-[#b6b6c3]">{row.desc}</td>

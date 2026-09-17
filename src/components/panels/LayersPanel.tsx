@@ -389,8 +389,8 @@ export function LayersPanel() {
           <div
             className={`relative flex items-center gap-1 px-2 py-1.5 border-l-2 transition-colors ${
               selection?.layerId === backgroundLayer.id
-                ? 'bg-[rgba(124,110,246,0.15)] border-[var(--pd-c-7c6ef6)]'
-                : 'border-transparent hover:bg-[rgba(255,255,255,0.04)]'
+                ? 'bg-[var(--pd-accent-wash)] border-[var(--pd-c-7c6ef6)]'
+                : 'border-transparent hover:bg-[var(--pd-fill-subtle)]'
             }`}
             onClick={() => select(backgroundLayer.id)}
           >
@@ -398,7 +398,7 @@ export function LayersPanel() {
             <button
               aria-label={backgroundLayer.visible ? 'Hide Background' : 'Show Background'}
               onClick={(e) => { e.stopPropagation(); setLayerVisibility(backgroundLayer.id, !backgroundLayer.visible) }}
-              className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[rgba(255,255,255,0.08)] shrink-0"
+              className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0"
               style={{ color: backgroundLayer.visible ? 'var(--pd-c-e8e8f0)' : 'var(--pd-c-3a3a4a)' }}
             >{backgroundLayer.visible ? <Icon name="eye" size={13} /> : <Icon name="eye-off" size={13} />}</button>
             <span className="shrink-0" style={{ color: 'var(--pd-c-8a86a0)' }}><Icon name="palette" size={13} /></span>

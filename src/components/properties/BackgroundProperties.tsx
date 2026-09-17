@@ -111,7 +111,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
       {hasImage && (
         <div className="space-y-3">
           <div
-            className="relative rounded-xl border border-[rgba(255,255,255,0.1)] overflow-hidden cursor-pointer group"
+            className="relative rounded-xl border border-[var(--pd-line)] overflow-hidden cursor-pointer group"
             style={{ height: 80 }}
             onClick={() => bgImageInputRef.current?.click()}
           >
@@ -127,7 +127,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
           <button
             type="button"
             onClick={() => upd({ imageDataUrl: undefined })}
-            className="text-xs text-[#f87171] hover:text-[#fca5a5] transition-colors"
+            className="text-xs text-[var(--pd-danger)] hover:text-[var(--pd-danger-soft)] transition-colors"
           >
             Remove image ×
           </button>
@@ -143,7 +143,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                   className={`rounded-lg border px-2 py-1.5 text-xs transition-colors ${
                     (layer.imageFit ?? 'cover') === fit
                       ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
-                      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
+                      : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >
                   {fit.charAt(0).toUpperCase() + fit.slice(1)}
@@ -196,7 +196,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
       <div>
         <div className="flex items-center justify-between mb-1">
           <label className={labelCls + ' !mb-0'}>Noise Texture</label>
-          <ToggleSwitch checked={(layer.noise ?? 0) > 0} onChange={(checked) => upd({ noise: checked ? 0.05 : 0 })} checkedKnobClassName="translate-x-4" ariaLabel="Toggle noise texture" />
+          <ToggleSwitch checked={(layer.noise ?? 0) > 0} onChange={(checked) => upd({ noise: checked ? 0.05 : 0 })} ariaLabel="Toggle noise texture" />
         </div>
         {(layer.noise ?? 0) > 0 && (
           <SliderField
@@ -222,8 +222,8 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                 onClick={() => selectAccent(i)}
                 className={`flex w-full cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-start text-xs transition-colors ${
                   selectedAccentIndex === i
-                    ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-[var(--pd-c-e8e8f0)]'
-                    : 'border-[rgba(255,255,255,0.08)] text-[#9a9aaa] hover:border-[rgba(124,110,246,0.5)] hover:bg-[rgba(255,255,255,0.04)]'
+                    ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)] text-[var(--pd-c-e8e8f0)]'
+                    : 'border-[var(--pd-line-soft)] text-[#9a9aaa] hover:border-[var(--pd-accent-soft)] hover:bg-[var(--pd-fill-subtle)]'
                 }`}
               >
                 <button
@@ -231,7 +231,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                   className="flex min-w-0 flex-1 items-center gap-2 text-start"
                 >
                   <span
-                    className="h-4 w-4 shrink-0 rounded-full border border-[rgba(255,255,255,0.2)]"
+                    className="h-4 w-4 shrink-0 rounded-full border border-[var(--pd-line-loud)]"
                     style={{
                       background: getBackgroundAccentRenderColor(
                         accent,
@@ -249,7 +249,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                     event.stopPropagation()
                     removeAccent(i)
                   }}
-                  className="px-1 text-lg leading-none text-[#f87171] hover:text-[#fca5a5] transition-colors"
+                  className="px-1 text-lg leading-none text-[var(--pd-danger)] hover:text-[var(--pd-danger-soft)] transition-colors"
                 >
                   ×
                 </button>
@@ -260,7 +260,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
           {selectedAccentIndex !== null && layer.accents[selectedAccentIndex] ? (() => {
             const accent = layer.accents[selectedAccentIndex]
             return (
-              <div className="space-y-3 border-t border-[rgba(255,255,255,0.08)] pt-3">
+              <div className="space-y-3 border-t border-[var(--pd-line-soft)] pt-3">
                 <div className={fieldCls}>
                   <label className={labelCls}>Color</label>
                   <ColorField

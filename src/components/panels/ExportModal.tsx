@@ -252,10 +252,10 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
       showCloseButton={!isExporting}
       closeLabel="Close export"
       maxWidth="max-w-5xl"
-      backdropClassName="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm"
+      backdropClassName="fixed inset-0 flex items-center justify-center backdrop-blur-sm"
       panelClassName="relative rounded-2xl border shadow-2xl w-full mx-4 h-[85vh] flex flex-col overflow-hidden"
-      header={<div className="px-5 py-4 border-b border-[rgba(255,255,255,0.06)] shrink-0"><h2 className="text-base font-semibold text-[var(--pd-c-e8e8f0)]">Export Images</h2><p className="text-xs text-[var(--pd-c-6b6b7a)] mt-0.5">{exportSummary}</p></div>}
-      footerClassName="px-6 py-4 border-t border-[rgba(255,255,255,0.06)] shrink-0"
+      header={<div className="px-5 py-4 border-b border-[var(--pd-line-subtle)] shrink-0"><h2 className="text-base font-semibold text-[var(--pd-c-e8e8f0)]">Export Images</h2><p className="text-xs text-[var(--pd-c-6b6b7a)] mt-0.5">{exportSummary}</p></div>}
+      footerClassName="px-6 py-4 border-t border-[var(--pd-line-subtle)] shrink-0"
       footer={<>
         {isExporting && exportProgress && (() => {
           const isIndeterminate = exportProgress.phase === 'zipping' || exportProgress.phase === 'downloading'
@@ -270,7 +270,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
               aria-valuemax={exportProgress.total}
               aria-valuenow={exportProgress.completed}
               aria-valuetext={`Exporting ${exportProgress.completed} of ${exportProgress.total}: ${exportProgress.formatLabel}, ${exportProgress.locale}`}
-              className="h-1 overflow-hidden rounded bg-[rgba(255,255,255,0.08)]"
+              className="h-1 overflow-hidden rounded bg-[var(--pd-fill-strong)]"
             >
               <div
                 className={`h-full bg-[var(--pd-c-7c6ef6)] transition-[width] duration-300 ease-out motion-reduce:transition-none ${isIndeterminate ? 'w-full animate-pulse' : ''}`}
@@ -291,17 +291,17 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
           <button
             onClick={handleCancelExport}
             disabled={isCancelling}
-            className="rounded-lg border border-[rgba(255,255,255,0.15)] px-3 py-2.5 text-sm font-medium text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.06)] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+            className="rounded-lg border border-[var(--pd-line)] px-3 py-2.5 text-sm font-medium text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
           >
             {isCancelling ? 'Cancelling…' : 'Cancel'}
           </button>
         </div> : <button disabled={!canRunExport} onClick={handleRunExport} className="w-full rounded-lg bg-[var(--pd-c-7c6ef6)] px-3 py-2.5 text-sm font-medium text-white hover:bg-[#6c5ed6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">Export PNGs</button>}
         {exportError ? (
-          <p className="mt-2 rounded border border-[rgba(248,113,113,0.35)] bg-[rgba(248,113,113,0.08)] px-2 py-1.5 text-[10px] leading-snug text-[#fca5a5]">{exportError}</p>
+          <p className="mt-2 rounded border border-[rgba(248,113,113,0.35)] bg-[rgba(248,113,113,0.08)] px-2 py-1.5 text-[10px] leading-snug text-[var(--pd-danger-soft)]">{exportError}</p>
         ) : !isExporting && selectedExportFormats.length === 0 ? (
-          <p className="mt-2 text-[10px] leading-snug text-[#f59e0b]">Select at least one format to export.</p>
+          <p className="mt-2 text-[10px] leading-snug text-[var(--pd-warn-strong)]">Select at least one format to export.</p>
         ) : !isExporting && selectedExportLocales.length === 0 ? (
-          <p className="mt-2 text-[10px] leading-snug text-[#f59e0b]">Select at least one locale to export.</p>
+          <p className="mt-2 text-[10px] leading-snug text-[var(--pd-warn-strong)]">Select at least one locale to export.</p>
         ) : (
           <p className="text-[10px] leading-snug text-[var(--pd-c-6b6b7a)] mt-2">ZIP and Folder preserve the <span className="text-[#8f90a3]">format/locale/file.png</span> structure.</p>
         )}
@@ -322,8 +322,8 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                   type="button"
                   onClick={() => setExportScope(item.value)}
                   className={`text-start rounded border px-2.5 py-2 transition-colors ${exportScope === item.value
-                    ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-white'
-                    : 'border-[rgba(255,255,255,0.08)] text-[#a6a7b8] hover:border-[rgba(255,255,255,0.18)]'}`}
+                    ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)] text-white'
+                    : 'border-[var(--pd-line-soft)] text-[#a6a7b8] hover:border-[var(--pd-line-loud)]'}`}
                 >
                   <span className="block text-[11px] font-medium">{item.label}</span>
                   <span className="block text-[10px] text-[var(--pd-c-6b6b7a)] mt-0.5 truncate">{item.help}</span>
@@ -356,7 +356,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                   return (
                     <label
                       key={formatId}
-                      className="flex items-center gap-2 px-1 py-0.5 rounded cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.04)]"
+                      className="flex items-center gap-2 px-1 py-0.5 rounded cursor-pointer transition-colors hover:bg-[var(--pd-fill-subtle)]"
                     >
                       <input
                         type="checkbox"
@@ -371,11 +371,11 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                         {format.width}×{format.height}{!hasLayouts && ' · no layouts; nothing will export'}
                       </span>
                       {adjustments > 0 ? (
-                        <span className="text-[9px] text-[#f59e0b] bg-[rgba(245,158,11,0.1)] rounded px-1 py-px shrink-0">
+                        <span className="text-[9px] text-[var(--pd-warn-strong)] bg-[rgba(245,158,11,0.1)] rounded px-1 py-px shrink-0">
                           adjusted ({adjustments})
                         </span>
                       ) : (
-                        <span className="text-[9px] text-[var(--pd-c-6b6b7a)] bg-[rgba(255,255,255,0.05)] rounded px-1 py-px shrink-0">
+                        <span className="text-[9px] text-[var(--pd-c-6b6b7a)] bg-[var(--pd-fill-soft)] rounded px-1 py-px shrink-0">
                           auto
                         </span>
                       )}
@@ -401,7 +401,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                     onClick={() => { if (!singleLocale) toggleExportLocale(locale) }}
                     className={`text-[11px] rounded-full border px-2 py-1 transition-colors ${checked
                       ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.16)] text-white'
-                      : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:text-white'} ${singleLocale ? 'cursor-default opacity-80' : ''}`}
+                      : 'border-[var(--pd-line-soft)] text-[#8f90a3] hover:text-[var(--pd-c-f0eff8)]'} ${singleLocale ? 'cursor-default opacity-80' : ''}`}
                   >
                     {locale}
                   </button>
@@ -414,7 +414,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
           {hasPanoGroups && (
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--pd-c-6b6b7a)] mb-3">Pano groups</p>
-              <div className="rounded border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] px-3 py-2">
+              <div className="rounded border border-[var(--pd-line-soft)] bg-[var(--pd-fill-subtle)] px-3 py-2">
                 <label className="flex items-center gap-2 text-[11px] text-[#a6a7b8]">
                   <ToggleSwitch
                     variant="checkbox"
@@ -433,7 +433,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                       const next = normalizePanoCompensationPx(parseInt(panoCompensationInput, 10) || 0)
                       setPanoCompensationInput(String(next || DEFAULT_PANO_COMPENSATION_PX))
                     }}
-                    className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
+                    className="w-14 rounded border border-[var(--pd-line-strong)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
                   />
                   <span className="text-[var(--pd-c-6b6b7a)]">px</span>
                 </label>
@@ -461,8 +461,8 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                     disabled={disabled}
                     onClick={() => setExportOutput(item.value)}
                     className={`text-start rounded border px-2 py-1.5 transition-colors ${exportOutput === item.value
-                      ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.14)] text-white'
-                      : 'border-[rgba(255,255,255,0.08)] text-[#8f90a3] hover:text-white'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)] text-white'
+                      : 'border-[var(--pd-line-soft)] text-[#8f90a3] hover:text-[var(--pd-c-f0eff8)]'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >
                     <span className="block text-[11px] font-medium">{item.label}</span>
                     <span className="block text-[9px] text-[var(--pd-c-6b6b7a)] mt-0.5">{item.help}</span>

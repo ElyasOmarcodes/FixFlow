@@ -13,8 +13,8 @@ const resumeTemporal = () => useEditorStore.temporal.getState().resume()
 const toolbarBtnCls = (active: boolean) =>
   `h-7 min-w-7 px-1.5 flex items-center justify-center rounded border text-xs transition-colors ${
     active
-      ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-a0a0b0)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.22)]'
+      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+      : 'border-[var(--pd-line)] text-[var(--pd-c-a0a0b0)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[var(--pd-line)]'
   }`
 
 /** B / I / U / S / fill / clear toolbar for the rich text editors (panel + canvas). */
@@ -73,7 +73,7 @@ export function RichTextToolbar({
           className={toolbarBtnCls(fillOpen)}
         >
           <span
-            className="inline-block h-4 w-4 rounded border border-[rgba(255,255,255,0.25)]"
+            className="inline-block h-4 w-4 rounded border border-[var(--pd-line-loud)]"
             style={{ background: fillToCss(api.swatchFill) }}
           />
         </button>
@@ -98,7 +98,7 @@ export function RichTextToolbar({
         <select
           value={rangeStyle.fontWeight === 'mixed' ? '' : rangeStyle.fontWeight}
           onChange={(e) => api.applyPatch({ fontWeight: Number(e.target.value) })}
-          className="h-7 rounded-md border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-0f0f13)] px-2 text-xs text-[var(--pd-c-e8e8f0)]"
+          className="h-7 rounded-md border border-[var(--pd-line)] bg-[var(--pd-c-0f0f13)] px-2 text-xs text-[var(--pd-c-e8e8f0)]"
         >
           {rangeStyle.fontWeight === 'mixed' && <option value="">Mixed</option>}
           {weights.map((w) => (
@@ -108,7 +108,7 @@ export function RichTextToolbar({
       </div>
 
       {fillOpen && (
-        <div className={`rounded-lg border border-[rgba(255,255,255,0.08)] bg-[#0d0d12] p-2.5 ${fillPopoverClassName ?? 'mt-2'}`}>
+        <div className={`rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-2.5 ${fillPopoverClassName ?? 'mt-2'}`}>
           <FillControl
             key={`${layer.id}-${typeof api.swatchFill === 'string' ? 'solid' : api.swatchFill.type}`}
             fill={api.swatchFill}

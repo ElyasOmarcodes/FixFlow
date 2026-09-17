@@ -334,7 +334,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         </span>
       )}
 
-      <div className="h-6 w-px shrink-0 bg-[rgba(255,255,255,0.1)]" />
+      <div className="h-6 w-px shrink-0 bg-[var(--pd-fill-strong)]" />
 
       {/* Undo / Redo */}
       <div className="flex items-center gap-0.5">
@@ -342,7 +342,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
           onClick={() => undo()}
           disabled={!canUndo}
           title={`${t('toolbar.undo')} (Ctrl+Z)`}
-          className="w-7 h-7 flex items-center justify-center text-sm rounded hover:bg-[rgba(255,255,255,0.06)] disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-7 h-7 flex items-center justify-center text-sm rounded hover:bg-[var(--pd-fill)] disabled:opacity-30 disabled:cursor-not-allowed"
           style={{ color: canUndo ? '#e8e8f0' : '#3a3a4a' }}
         >
           <Icon name="undo" size={15} />
@@ -351,14 +351,14 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
           onClick={() => redo()}
           disabled={!canRedo}
           title={`${t('toolbar.redo')} (Ctrl+Shift+Z)`}
-          className="w-7 h-7 flex items-center justify-center text-sm rounded hover:bg-[rgba(255,255,255,0.06)] disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-7 h-7 flex items-center justify-center text-sm rounded hover:bg-[var(--pd-fill)] disabled:opacity-30 disabled:cursor-not-allowed"
           style={{ color: canRedo ? '#e8e8f0' : '#3a3a4a' }}
         >
           <Icon name="redo" size={15} />
         </button>
       </div>
 
-      <div className="h-6 w-px shrink-0 bg-[rgba(255,255,255,0.1)]" />
+      <div className="h-6 w-px shrink-0 bg-[var(--pd-fill-strong)]" />
 
       {/* Smart snap — a mode, so it reads as pressed rather than as a command. */}
       <button
@@ -367,15 +367,15 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         title={`${t('toolbar.smartSnapTitle')} (Hold Alt to bypass)`}
         className={`pd-snap-toggle flex shrink-0 items-center gap-1.5 rounded border px-2.5 py-1 text-xs transition-colors ${
           smartSnap
-            ? 'border-[rgba(124,110,246,0.5)] bg-[rgba(124,110,246,0.18)] text-[var(--pd-c-c4b5fd)]'
-            : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:border-[rgba(255,255,255,0.2)] hover:text-[var(--pd-c-e8e8f0)]'
+            ? 'border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash-strong)] text-[var(--pd-c-c4b5fd)]'
+            : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:border-[var(--pd-line-loud)] hover:text-[var(--pd-c-e8e8f0)]'
         }`}
       >
         <Icon name="magnet" size={13} />
         <span className="max-[1099px]:hidden">{t('toolbar.smartSnap')}</span>
       </button>
 
-      <div className="h-6 w-px shrink-0 bg-[rgba(255,255,255,0.1)]" />
+      <div className="h-6 w-px shrink-0 bg-[var(--pd-fill-strong)]" />
 
       {/* Group actions */}
       <div className="flex items-center gap-1.5">
@@ -383,7 +383,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
           <button
             onClick={() => createGroup(selectedLayerIds)}
             title={t('toolbar.groupTitle')}
-            className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-2.5 py-1 rounded border border-[rgba(124,110,246,0.5)] bg-[rgba(124,110,246,0.15)] hover:bg-[rgba(124,110,246,0.25)] transition-colors"
+            className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-2.5 py-1 rounded border border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] hover:bg-[rgba(124,110,246,0.25)] transition-colors"
           >
             <Icon name="group" size={13} />
             {t('toolbar.group')} ({selectedLayerIds.length})
@@ -400,7 +400,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         <button
           onClick={() => setSettingsOpen(true)}
           title={t('toolbar.settingsTitle')}
-          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-3 py-1.5 rounded border border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-3 py-1.5 rounded border border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)] transition-colors"
         >
           <Icon name="settings" size={13} /><span className="max-[1099px]:hidden">{t('toolbar.settings')}</span>
         </button>
@@ -411,7 +411,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
           className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border transition-colors ${
             mode === 'localization'
               ? 'text-white bg-[rgba(124,110,246,0.22)] border-[rgba(124,110,246,0.45)]'
-              : 'text-[var(--pd-c-e8e8f0)] border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)]'
+              : 'text-[var(--pd-c-e8e8f0)] border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)]'
           }`}
         >
           <Icon name="languages" size={13} />
@@ -421,7 +421,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         <button
           onClick={() => setHelpOpen(true)}
           title={t('toolbar.helpTitle')}
-          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-a0a0b0)] px-3 py-1.5 rounded border border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--pd-c-e8e8f0)] transition-colors"
+          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-a0a0b0)] px-3 py-1.5 rounded border border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)] hover:text-[var(--pd-c-e8e8f0)] transition-colors"
         >
           <Icon name="help" size={13} strokeWidth={2} />
           <span className="max-[1099px]:hidden">{t('toolbar.help')}</span>
@@ -433,7 +433,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
           target="_blank"
           rel="noopener noreferrer"
           title="View on GitHub"
-          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-a0a0b0)] px-3 py-1.5 rounded border border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] hover:text-[var(--pd-c-e8e8f0)] transition-colors"
+          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-a0a0b0)] px-3 py-1.5 rounded border border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)] hover:text-[var(--pd-c-e8e8f0)] transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>

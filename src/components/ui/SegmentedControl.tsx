@@ -29,7 +29,7 @@ export function SegmentedControl<T extends string>({
   className = 'grid grid-cols-3 gap-2',
   optionClassName = 'rounded-lg border px-2 py-2 text-xs transition-colors',
   activeClassName = 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white',
-  inactiveClassName = 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]',
+  inactiveClassName = 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-e8e8f0)]',
   renderOption,
 }: SegmentedControlProps<T>) {
   return (

@@ -141,7 +141,7 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
       onClose={onClose}
       onEscape={() => exportOpen ? setExportOpen(false) : onClose()}
       maxWidth=""
-      backdropClassName="fixed inset-0 z-[200] flex items-center justify-center"
+      backdropClassName="fixed inset-0 flex items-center justify-center"
       backdropStyle={{ background: 'rgba(0,0,0,0.6)' }}
       panelClassName=""
       panelStyle={{ width: 680, maxHeight: '80vh', background: 'var(--pd-c-18181f)', border: '1px solid var(--pd-field-border)', borderRadius: 12, display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.6)', overflow: 'hidden' }}

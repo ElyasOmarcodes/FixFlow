@@ -165,9 +165,9 @@ export function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
   const sectionLabelCls =
     'text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider px-2 py-1 select-none'
   const itemBaseCls =
-    'w-full text-start px-3 py-1.5 text-sm text-[var(--pd-c-e8e8f0)] hover:bg-[rgba(255,255,255,0.05)] transition-colors rounded'
-  const itemSelectedCls = 'bg-[rgba(124,110,246,0.15)] !text-[#c4b5fd]'
-  const itemActiveCls = 'bg-[rgba(255,255,255,0.08)] outline-none'
+    'w-full text-start px-3 py-1.5 text-sm text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-soft)] transition-colors rounded'
+  const itemSelectedCls = 'bg-[var(--pd-accent-wash)] !text-[#c4b5fd]'
+  const itemActiveCls = 'bg-[var(--pd-fill-strong)] outline-none'
 
   const noResults =
     filteredCustom.length === 0 && filteredWebSafe.length === 0 &&
@@ -202,9 +202,9 @@ export function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
 
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute inset-x-0 top-full mt-1 z-50 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#0f0f1a] shadow-xl shadow-black/50 overflow-hidden">
+        <div className="absolute inset-x-0 top-full mt-1 z-[var(--pd-z-popover)] rounded-lg border border-[var(--pd-line)] bg-[var(--pd-panel)] shadow-xl shadow-black/50 overflow-hidden">
           {/* Sticky search input */}
-          <div className="sticky top-0 bg-[#0f0f1a] border-b border-[rgba(255,255,255,0.08)] p-1.5">
+          <div className="sticky top-0 bg-[var(--pd-panel)] border-b border-[var(--pd-line-soft)] p-1.5">
             <input
               ref={searchRef}
               type="text"
@@ -224,8 +224,8 @@ export function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
                   onClick={() => { setScriptFilter(f.value); setActiveIdx(-1) }}
                   className={`rounded border px-1 py-1 text-[10px] transition-colors ${
                     scriptFilter === f.value
-                      ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.18)] text-[#c4b5fd]'
-                      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
+                      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+                      : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >
                   {t(f.labelKey)}
@@ -402,7 +402,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
         {/* Custom font upload */}
         <div className="mt-2 flex items-center gap-2">
           <label
-            className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[rgba(255,255,255,0.2)] transition-colors"
+            className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[var(--pd-line-loud)] transition-colors"
             title="Upload a .ttf, .otf, or .woff2 font file"
           >
             + Upload Font
@@ -440,7 +440,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
         {customFonts.some(f => f.family === layer.fontFamily) && (
           <button
             type="button"
-            className="mt-1 text-xs text-[#f87171] hover:text-[#fca5a5] transition-colors"
+            className="mt-1 text-xs text-[var(--pd-danger)] hover:text-[var(--pd-danger-soft)] transition-colors"
             onClick={() => {
               const ref = customFonts.find(f => f.family === layer.fontFamily)
               if (!ref) return
@@ -480,7 +480,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
               className={`rounded-lg border px-2 py-2 text-xs transition-colors ${
                 layer.align === item.value
                   ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
-                  : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]'
+                  : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-e8e8f0)]'
               }`}
             >
               <span className="flex items-center justify-center gap-1.5">
@@ -508,7 +508,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
                   className={`rounded-lg border px-2 py-2 text-xs transition-colors ${
                     (layer.verticalAlign ?? 'top') === item.value
                       ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
-                      : 'border-[rgba(255,255,255,0.1)] text-[var(--pd-c-6b6b7a)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--pd-c-e8e8f0)]'
+                      : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >
                   <span className="flex items-center justify-center gap-1.5">

@@ -67,7 +67,7 @@ export function BrandKitButton() {
             {brandColors.slice(0, 3).map((c: BrandColor) => (
               <span
                 key={c.id}
-                className="w-3 h-3 rounded-full border border-[rgba(255,255,255,0.2)]"
+                className="w-3 h-3 rounded-full border border-[var(--pd-line-loud)]"
                 style={{ background: c.value }}
               />
             ))}
@@ -81,7 +81,7 @@ export function BrandKitButton() {
       {open && (
         <div
           ref={popoverRef}
-          className="absolute top-full start-0 mt-1 z-50 w-72 rounded-xl border border-[rgba(255,255,255,0.1)] bg-[var(--pd-c-18181f)] shadow-2xl p-3"
+          className="absolute top-full start-0 mt-1 z-[var(--pd-z-popover)] w-72 rounded-xl border border-[var(--pd-line)] bg-[var(--pd-c-18181f)] shadow-2xl p-3"
           style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}
         >
           <div className="mb-2">

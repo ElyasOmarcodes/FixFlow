@@ -143,12 +143,12 @@ export function PreviewModal({
       open={open}
       onClose={onClose}
       maxWidth="max-w-[90vw]"
-      backdropClassName="fixed inset-0 z-[9999] flex items-center justify-center bg-[#08080c] p-6"
+      backdropClassName="fixed inset-0 flex items-center justify-center bg-[var(--pd-workspace)] p-6"
       backdropStyle={undefined}
       panelClassName="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-xl border bg-[var(--pd-c-18181f)] shadow-2xl"
       panelStyle={{ borderColor: 'rgba(255,255,255,0.08)' }}
       showCloseButton={false}
-      header={<div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.08)] px-6 py-4">
+      header={<div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--pd-line-soft)] px-6 py-4">
           <div>
             <h2 className="text-sm font-semibold text-[#f3f0ff]">Preview</h2>
             {previewProgress.status === 'capturing' || previewProgress.status === 'preparing' ? (
@@ -158,7 +158,7 @@ export function PreviewModal({
                   <span>{previewProgress.completedSlides} / {previewProgress.totalSlides}</span>
                 </div>
                 <div
-                  className="h-1 overflow-hidden rounded-full bg-[rgba(255,255,255,0.08)]"
+                  className="h-1 overflow-hidden rounded-full bg-[var(--pd-fill-strong)]"
                   role="progressbar"
                   aria-valuemin={0}
                   aria-valuemax={previewProgress.totalSlides}
@@ -170,7 +170,7 @@ export function PreviewModal({
                 <p className="mt-1 text-[10px] text-[#7d7a90]">Slide {previewProgress.completedSlides} of {previewProgress.totalSlides}{previewProgress.currentGroupName ? ` · ${previewProgress.currentGroupName}` : ''}</p>
               </div>
             ) : previewProgress.status === 'error' ? (
-              <p className="mt-1 rounded border border-[rgba(248,113,113,0.35)] bg-[rgba(248,113,113,0.08)] px-2 py-1 text-xs text-[#fca5a5]">Preview generation failed</p>
+              <p className="mt-1 rounded border border-[rgba(248,113,113,0.35)] bg-[rgba(248,113,113,0.08)] px-2 py-1 text-xs text-[var(--pd-danger-soft)]">Preview generation failed</p>
             ) : (
               <p className="mt-1 text-xs text-[#7d7a90]">
                 {totalSlides} slide{totalSlides !== 1 ? 's' : ''} · {slideGroups.length} group{slideGroups.length !== 1 ? 's' : ''}
@@ -181,16 +181,16 @@ export function PreviewModal({
           <div className="flex flex-wrap items-center gap-2">
             {/* Platform selector */}
             {platformFormats.length > 1 && (
-              <SegmentedControl value={activeCanvasFormat} options={platformFormats.map((format) => ({ value: format, label: getFormatLabel(format, settings.customFormats) }))} onChange={selectFormat} className="flex items-center gap-0.5 rounded-lg border border-[rgba(255,255,255,0.1)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[#cbbfff] font-bold" inactiveClassName="bg-transparent text-[#7d7a90] font-medium" />
+              <SegmentedControl value={activeCanvasFormat} options={platformFormats.map((format) => ({ value: format, label: getFormatLabel(format, settings.customFormats) }))} onChange={selectFormat} className="flex items-center gap-0.5 rounded-lg border border-[var(--pd-line)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[#cbbfff] font-bold" inactiveClassName="bg-transparent text-[#7d7a90] font-medium" />
             )}
 
             {/* Locale selector */}
             {locales.length > 1 && (
-              <SegmentedControl value={activeLocale} options={locales.map((locale) => ({ value: locale, label: getLanguageName(locale), title: getLanguageName(locale) }))} onChange={selectLocale} className="flex items-center gap-0.5 rounded-lg border border-[rgba(255,255,255,0.1)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[#cbbfff] font-bold" inactiveClassName="bg-transparent text-[#7d7a90] font-medium" />
+              <SegmentedControl value={activeLocale} options={locales.map((locale) => ({ value: locale, label: getLanguageName(locale), title: getLanguageName(locale) }))} onChange={selectLocale} className="flex items-center gap-0.5 rounded-lg border border-[var(--pd-line)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[#cbbfff] font-bold" inactiveClassName="bg-transparent text-[#7d7a90] font-medium" />
             )}
 
             {hasPanoGroups && (
-              <label className="flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.1)] px-2 py-1 text-[11px] text-[#8f90a3]">
+              <label className="flex items-center gap-2 rounded-lg border border-[var(--pd-line)] px-2 py-1 text-[11px] text-[#8f90a3]">
                 <ToggleSwitch
                   variant="checkbox"
                   checked={panoSettings.compensate}
@@ -215,7 +215,7 @@ export function PreviewModal({
                     if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
                     e.stopPropagation()
                   }}
-                  className="w-14 rounded border border-[rgba(255,255,255,0.12)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
+                  className="w-14 rounded border border-[var(--pd-line-strong)] bg-[var(--pd-c-0f0f13)] px-1 py-0.5 text-end text-[var(--pd-c-e8e8f0)] disabled:opacity-40"
                 />
                 <span>px</span>
               </label>
@@ -223,7 +223,7 @@ export function PreviewModal({
 
             <button
               onClick={onClose}
-              className="rounded-md px-2 py-1 text-xl leading-none text-[#8d89a3] transition-colors hover:text-white"
+              className="rounded-md px-2 py-1 text-xl leading-none text-[#8d89a3] transition-colors hover:text-[var(--pd-c-f0eff8)]"
               aria-label="Close preview"
             >
               ×

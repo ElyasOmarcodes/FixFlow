@@ -47,7 +47,7 @@ export function HelpMarkdown({ source }: { source: string }) {
           const value = String(children).replace(/\n$/, '')
           if (value.includes('\n')) {
             return (
-              <code className={`block whitespace-pre-wrap rounded-lg border border-[rgba(255,255,255,0.08)] bg-[var(--pd-c-0f0f13)] p-3 font-mono text-[11px] leading-5 text-[#c8c3ef] ${className ?? ''}`}>
+              <code className={`block whitespace-pre-wrap rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-3 font-mono text-[11px] leading-5 text-[#c8c3ef] ${className ?? ''}`}>
                 {value}
               </code>
             )
@@ -56,17 +56,17 @@ export function HelpMarkdown({ source }: { source: string }) {
         },
         pre: ({ children }) => <pre className="my-4">{children}</pre>,
         table: ({ children }) => (
-          <div className="overflow-hidden rounded-xl border border-[rgba(255,255,255,0.07)]">
+          <div className="overflow-hidden rounded-xl border border-[var(--pd-line)]">
             <table className="w-full border-collapse text-[12px]">{children}</table>
           </div>
         ),
         thead: () => null,
         tbody: ({ children }) => <tbody>{children}</tbody>,
         tr: ({ children }) => (
-          <tr className="odd:bg-[rgba(255,255,255,0.022)] even:bg-transparent">{children}</tr>
+          <tr className="odd:bg-[var(--pd-fill)] even:bg-transparent">{children}</tr>
         ),
         td: ({ children }) => (
-          <td className="px-3 py-2.5 text-[#b6b6c3] first:w-[46%] first:border-r first:border-[rgba(255,255,255,0.045)] first:text-[var(--pd-c-777786)] sm:first:w-[42%]">
+          <td className="px-3 py-2.5 text-[#b6b6c3] first:w-[46%] first:border-r first:border-[var(--pd-line)] first:text-[var(--pd-c-777786)] sm:first:w-[42%]">
             {children}
           </td>
         ),
