@@ -390,4 +390,17 @@ export const ps: Record<TranslationKey, string> = {
   'translateAll.progress': 'د {total} څخه {done} ژباړل کیږي…',
   'translateAll.complete': '{count} وژباړل شول.',
   'translateAll.partial': '{count} وژباړل شول، {failed} ونه ژباړل شول — بیا یې هڅه وکړئ.',
+  // ─ د رنګ ټاکونکی
+  'color.hue': 'رنګ',
+  'color.hex': 'د هیکس ارزښت',
+  'color.eyedropper': 'له سکرین څخه رنګ واخله',
+  'color.saveToBrand': 'د برانډ رنګونو کې یې خوندي کړه',
+  'color.brandNamePlaceholder': 'دې رنګ ته نوم ورکړه',
+  'color.unbind': 'د برانډ رنګ سره اړیکه پرې کړه',
+  'color.swatches': 'رنګونه',
+  'color.palette': 'پلیټ',
+  'color.brand': 'برانډ',
+  'color.recent': 'وروستي',
+  'color.noBrand': 'لا تر اوسه د برانډ رنګ نشته — په + یې خوندي کړه.',
+  'color.noRecent': 'کوم رنګونه چې کاروې، دلته به ښکاري.',
 }

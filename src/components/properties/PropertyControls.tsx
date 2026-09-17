@@ -1,16 +1,14 @@
 import { RecentFills } from './RecentFills'
+import { ColorField } from './ColorField'
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent, ReactNode } from 'react'
 import type { FillValue, GradientStop, LinearGradient, RadialGradient } from '@/types'
 import { useEditorStore } from '@/store'
 import { useBrandColors } from '@/hooks/useBrandColors'
-import { isBrandToken, parseBrandToken, resolveBrandColor, toBrandToken } from '@/utils/brandColors'
+import { isBrandToken, resolveBrandColor } from '@/utils/brandColors'
 import { fillToCss } from '@/utils/gradients'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
-import { Icon } from '@/components/ui/Icon'
 
-const inputCls =
-  'bg-[var(--pd-c-0f0f13)] border border-[var(--pd-line)] rounded px-2 py-1 text-sm text-[var(--pd-c-e8e8f0)] w-full focus:outline-none focus:border-[var(--pd-accent-soft)]'
 const labelCls = 'text-[11px] text-[var(--pd-c-6b6b7a)] mb-1 block uppercase tracking-[0.08em]'
 const rowCls = 'flex gap-2 mb-3'
 const fieldCls = 'flex-1 min-w-0'
@@ -122,103 +120,6 @@ function updateStopColor(stops: GradientStop[], index: number, color: string) {
   return { stops: sorted, index: sorted.indexOf(target) }
 }
 
-export function ColorField({
-  value,
-  onChange,
-  placeholder = '#FFFFFF',
-  onInteractionStart,
-  onInteractionEnd,
-}: {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  onInteractionStart?: () => void
-  onInteractionEnd?: () => void
-}) {
-  const brandColors = useBrandColors()
-  const resolvedValue = resolveBrandColor(value, brandColors)
-  const safeValue = normalizeHexColor(resolvedValue)
-  const activeBrand = isBrandToken(value) ? brandColors.find((c) => c.id === (parseBrandToken(value) ?? '')) : undefined
-  const activeRef = useRef(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const beginInteraction = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
-    }
-    if (!activeRef.current) {
-      activeRef.current = true
-      onInteractionStart?.()
-    }
-  }
-
-  const scheduleEnd = () => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      timerRef.current = null
-      activeRef.current = false
-      onInteractionEnd?.()
-    }, 600)
-  }
-
-  return (
-    <div>
-      <RecentFills fill={value} onChange={(next) => { if (typeof next === 'string') onChange(next) }} />
-      {/* Brand colors row — always visible */}
-      <div className="flex flex-wrap gap-1.5 mb-2 items-center">
-        {brandColors.map((bc) => (
-          <button
-            key={bc.id}
-            type="button"
-            title={bc.name}
-            onClick={() => onChange(toBrandToken(bc.id))}
-            className={`w-5 h-5 rounded-full border-2 transition-all ${
-              activeBrand?.id === bc.id
-                ? 'border-[var(--pd-c-7c6ef6)] scale-110'
-                : 'border-[var(--pd-line-loud)] hover:border-[var(--pd-line)]'
-            }`}
-            style={{ background: bc.value }}
-          />
-        ))}
-        {activeBrand && (
-          <button
-            type="button"
-            title="Clear brand binding"
-            onClick={() => onChange(safeValue)}
-            className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] hover:border-[var(--pd-c-7c6ef6)] transition-colors"
-          >
-            <Icon name="close" size={10} strokeWidth={2.4} /> {activeBrand.name}
-          </button>
-        )}
-        <AddBrandColorButton currentColor={safeValue} />
-      </div>
-      <div className="flex items-center gap-2">
-        <input
-          type="color"
-          value={safeValue}
-          onPointerDown={beginInteraction}
-          onChange={(e) => {
-            beginInteraction()
-            onChange(e.target.value)
-            scheduleEnd()
-          }}
-          className="h-8 w-8 rounded-md cursor-pointer border border-[var(--pd-line)] bg-transparent"
-        />
-        <input
-          type="text"
-          value={activeBrand ? safeValue : value}
-          onFocus={beginInteraction}
-          onBlur={scheduleEnd}
-          onChange={(e) => onChange(e.target.value)}
-          className={`${inputCls} flex-1`}
-          placeholder={placeholder}
-        />
-      </div>
-    </div>
-  )
-}
-
 export interface GradientEditorProps {
   fill: FillValue
   onChange: (f: FillValue) => void
@@ -256,84 +157,6 @@ const GRADIENT_PRESETS: Array<{ label: string; fill: LinearGradient }> = [
   { label: 'Lavender', fill: { type: 'linear', angle: 135, stops: [{ offset: 0, color: '#E0C3FC' }, { offset: 1, color: '#8EC5FC' }] } },
   { label: 'Neon',     fill: { type: 'linear', angle: 135, stops: [{ offset: 0, color: '#00DBDE' }, { offset: 1, color: '#FC00FF' }] } },
 ]
-
-const SOLID_PRESETS: Array<{ label: string; color: string }> = [
-  // Neutrals
-  { label: 'Black',       color: '#000000' },
-  { label: 'Near Black',  color: 'var(--pd-c-0f0f13)' },
-  { label: 'Dark Gray',   color: '#1c1c2e' },
-  { label: 'Gray',        color: '#6b7280' },
-  { label: 'Light Gray',  color: '#d1d5db' },
-  { label: 'White',       color: '#ffffff' },
-  // iOS / App Store accents
-  { label: 'iOS Blue',    color: '#007AFF' },
-  { label: 'iOS Green',   color: '#34C759' },
-  { label: 'iOS Red',     color: '#FF3B30' },
-  { label: 'iOS Orange',  color: '#FF9500' },
-  { label: 'iOS Purple',  color: '#AF52DE' },
-  { label: 'iOS Teal',    color: '#5AC8FA' },
-]
-
-function AddBrandColorButton({ currentColor }: { currentColor: string }) {
-  const [adding, setAdding] = useState(false)
-  const [name, setName] = useState('')
-  const addBrandColor = useEditorStore((s) => s.addBrandColor)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (adding) inputRef.current?.focus()
-  }, [adding])
-
-  if (!adding) {
-    return (
-      <button
-        type="button"
-        title="Save as brand color"
-        onClick={() => { setAdding(true); setName('') }}
-        className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-dashed border-[var(--pd-line-loud)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[var(--pd-line)] transition-colors"
-      >
-        <Icon name="plus" size={10} strokeWidth={2.4} /> Brand
-      </button>
-    )
-  }
-
-  return (
-    <div className="flex items-center gap-1">
-      <input
-        ref={inputRef}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && name.trim()) {
-            addBrandColor(name.trim(), currentColor)
-            setAdding(false)
-          }
-          if (e.key === 'Escape') setAdding(false)
-          e.stopPropagation()
-        }}
-        placeholder="Name…"
-        className="w-20 rounded border border-[var(--pd-accent-soft)] bg-[var(--pd-c-0f0f13)] px-1.5 py-0.5 text-[10px] text-[var(--pd-c-e8e8f0)] outline-none"
-      />
-      <button
-        type="button"
-        onClick={() => { if (name.trim()) { addBrandColor(name.trim(), currentColor); setAdding(false) } }}
-        disabled={!name.trim()}
-        aria-label="Save brand color"
-        className="flex items-center px-1.5 py-1 rounded bg-[var(--pd-c-7c6ef6)] text-white disabled:opacity-40"
-      >
-        <Icon name="check" size={11} strokeWidth={2.6} />
-      </button>
-      <button
-        type="button"
-        onClick={() => setAdding(false)}
-        aria-label="Cancel"
-        className="flex items-center text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]"
-      >
-        <Icon name="close" size={12} strokeWidth={2.2} />
-      </button>
-    </div>
-  )
-}
 
 export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, onInteractionEnd = () => {} }: GradientEditorProps) {
   const brandColors = useBrandColors()
@@ -451,66 +274,6 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
         inactiveClassName="text-[var(--pd-c-6b6b7a)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-e8e8f0)]"
       />
 
-      {/* ── Swatches tray (all modes) ── */}
-      {(() => {
-        const savedSolids = savedGradients.filter((g): g is string => typeof g === 'string')
-        const hasBrand = brandColors.length > 0
-        const hasSaved = savedSolids.length > 0
-        if (!hasBrand && !hasSaved) return null
-        return (
-          <div className="space-y-1.5">
-            {hasBrand && (
-              <div>
-                <span className={labelCls}>Brand</span>
-                <div className="mt-1 flex flex-wrap gap-1.5 items-center">
-                  {brandColors.map((bc) => {
-                    const isActive = typeof fill === 'string' && isBrandToken(fill) && parseBrandToken(fill) === bc.id
-                    return (
-                      <button
-                        key={bc.id}
-                        type="button"
-                        title={bc.name}
-                        onClick={() => onChange(toBrandToken(bc.id))}
-                        className={`w-5 h-5 rounded-full border-2 transition-all ${
-                          isActive ? 'border-[var(--pd-c-7c6ef6)] scale-110' : 'border-[var(--pd-line-loud)] hover:border-[var(--pd-line)]'
-                        }`}
-                        style={{ background: resolveBrandColor(bc.value, brandColors) }}
-                      />
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-            {hasSaved && (
-              <div>
-                <span className={labelCls}>Saved</span>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {savedSolids.map((color, i) => (
-                    <div key={i} className="relative group">
-                      <button
-                        type="button"
-                        title={color}
-                        onClick={() => onChange(color)}
-                        className="h-5 w-5 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
-                        style={{ background: color }}
-                      />
-                      <button
-                        type="button"
-                        title="Remove"
-                        onClick={() => updateProject({ savedGradients: savedGradients.filter((g) => g !== color) })}
-                        className="absolute -top-1 -right-1 hidden group-hover:flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--pd-panel)] border border-[var(--pd-line-loud)] text-[8px] text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] leading-none"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )
-      })()}
-
       {mode !== 'solid' && (
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -569,24 +332,6 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {mode === 'solid' && (
-        <div>
-          <span className={labelCls}>Presets</span>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {SOLID_PRESETS.map((p) => (
-              <button
-                key={p.label}
-                type="button"
-                title={p.label}
-                onClick={() => onChange(p.color)}
-                className="h-5 w-5 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
-                style={{ background: p.color }}
-              />
-            ))}
-          </div>
         </div>
       )}
 
@@ -784,6 +529,8 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
     </div>
   )
 }
+
+export { ColorField }
 
 export function FillControl(props: GradientEditorProps) {
   return <GradientEditor {...props} />

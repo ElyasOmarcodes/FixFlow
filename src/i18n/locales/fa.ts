@@ -390,4 +390,17 @@ export const fa: Record<TranslationKey, string> = {
   'translateAll.progress': 'ترجمهٔ {done} از {total}…',
   'translateAll.complete': '{count} ترجمه شد.',
   'translateAll.partial': '{count} ترجمه شد، {failed} ترجمه نشد — دوباره تلاش کنید.',
+  // ─ انتخابگر رنگ
+  'color.hue': 'فام',
+  'color.hex': 'مقدار هگز',
+  'color.eyedropper': 'انتخاب رنگ از صفحه',
+  'color.saveToBrand': 'ذخیره در رنگ‌های برند',
+  'color.brandNamePlaceholder': 'نامی برای این رنگ',
+  'color.unbind': 'جدا کردن از رنگ برند',
+  'color.swatches': 'نمونه‌رنگ‌ها',
+  'color.palette': 'پالت',
+  'color.brand': 'برند',
+  'color.recent': 'اخیر',
+  'color.noBrand': 'هنوز رنگ برندی نیست — با + ذخیره کنید.',
+  'color.noRecent': 'رنگ‌هایی که استفاده کنید اینجا می‌آیند.',
 }

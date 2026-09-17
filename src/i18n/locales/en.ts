@@ -395,6 +395,19 @@ export const en = {
   'translateAll.progress': 'Translating {done} of {total}…',
   'translateAll.complete': '{count} translated.',
   'translateAll.partial': '{count} translated, {failed} could not be — try those again.',
+  // ─ Colour picker
+  'color.hue': 'Hue',
+  'color.hex': 'Hex value',
+  'color.eyedropper': 'Pick a colour from the screen',
+  'color.saveToBrand': 'Save to brand colours',
+  'color.brandNamePlaceholder': 'Name this colour',
+  'color.unbind': 'Unlink from the brand colour',
+  'color.swatches': 'Swatches',
+  'color.palette': 'Palette',
+  'color.brand': 'Brand',
+  'color.recent': 'Recent',
+  'color.noBrand': 'No brand colours yet — save one with +.',
+  'color.noRecent': 'Colours you use will show up here.',
 } as const
 
 export type TranslationKey = keyof typeof en
