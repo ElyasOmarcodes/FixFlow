@@ -226,6 +226,7 @@ const ICONS = {
   // Horseshoe magnet: two prongs and the arc joining them, with the pole tips
   // left open so the shape still reads at 13px.
   magnet: <><path d="M6 15V7a6 6 0 0 1 12 0v8" /><path d="M6 15v2a6 6 0 0 0 12 0v-2" /><path d="M6 11h4M14 11h4" /></>,
+  circle: <circle cx="12" cy="12" r="9" />,
   home: <><path d="M3 10.5 12 3l9 7.5" /><path d="M5.5 9.5V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.5" /><path d="M9.5 21v-6h5v6" /></>,
   grid: (
     <>

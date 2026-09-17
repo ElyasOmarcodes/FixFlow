@@ -2,8 +2,11 @@
 // The fetch path parses real SVG markup with DOMParser, so this one file
 // needs a DOM; the rest of the suite stays on the faster node environment.
 import { describe, it, expect, vi, afterEach } from 'vitest'
+import { MATERIAL_SYMBOL_NAMES } from '@/assets/icons/materialSymbolNames'
 import {
-  MATERIAL_SYMBOL_NAMES, fetchMaterialSymbol, parseViewBox, searchMaterialSymbols,
+  DEFAULT_VARIANT, SYMBOL_STYLES, SYMBOL_WEIGHTS,
+  fetchMaterialSymbol, loadSymbolNames, parseViewBox, searchMaterialSymbols,
+  symbolUrl, variantSegment,
 } from './materialSymbols'
 
 const SAMPLE = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">'
@@ -11,32 +14,83 @@ const SAMPLE = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -
 
 afterEach(() => { vi.unstubAllGlobals() })
 
-describe('MATERIAL_SYMBOL_NAMES', () => {
-  it('has no duplicates', () => {
-    expect(new Set(MATERIAL_SYMBOL_NAMES).size).toBe(MATERIAL_SYMBOL_NAMES.length)
+describe('the bundled catalogue', () => {
+  it('covers the whole of fonts.google.com/icons, not a hand-picked subset', () => {
+    // The point of the generator: a search box over 159 names looked broken.
+    expect(MATERIAL_SYMBOL_NAMES.length).toBeGreaterThan(4000)
   })
 
-  it('uses the endpoint’s own naming — lowercase with underscores', () => {
+  it('has no duplicates and uses the endpoint’s own naming', () => {
+    expect(new Set(MATERIAL_SYMBOL_NAMES).size).toBe(MATERIAL_SYMBOL_NAMES.length)
     for (const name of MATERIAL_SYMBOL_NAMES) expect(name).toMatch(/^[a-z0-9_]+$/)
+  })
+
+  it('is sorted, so a regeneration diffs to just the new icons', () => {
+    expect([...MATERIAL_SYMBOL_NAMES]).toEqual([...MATERIAL_SYMBOL_NAMES].sort())
+  })
+
+  it('loads lazily and caches the module', async () => {
+    const first = await loadSymbolNames()
+    expect(await loadSymbolNames()).toBe(first)
+    expect(first.length).toBe(MATERIAL_SYMBOL_NAMES.length)
+  })
+})
+
+describe('variants', () => {
+  it('names weight 400 unfilled "default"', () => {
+    expect(variantSegment(DEFAULT_VARIANT)).toBe('default')
+  })
+
+  it('composes weight before fill, which is the order the endpoint expects', () => {
+    expect(variantSegment({ style: 'outlined', filled: true, weight: 400 })).toBe('fill1')
+    expect(variantSegment({ style: 'sharp', filled: false, weight: 700 })).toBe('wght700')
+    expect(variantSegment({ style: 'rounded', filled: true, weight: 200 })).toBe('wght200fill1')
+  })
+
+  it('builds a URL per style', () => {
+    for (const style of SYMBOL_STYLES) {
+      expect(symbolUrl('rocket_launch', { style, filled: false, weight: 400 }))
+        .toBe(`https://fonts.gstatic.com/s/i/short-term/release/materialsymbols${style}/rocket_launch/default/24px.svg`)
+    }
+  })
+
+  it('offers the three styles and seven weights Google draws', () => {
+    expect(SYMBOL_STYLES).toEqual(['outlined', 'rounded', 'sharp'])
+    expect(SYMBOL_WEIGHTS).toEqual([100, 200, 300, 400, 500, 600, 700])
   })
 })
 
 describe('searchMaterialSymbols', () => {
-  it('returns everything for an empty query', () => {
-    expect(searchMaterialSymbols('')).toHaveLength(MATERIAL_SYMBOL_NAMES.length)
+  const names = ['car', 'car_rental', 'scorecard', 'rocket_launch', 'shopping_cart']
+
+  it('returns everything, capped, for an empty query', () => {
+    expect(searchMaterialSymbols('', names)).toEqual(names)
+    expect(searchMaterialSymbols('', names, 2)).toHaveLength(2)
+  })
+
+  it('ranks an exact name, then a word start, then a match inside a word', () => {
+    // 'cart' begins a word, so shopping_cart outranks scorecard, where 'car'
+    // is buried mid-word; the shorter of two equal scores wins.
+    expect(searchMaterialSymbols('car', names))
+      .toEqual(['car', 'car_rental', 'shopping_cart', 'scorecard'])
   })
 
   it('reads underscores as spaces, so a typed phrase finds the symbol', () => {
-    expect(searchMaterialSymbols('rocket launch')).toContain('rocket_launch')
-    expect(searchMaterialSymbols('rocket_launch')).toContain('rocket_launch')
+    expect(searchMaterialSymbols('rocket launch', names)).toEqual(['rocket_launch'])
+    expect(searchMaterialSymbols('rocket_launch', names)).toEqual(['rocket_launch'])
   })
 
   it('requires every term to match, not just one', () => {
-    expect(searchMaterialSymbols('shopping cart')).toEqual(['shopping_cart'])
+    expect(searchMaterialSymbols('shopping cart', names)).toEqual(['shopping_cart'])
   })
 
   it('returns nothing rather than everything when no symbol matches', () => {
-    expect(searchMaterialSymbols('definitely-not-an-icon')).toEqual([])
+    expect(searchMaterialSymbols('definitely-not-an-icon', names)).toEqual([])
+  })
+
+  it('searches the real catalogue', () => {
+    const hits = searchMaterialSymbols('rocket', MATERIAL_SYMBOL_NAMES)
+    expect(hits).toContain('rocket_launch')
   })
 })
 
@@ -50,7 +104,6 @@ describe('parseViewBox', () => {
   })
 
   it('falls back to the 24-grid for anything unusable', () => {
-    // A malformed box must not produce a zero or NaN scale on the canvas.
     for (const input of [undefined, '', 'not a box', '0 0 0 24', '0 0 24']) {
       expect(parseViewBox(input)).toEqual([0, 0, 24, 24])
     }
@@ -66,12 +119,21 @@ describe('fetchMaterialSymbol', () => {
     expect(symbol.filled).toBe(true)
   })
 
-  it('caches, so re-picking a symbol never refetches', async () => {
+  it('requests the chosen variant', async () => {
+    const spy = vi.fn(async (url: string) => { void url; return new Response(SAMPLE, { status: 200 }) })
+    vi.stubGlobal('fetch', spy)
+    await fetchMaterialSymbol('variant_probe', { style: 'rounded', filled: true, weight: 700 })
+    expect(spy.mock.calls[0][0]).toContain('materialsymbolsrounded/variant_probe/wght700fill1/')
+  })
+
+  it('caches per variant, so switching style refetches but re-picking does not', async () => {
     const spy = vi.fn(async () => new Response(SAMPLE, { status: 200 }))
     vi.stubGlobal('fetch', spy)
-    await fetchMaterialSymbol('cached_once')
-    await fetchMaterialSymbol('cached_once')
+    await fetchMaterialSymbol('cache_probe', { style: 'outlined', filled: false, weight: 400 })
+    await fetchMaterialSymbol('cache_probe', { style: 'outlined', filled: false, weight: 400 })
     expect(spy).toHaveBeenCalledTimes(1)
+    await fetchMaterialSymbol('cache_probe', { style: 'sharp', filled: false, weight: 400 })
+    expect(spy).toHaveBeenCalledTimes(2)
   })
 
   it('concatenates multiple paths into one subpathed `d`', async () => {

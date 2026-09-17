@@ -1955,6 +1955,89 @@
   color: var(--pd-c-c4b5fd);
 }
 
+/* Google-symbol variant controls: style, fill and weight. */
+.pd-icon-variants {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pd-icon-variant-group {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-field-border);
+  background: var(--pd-c-0f0f13);
+}
+
+.pd-icon-variant-group button {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--pd-c-8a86a0);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-icon-variant-group button[aria-pressed='true'] {
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+
+.pd-icon-variant-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--pd-field-border);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--pd-c-8a86a0);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-icon-variant-toggle[aria-pressed='true'] {
+  border-color: var(--pd-accent);
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+
+.pd-icon-weight {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-icon-weight select {
+  padding: 5px 24px 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--pd-field-border);
+  background-color: var(--pd-c-0f0f13);
+  color: var(--pd-c-e8e8f0);
+  font-size: 11.5px;
+}
+
+/* Google serves its symbols as black artwork, which disappears on a dark
+   panel. Recoloured to the current text colour with a filter, since an <img>
+   cannot inherit `fill` — and the grid has to stay <img> so hundreds of
+   previews cost one cached request each rather than a parse. */
+.pd-symbol-img {
+  filter: invert(var(--pd-symbol-invert, 1));
+  opacity: 0.86;
+}
+
+:root[data-theme='light'] { --pd-symbol-invert: 0; }
+
 @keyframes pd-spin { to { transform: rotate(360deg); } }
 
 .pd-spin-slow { animation: pd-spin 900ms linear infinite; }
