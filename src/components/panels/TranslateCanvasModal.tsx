@@ -137,7 +137,7 @@ export function TranslateCanvasModal({ open, onClose, onNeedsApiKey }: Translate
 
       <div className="pd-translate-all-field">
         <label className="pd-translate-all-label" htmlFor="pd-translate-scope">{t('translateAll.scope')}</label>
-        <div className="pd-icon-source" id="pd-translate-scope" role="group" aria-label={t('translateAll.scope')}>
+        <div className="pd-icon-source pd-translate-all-scope" id="pd-translate-scope" role="group" aria-label={t('translateAll.scope')}>
           <button type="button" role="tab" aria-selected={scope === 'slide'} disabled={running} onClick={() => setScope('slide')}>
             {t('translateAll.scopeSlide')}
           </button>
@@ -171,7 +171,7 @@ export function TranslateCanvasModal({ open, onClose, onNeedsApiKey }: Translate
 
       <p className="pd-translate-all-count">
         <Icon name="text" size={13} />
-        {t('translateAll.found', { count: targets.length })}
+        {targets.length === 1 ? t('translateAll.foundOne') : t('translateAll.found', { count: targets.length })}
       </p>
 
       {running && (

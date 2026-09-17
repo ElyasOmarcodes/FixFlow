@@ -5,7 +5,7 @@ import {
   searchMaterialSymbols, symbolUrl,
   type SymbolStyle, type SymbolVariant, type SymbolWeight,
 } from '@/utils/materialSymbols'
-import { loadSymbolFont, symbolFontFamily } from '@/utils/symbolFont'
+import { loadSymbolFont, symbolFontFamily, symbolRendersAsGlyph } from '@/utils/symbolFont'
 import { ModalShell } from '@/components/ui/ModalShell'
 import { Icon } from '@/components/ui/Icon'
 import { VirtualIconGrid } from './icons/VirtualIconGrid'
@@ -127,13 +127,10 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
   useEffect(() => {
     if (source !== 'online') return
     let cancelled = false
-    loadSymbolFont(style, weight, filled).then(() => {
-      if (cancelled) return
-      let available = false
-      try {
-        available = document.fonts.check(`24px "${symbolFontFamily(style)}"`, 'home')
-      } catch { /* No font API, or a blocked CDN: the images carry the grid. */ }
-      if (available) setReadyFontKey(fontKey)
+    loadSymbolFont(style, weight, filled).then((installed) => {
+      // A blocked CDN loads nothing, and the grid stays on the image previews
+      // rather than printing four thousand icon names.
+      if (!cancelled && installed) setReadyFontKey(fontKey)
     })
     return () => { cancelled = true }
   }, [source, style, weight, filled, fontKey])
@@ -282,7 +279,7 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
                   >
                     {pendingName === name ? (
                       <Icon name="spinner" size={22} className="pd-spin-slow" />
-                    ) : fontReady ? (
+                    ) : fontReady && symbolRendersAsGlyph(style, weight, filled, name) ? (
                       // The glyph *is* the name: Material Symbols map each
                       // icon's name to its artwork as a ligature.
                       <span className="pd-symbol-glyph" style={{ fontFamily: symbolFontFamily(style) }} aria-hidden="true">

@@ -50,11 +50,12 @@
     "test:watch": "vitest",
     "test:responsive": "node scripts/verify-responsive.mjs",
     "test:editor": "node scripts/verify-editor.mjs",
+    "test:icons": "node scripts/verify-icons.mjs",
     "test:start": "node scripts/verify-start.mjs",
     "test:templates": "node scripts/verify-templates.mjs",
     "build:templates": "node scripts/build-editorial-templates.mjs && node scripts/build-template-manifest.mjs",
     "test:native": "node scripts/verify-native.mjs",
-    "verify": "npm run typecheck && npm run lint && npm test -- --run && npm run build && npm run test:responsive && npm run test:editor && npm run test:native && npm run test:start && npm run test:templates"
+    "verify": "npm run typecheck && npm run lint && npm test -- --run && npm run build && npm run test:responsive && npm run test:editor && npm run test:icons && npm run test:native && npm run test:start && npm run test:templates"
   },
   "engines": {
     "node": ">=20.19.0"

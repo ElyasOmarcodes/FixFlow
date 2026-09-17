@@ -2068,6 +2068,11 @@
   font-size: 13px;
 }
 
+/* The two scope choices split the row evenly, so neither reads as the
+   afterthought of the other. */
+.pd-translate-all-scope { display: flex; }
+.pd-translate-all-scope button { flex: 1 1 0; }
+
 .pd-translate-all-count,
 .pd-translate-all-progress,
 .pd-translate-all-ok,
@@ -2214,9 +2219,12 @@
   font-style: normal;
   letter-spacing: normal;
   white-space: nowrap;
-  overflow: visible;
+  /* A last guard: if a name ever slips past the ligature check, it is clipped
+     to its cell rather than dragged across the neighbouring ones. */
+  overflow: hidden;
   text-overflow: clip;
   width: auto;
+  max-width: 100%;
   color: inherit;
   direction: ltr;
   -webkit-font-feature-settings: 'liga';

@@ -28,17 +28,22 @@ export function symbolFontFamily(style: SymbolStyle): string {
   return FAMILY[style]
 }
 
-const loaded = new Map<string, Promise<void>>()
+const loaded = new Map<string, Promise<boolean>>()
 
 /**
- * Fetch one instance of the family.
+ * Fetch one instance of the family. Resolves with whether it can be drawn.
  *
  * Fixed axis values rather than the variable font: the full variable face is
  * 3.8 MB, a fixed instance is ~320 KB, and the picker only ever shows one
  * combination at a time. Switching weight or fill fetches the next instance,
  * which the browser then caches.
+ *
+ * The resolved boolean is what the caller must trust — not
+ * `document.fonts.check`, which answers true when *no* face matches the
+ * family, so a blocked stylesheet reads as "nothing left to load" and the
+ * grid renders 4,403 icon names as text.
  */
-export function loadSymbolFont(style: SymbolStyle, weight: SymbolWeight, filled: boolean): Promise<void> {
+export function loadSymbolFont(style: SymbolStyle, weight: SymbolWeight, filled: boolean): Promise<boolean> {
   const key = `${style}:${weight}:${filled ? 1 : 0}`
   const existing = loaded.get(key)
   if (existing) return existing
@@ -46,19 +51,23 @@ export function loadSymbolFont(style: SymbolStyle, weight: SymbolWeight, filled:
   const family = FAMILY[style].replace(/ /g, '+')
   const href = `https://fonts.googleapis.com/css2?family=${family}:opsz,wght,FILL,GRAD@24,${weight},${filled ? 1 : 0},0&display=swap`
 
-  const promise = new Promise<void>((resolve) => {
+  const promise = new Promise<boolean>((resolve) => {
     const link = document.createElement('link')
     link.rel = 'stylesheet'
     link.href = href
-    // Resolve either way: a blocked or offline font must leave the grid
-    // showing names rather than leaving the caller waiting forever.
+    // Resolve either way: a blocked or offline font must leave the grid on
+    // the image previews rather than leaving the caller waiting forever.
     link.addEventListener('load', () => {
       // `document.fonts.load` is what actually pulls the file; the stylesheet
-      // alone only declares the face.
+      // alone only declares the face. It resolves with the faces it loaded,
+      // which is the honest answer to "can this be drawn".
       const spec = `24px "${FAMILY[style]}"`
-      void document.fonts.load(spec, 'home').catch(() => {}).finally(() => resolve())
+      document.fonts.load(spec, 'home').then(
+        (faces) => resolve(faces.length > 0),
+        () => resolve(false),
+      )
     })
-    link.addEventListener('error', () => resolve())
+    link.addEventListener('error', () => resolve(false))
     document.head.append(link)
   })
 
@@ -66,7 +75,51 @@ export function loadSymbolFont(style: SymbolStyle, weight: SymbolWeight, filled:
   return promise
 }
 
+/**
+ * Whether the font actually draws this name, rather than spelling it out.
+ *
+ * Google's published index carries a handful of names the font has no
+ * ligature for — `workspace_studio` and `youtube_video` among them. A missing
+ * ligature is not a blank cell: the family includes Latin letterforms, so the
+ * name is rendered as text, in caps, several times wider than the cell, which
+ * looks like the grid has broken.
+ *
+ * Measuring catches it exactly. A resolved ligature is one glyph on a 24-unit
+ * advance; a name drawn letter by letter is far wider. Those few cells fall
+ * back to the image endpoint, which does have the artwork.
+ */
+const ONE_GLYPH_MAX_PX = 30
+
+let measureContext: CanvasRenderingContext2D | null | undefined
+const glyphCache = new Map<string, boolean>()
+
+export function symbolRendersAsGlyph(
+  style: SymbolStyle,
+  weight: SymbolWeight,
+  filled: boolean,
+  name: string,
+): boolean {
+  const key = `${style}:${weight}:${filled ? 1 : 0}:${name}`
+  const cached = glyphCache.get(key)
+  if (cached !== undefined) return cached
+
+  if (measureContext === undefined) {
+    measureContext = typeof document === 'undefined'
+      ? null
+      : document.createElement('canvas').getContext('2d')
+  }
+  // No canvas to measure with: assume the glyph is there rather than sending
+  // the whole grid to the slow path.
+  if (!measureContext) return true
+
+  measureContext.font = `${weight} 24px "${FAMILY[style]}"`
+  const rendered = measureContext.measureText(name).width <= ONE_GLYPH_MAX_PX
+  glyphCache.set(key, rendered)
+  return rendered
+}
+
 /** Test hook. */
 export function resetSymbolFontCache(): void {
   loaded.clear()
+  glyphCache.clear()
 }
