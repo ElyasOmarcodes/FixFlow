@@ -17,6 +17,11 @@ try {
   browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined, args: ['--no-sandbox', '--disable-dev-shm-usage'] })
   for (const [width, height] of [[320, 640], [390, 844], [844, 390], [768, 1024], [1024, 768], [1440, 900]]) {
     const page = await browser.newPage({ viewport: { width, height }, hasTouch: width < 1024 })
+    // These runs exercise the editor, so skip the launch screen the way a
+    // returning user would — it is verified on its own in verify-start.mjs.
+    await page.addInitScript(() => {
+      try { window.localStorage.setItem('pixeldeck:start-screen', 'off') } catch { /* private window */ }
+    })
     const errors = []
     page.on('pageerror', (error) => errors.push(error.message))
     await page.goto('http://127.0.0.1:4173')

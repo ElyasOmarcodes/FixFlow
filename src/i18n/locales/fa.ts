@@ -95,6 +95,25 @@ export const fa: Record<TranslationKey, string> = {
   'common.search': 'جست‌وجو',
   'common.upload': 'بارگذاری',
 
+  // ── Start screen ─────────────────────────────────────────────────────────
+  'start.title': 'PixelDeck',
+  'start.tagline': 'اسکرین‌شات‌های فروشگاه — یک بار طراحی کنید، برای هر اندازه خروجی بگیرید.',
+  'start.continueIn': 'ادامه در {name}',
+  'start.newProject': 'پروژهٔ جدید',
+  'start.newProjectHint': 'بوم خالی در اندازهٔ App Store',
+  'start.openFile': 'باز کردن فایل',
+  'start.openFileHint': 'پروژهٔ .json که پیش‌تر خروجی گرفته‌اید',
+  'start.recent': 'پروژه‌های اخیر',
+  'start.noProjects': 'هنوز چیزی اینجا نیست — پروژه‌ای تازه بسازید یا یکی از قالب‌های زیر را انتخاب کنید.',
+  'start.open': 'باز',
+  'start.templates': 'شروع از یک قالب',
+  'start.slideCount': '{count} اسلاید',
+  'start.showOnLaunch': 'هنگام باز شدن PixelDeck این صفحه نمایش داده شود',
+  'start.justNow': 'همین حالا',
+  'start.minutesAgo': '{count} دقیقه پیش',
+  'start.hoursAgo': '{count} ساعت پیش',
+  'start.daysAgo': '{count} روز پیش',
+
   // ── Canvas viewport ──────────────────────────────────────────────────────
   'canvas.fit': 'اندازه',
   'canvas.format': 'قالب',
@@ -112,6 +131,7 @@ export const fa: Record<TranslationKey, string> = {
   'toolbar.github': 'گیت‌هاب',
   'toolbar.group': 'گروه',
   'toolbar.groupTitle': 'لایه‌های انتخاب‌شده را گروه کن',
+  'toolbar.home': 'خانه',
   'toolbar.help': 'راهنما',
   'toolbar.helpTitle': 'راهنما و کلیدهای میان‌بر',
   'toolbar.localization': 'بومی‌سازی',

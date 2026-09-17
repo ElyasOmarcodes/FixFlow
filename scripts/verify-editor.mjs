@@ -14,6 +14,11 @@ await mkdir('test-results/editor', { recursive: true })
 try {
   for (const width of [390, 768, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 900 }, hasTouch: width < 1024 })
+    // These runs exercise the editor, so skip the launch screen the way a
+    // returning user would — it is verified on its own in verify-start.mjs.
+    await page.addInitScript(() => {
+      try { window.localStorage.setItem('pixeldeck:start-screen', 'off') } catch { /* private window */ }
+    })
     const errors = []
     page.on('pageerror', (error) => errors.push(error.message))
     await page.goto(process.env.PIXELDECK_TEST_URL || 'http://127.0.0.1:5173')

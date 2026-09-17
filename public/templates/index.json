@@ -8,7 +8,8 @@
       "category": "Health & Fitness",
       "file": "/templates/nutrition-coach.template.json",
       "slides": 7,
-      "previewSize": "1290×2796"
+      "previewSize": "1290×2796",
+      "preview": "linear-gradient(250deg, #1c1c2e 0%, #2d3561 50%, #0d0d1a 100%)"
     },
     {
       "slug": "ledger-dark",
@@ -17,7 +18,8 @@
       "category": "Finance",
       "file": "/templates/ledger-dark.template.json",
       "slides": 7,
-      "previewSize": "1290×2796"
+      "previewSize": "1290×2796",
+      "preview": "radial-gradient(66% 27% at 82% 10%, rgba(124,58,237,0.30), transparent 70%), radial-gradient(70% 29% at 10% 85%, rgba(59,130,246,0.22), transparent 70%), linear-gradient(250deg, #070A1F 0%, #10173A 50%, #1B2350 100%)"
     },
     {
       "slug": "wanderlight",
@@ -26,7 +28,8 @@
       "category": "Travel",
       "file": "/templates/wanderlight.template.json",
       "slides": 6,
-      "previewSize": "1290×2796"
+      "previewSize": "1290×2796",
+      "preview": "radial-gradient(54% 21% at 80% 12%, rgba(255,255,255,0.35), transparent 70%), radial-gradient(62% 25% at 15% 90%, rgba(255,126,95,0.25), transparent 70%), linear-gradient(260deg, #0EA5E9 0%, #7DD3FC 50%, #E0F2FE 100%)"
     },
     {
       "slug": "deep-focus",
@@ -35,7 +38,8 @@
       "category": "Productivity",
       "file": "/templates/deep-focus.template.json",
       "slides": 6,
-      "previewSize": "1290×2796"
+      "previewSize": "1290×2796",
+      "preview": "radial-gradient(62% 25% at 85% 8%, rgba(99,102,241,0.16), transparent 70%), radial-gradient(66% 27% at 8% 85%, rgba(245,158,11,0.10), transparent 70%), linear-gradient(255deg, #F8FAFC 0%, #EEF2FF 50%, #E0E7FF 100%)"
     },
     {
       "slug": "noor-editorial",
@@ -44,7 +48,8 @@
       "category": "Editorial",
       "file": "/templates/noor-editorial.template.json",
       "slides": 7,
-      "previewSize": "1320×2868"
+      "previewSize": "1320×2868",
+      "preview": "#f4efe4"
     },
     {
       "slug": "orbit-studio",
@@ -53,7 +58,8 @@
       "category": "Editorial",
       "file": "/templates/orbit-studio.template.json",
       "slides": 7,
-      "previewSize": "1320×2868"
+      "previewSize": "1320×2868",
+      "preview": "#111127"
     },
     {
       "slug": "serein-wellness",
@@ -62,7 +68,8 @@
       "category": "Editorial",
       "file": "/templates/serein-wellness.template.json",
       "slides": 7,
-      "previewSize": "1320×2868"
+      "previewSize": "1320×2868",
+      "preview": "#f9e8d7"
     }
   ]
 }

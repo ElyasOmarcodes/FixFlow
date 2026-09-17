@@ -24,10 +24,16 @@ import { registerStage } from '@/utils/stageRegistry'
 import { getScopedEditingIndicator } from '@/utils/scopedEditingIndicator'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { useProjectsStore } from '@/store/projects'
+import { shouldShowStartScreenOnLaunch } from '@/utils/startScreenPreference'
 
 // Lazy-load the localization view — it's a separate mode and not needed on initial load.
 const LocalizationView = lazy(() =>
   import('@/pages/LocalizationView').then((m) => ({ default: m.LocalizationView })),
+)
+
+// Lazy too: after the first launch it may never be opened again.
+const StartScreen = lazy(() =>
+  import('@/pages/StartScreen').then((m) => ({ default: m.StartScreen })),
 )
 
 const INITIAL_SPLASH_MIN_MS = 450
@@ -35,6 +41,9 @@ const INITIAL_SPLASH_MIN_MS = 450
 export default function App() {
   const t = useT()
   const [mobilePanel, setMobilePanel] = useState<'layers' | 'properties' | null>(null)
+  // Read once, at mount: flipping the preference from inside the screen must
+  // not close the screen the user is still looking at.
+  const [startOpen, setStartOpen] = useState(shouldShowStartScreenOnLaunch)
   const stageRef = useRef<Konva.Stage>(null)
   const conflictNotice = useProjectsStore((s) => s.conflictNotice)
 
@@ -43,6 +52,8 @@ export default function App() {
     const listener = NativeApp.addListener('backButton', () => {
       if (document.querySelector('[role="dialog"]')) {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      } else if (startOpen) {
+        setStartOpen(false)
       } else if (mobilePanel) {
         setMobilePanel(null)
       } else {
@@ -51,7 +62,7 @@ export default function App() {
       }
     })
     return () => { void listener.then((handle) => handle.remove()) }
-  }, [mobilePanel])
+  }, [mobilePanel, startOpen])
 
   // Register the stage in the singleton registry so PropertiesPanel and other
   // non-canvas components can access it for bounding-box queries (alignment).
@@ -127,6 +138,13 @@ export default function App() {
       // Don't fire when user is typing in an input or rich text editor
       const active = document.activeElement as HTMLElement | null
       if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return
+
+      // The start screen covers the editor, so Delete must not remove a layer
+      // the user cannot see. Escape still dismisses the screen.
+      if (startOpen) {
+        if (e.key === 'Escape') setStartOpen(false)
+        return
+      }
 
       if (e.key === 'Escape') {
         setMobilePanel(null)
@@ -232,7 +250,7 @@ export default function App() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [undo, redo, exitGroupEdit, editingGroupId])
+  }, [undo, redo, exitGroupEdit, editingGroupId, startOpen])
 
   // Returning from localization starts the editor on the default locale.
   const handleSetMode = (mode: 'editor' | 'localization') => {
@@ -280,6 +298,7 @@ export default function App() {
         onSetMode={handleSetMode}
         onExport={() => setExportOpen(true)}
         onPreview={() => setPreviewOpen(true)}
+        onHome={() => setStartOpen(true)}
       />
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {/* Localization view — absolutely covers the editor when active */}
@@ -365,6 +384,11 @@ export default function App() {
         cancelCapture={cancelPreviewCapture}
         initialLocale={previewLocale}
       />
+      {startOpen && hasCompletedInitialLoad && (
+        <Suspense>
+          <StartScreen onClose={() => setStartOpen(false)} />
+        </Suspense>
+      )}
       <AppLoadingScreen visible={!hasCompletedInitialLoad} />
       {offscreenThumbnailElement}
     </div>

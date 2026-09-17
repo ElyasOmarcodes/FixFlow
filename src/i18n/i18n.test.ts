@@ -33,8 +33,9 @@ describe('UI dictionaries', () => {
 
   it('writes Pashto and Persian in Arabic script rather than transliterating', () => {
     const arabicScript = /[؀-ۿ]/
-    // The only values that are legitimately Latin: the raw axis letters.
-    const exempt = new Set(['props.x', 'props.y'])
+    // Legitimately Latin everywhere: the raw axis letters, and the product
+    // name, which is a brand and is not translated.
+    const exempt = new Set(['props.x', 'props.y', 'start.title'])
     for (const [code, dict] of Object.entries(locales)) {
       for (const [key, value] of Object.entries(dict)) {
         if (exempt.has(key)) continue

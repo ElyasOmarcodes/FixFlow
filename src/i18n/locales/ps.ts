@@ -95,6 +95,25 @@ export const ps: Record<TranslationKey, string> = {
   'common.search': 'پلټنه',
   'common.upload': 'پورته کول',
 
+  // ── Start screen ─────────────────────────────────────────────────────────
+  'start.title': 'PixelDeck',
+  'start.tagline': 'د پلورنځي سکرین شاټونه — یو ځل یی ډیزاین کړه، هر اندازې ته یې صادر کړه.',
+  'start.continueIn': 'په {name} کې دوام ورکړه',
+  'start.newProject': 'نوی پروجکټ',
+  'start.newProjectHint': 'د App Store په اندازه سپین کانواس',
+  'start.openFile': 'فایل خلاص کړه',
+  'start.openFileHint': 'هغه .json پروجکټ چې مخکې دې صادر کړی و',
+  'start.recent': 'وروستي پروجکټونه',
+  'start.noProjects': 'لا څه نشته — نوی پروجکټ پیل کړه یا لاندې یو تمپلیټ وټاکه.',
+  'start.open': 'خلاص',
+  'start.templates': 'له تمپلیټ پیل وکړه',
+  'start.slideCount': '{count} سلایډونه',
+  'start.showOnLaunch': 'کله چې PixelDeck خلاصیږي دا پاڼه وښیه',
+  'start.justNow': 'همدا اوس',
+  'start.minutesAgo': '{count} دقیقې مخکې',
+  'start.hoursAgo': '{count} ساعته مخکې',
+  'start.daysAgo': '{count} ورځې مخکې',
+
   // ── Canvas viewport ──────────────────────────────────────────────────────
   'canvas.fit': 'برابر',
   'canvas.format': 'بڼه',
@@ -112,6 +131,7 @@ export const ps: Record<TranslationKey, string> = {
   'toolbar.github': 'ګیټ هب',
   'toolbar.group': 'ډله',
   'toolbar.groupTitle': 'ټاکل شوې پرتې په یوه ډله کې واچوه',
+  'toolbar.home': 'کور',
   'toolbar.help': 'مرسته',
   'toolbar.helpTitle': 'مرسته او د کیبورډ لنډ لارې',
   'toolbar.localization': 'ژباړه',

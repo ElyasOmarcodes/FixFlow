@@ -527,7 +527,10 @@ export function TemplatesModal({ open, onClose }: TemplatesModalProps) {
                   <div
                     style={{
                       aspectRatio: '16 / 9',
-                      background: 'rgba(255,255,255,0.04)',
+                      // The template's own first-slide fill, so the gallery
+                      // shows which design is which rather than seven
+                      // identical grey plates.
+                      background: entry.preview ?? 'rgba(255,255,255,0.04)',
                       overflow: 'hidden',
                       position: 'relative',
                     }}

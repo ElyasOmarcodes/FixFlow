@@ -1386,6 +1386,304 @@
 
 .pd-slide-options-popover header button:active { background: var(--pd-hover); }
 
+/* ── Start screen ──────────────────────────────────────────────────────────
+   The launch page. It covers the editor rather than replacing it, so it is a
+   full-bleed layer with its own scroll; the editor underneath keeps its stage
+   and its observers alive the whole time. */
+.pd-start {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(124, 110, 246, 0.22), transparent 62%),
+    radial-gradient(900px 560px at 92% 4%, rgba(236, 72, 153, 0.14), transparent 60%),
+    var(--pd-c-0f0f13);
+  animation: pd-fade-in var(--pd-dur-base) var(--pd-ease-decel) both;
+}
+
+.pd-start-scroll {
+  width: min(1080px, 100%);
+  margin-inline: auto;
+  padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 40px) 64px;
+  animation: pd-rise-in var(--pd-dur-slow) var(--pd-ease-decel) both;
+}
+
+.pd-start-head { position: relative; margin-bottom: 26px; }
+
+.pd-start-head h1 {
+  margin-top: 14px;
+  font-size: clamp(26px, 5vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--pd-c-e8e8f0);
+}
+
+.pd-start-head p {
+  margin-top: 6px;
+  max-width: 46ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-start-dismiss {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--pd-field-border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pd-c-b0b0c4);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-start-dismiss:hover {
+  border-color: var(--pd-accent);
+  color: var(--pd-c-e8e8f0);
+  background: var(--pd-accent-wash);
+}
+
+.pd-start-dismiss:active { transform: scale(0.96); }
+
+/* The dismiss arrow points the way out, so it follows the writing direction. */
+[dir='rtl'] .pd-start-dismiss svg { transform: scaleX(-1); }
+
+.pd-start-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.pd-start-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  text-align: start;
+  color: #fff;
+  background: linear-gradient(135deg, var(--pd-accent), #ec4899);
+  box-shadow: 0 10px 30px -14px rgba(124, 110, 246, 0.9);
+  transition:
+    filter var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-start-cta span { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pd-start-cta strong { font-size: 14px; font-weight: 700; }
+.pd-start-cta em { font-style: normal; font-size: 11.5px; opacity: 0.82; }
+.pd-start-cta:hover:not(:disabled) { filter: brightness(1.08); }
+.pd-start-cta:active:not(:disabled) { transform: scale(0.985); }
+.pd-start-cta:disabled { opacity: 0.6; }
+
+.pd-start-cta-quiet {
+  background: var(--pd-c-18181f);
+  border-color: var(--pd-field-border);
+  color: var(--pd-c-b0b0c4);
+  box-shadow: none;
+}
+
+.pd-start-cta-quiet:hover:not(:disabled) {
+  border-color: var(--pd-accent);
+  color: var(--pd-c-e8e8f0);
+  filter: none;
+}
+
+.pd-start-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #fca5a5;
+}
+
+.pd-start-section { margin-top: 34px; }
+
+.pd-start-section h2 {
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-start-empty { font-size: 12.5px; color: var(--pd-c-6b6b7a); }
+
+.pd-start-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+  gap: 10px;
+}
+
+.pd-start-grid-wide { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); }
+
+.pd-start-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 14px;
+  border: 1px solid var(--pd-field-border);
+  background: var(--pd-c-18181f);
+  text-align: start;
+  transition:
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-start-card:hover:not(:disabled) { border-color: var(--pd-accent); background: var(--pd-hover); }
+.pd-start-card:active:not(:disabled) { transform: scale(0.98); }
+.pd-start-card:disabled { opacity: 0.55; }
+
+.pd-start-card-tile {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.pd-start-card-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.pd-start-card-body strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pd-c-e8e8f0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-start-card-body em { font-style: normal; font-size: 11px; color: var(--pd-c-6b6b7a); }
+
+.pd-start-card-badge {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 10px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pd-c-c4b5fd);
+  background: var(--pd-accent-wash);
+}
+
+.pd-start-template {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--pd-field-border);
+  background: var(--pd-c-18181f);
+  text-align: start;
+  transition:
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-start-template:hover:not(:disabled) { border-color: var(--pd-accent); }
+.pd-start-template:active:not(:disabled) { transform: scale(0.98); }
+.pd-start-template:disabled { opacity: 0.55; }
+
+.pd-start-template-thumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: var(--pd-c-0f0f13);
+  color: var(--pd-c-3a3a4a);
+}
+
+.pd-start-template-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.pd-start-template-busy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.pd-start-template-body { display: flex; flex-direction: column; gap: 2px; padding: 9px 11px 11px; min-width: 0; }
+
+.pd-start-template-body strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--pd-c-e8e8f0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-start-template-body em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--pd-c-6b6b7a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-start-foot {
+  margin-top: 34px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pd-field-border);
+}
+
+.pd-start-foot label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--pd-c-8a86a0);
+  cursor: pointer;
+}
+
+.pd-home-button {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  margin-inline-start: -6px;
+  border-radius: 8px;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-home-button:hover { background: var(--pd-hover); }
+.pd-home-button:active { transform: scale(0.94); }
+
+@keyframes pd-rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* ── Icon picker ───────────────────────────────────────────────────────────
    A dense grid: the point is to scan a few hundred glyphs quickly, so the
    cells are square, the label sits under the glyph, and the grid itself is

@@ -49,7 +49,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:responsive": "node scripts/verify-responsive.mjs",
-    "test:editor": "node scripts/verify-editor.mjs"
+    "test:editor": "node scripts/verify-editor.mjs",
+    "test:start": "node scripts/verify-start.mjs"
   },
   "engines": {
     "node": ">=20.19.0"

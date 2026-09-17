@@ -30,9 +30,11 @@ interface ToolbarProps {
   onPreview: () => void
   mode: 'editor' | 'localization'
   onSetMode: (mode: 'editor' | 'localization') => void
+  /** Reopen the start screen. */
+  onHome: () => void
 }
 
-export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) {
+export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: ToolbarProps) {
   const t = useT()
   // The desktop toolbar is not rendered at all on compact widths — it is not
   // merely hidden. A hidden copy would duplicate every control in the
@@ -143,6 +145,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
             key: 'project',
             title: t('toolbar.projects'),
             actions: [
+              { key: 'home', icon: 'home', label: t('toolbar.home'), onClick: runAndClose(onHome) },
               { key: 'projects', icon: 'grid', label: t('toolbar.projects'), onClick: runAndClose(() => setProjectsOpen(true)) },
               { key: 'templates', icon: 'template', label: t('toolbar.templates'), onClick: runAndClose(() => setTemplatesOpen(true)) },
               { key: 'preview', icon: 'eye', label: t('slides.preview'), onClick: runAndClose(onPreview) },
@@ -195,8 +198,16 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview }: ToolbarProps) 
         borderColor: 'rgba(255,255,255,0.08)',
       }}
     >
-      {/* Logo */}
-      <Logo />
+      {/* Logo — doubles as the way back to the start screen. */}
+      <button
+        type="button"
+        className="pd-home-button"
+        onClick={onHome}
+        title={t('toolbar.home')}
+        aria-label={t('toolbar.home')}
+      >
+        <Logo />
+      </button>
       <ThemeControl />
 
       {/* Current project name — click to rename inline */}

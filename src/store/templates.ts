@@ -7,6 +7,12 @@ export interface TemplateManifestEntry {
   description: string
   category?: string
   thumbnail?: string   // path relative to BASE_URL e.g. /templates/thumbs/slug.png
+  /**
+   * A CSS background built from the template's own first-slide fill, written
+   * by scripts/build-template-manifest.mjs. Stands in for a rendered thumbnail,
+   * which would mean running Konva to produce.
+   */
+  preview?: string
   file: string         // path relative to BASE_URL e.g. /templates/slug.template.json
   slides?: number      // total slide count across all slide groups
   previewSize?: string // e.g. "1290×2796" — first slide group dimensions

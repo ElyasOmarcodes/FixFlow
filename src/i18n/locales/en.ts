@@ -100,6 +100,25 @@ export const en = {
   'common.search': 'Search',
   'common.upload': 'Upload',
 
+  // ── Start screen ─────────────────────────────────────────────────────────
+  'start.title': 'PixelDeck',
+  'start.tagline': 'Store screenshots, designed once and exported for every size.',
+  'start.continueIn': 'Continue in {name}',
+  'start.newProject': 'New project',
+  'start.newProjectHint': 'A blank canvas at App Store size',
+  'start.openFile': 'Open a file',
+  'start.openFileHint': 'Import a .json project you exported before',
+  'start.recent': 'Recent projects',
+  'start.noProjects': 'Nothing here yet — start a new project or pick a template below.',
+  'start.open': 'Open',
+  'start.templates': 'Start from a template',
+  'start.slideCount': '{count} slides',
+  'start.showOnLaunch': 'Show this screen when PixelDeck opens',
+  'start.justNow': 'just now',
+  'start.minutesAgo': '{count} min ago',
+  'start.hoursAgo': '{count} h ago',
+  'start.daysAgo': '{count} d ago',
+
   // ── Canvas viewport ──────────────────────────────────────────────────────
   'canvas.fit': 'Fit',
   'canvas.format': 'Format',
@@ -117,6 +136,7 @@ export const en = {
   'toolbar.github': 'GitHub',
   'toolbar.group': 'Group',
   'toolbar.groupTitle': 'Group selected layers',
+  'toolbar.home': 'Home',
   'toolbar.help': 'Help',
   'toolbar.helpTitle': 'Help & keyboard shortcuts',
   'toolbar.localization': 'Localization',
