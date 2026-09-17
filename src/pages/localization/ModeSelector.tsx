@@ -30,14 +30,14 @@ export function ModeSelector({ layer, onUpdate }: ModeSelectorProps) {
             onClick={() => onUpdate(opt.value === 'auto' ? undefined : opt.value)}
             className={`rounded px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide transition ${
               disabled
-                ? 'cursor-not-allowed text-[#3a3a4a] border border-[var(--pd-fill-subtle)]'
+                ? 'cursor-not-allowed text-[var(--pd-c-3a3a4a)] border border-[var(--pd-fill-subtle)]'
                 : active
                   ? opt.value === 'skip'
                     ? 'bg-[rgba(239,68,68,0.18)] border border-[rgba(239,68,68,0.4)] text-[var(--pd-danger-soft)]'
                     : opt.value === 'manual'
                       ? 'bg-[rgba(245,158,11,0.18)] border border-[rgba(245,158,11,0.4)] text-[var(--pd-warn)]'
-                      : 'bg-[var(--pd-accent-wash-strong)] border border-[var(--pd-accent-soft)] text-[#c4b5fd]'
-                  : 'border border-[var(--pd-line-soft)] text-[#555665] hover:text-[#9a9ab0] hover:border-[var(--pd-line-strong)]'
+                      : 'bg-[var(--pd-accent-wash-strong)] border border-[var(--pd-accent-soft)] text-[var(--pd-c-c4b5fd)]'
+                  : 'border border-[var(--pd-line-soft)] text-[var(--pd-c-525260)] hover:text-[var(--pd-c-a0a0b0)] hover:border-[var(--pd-line-strong)]'
             }`}
           >
             {opt.label}

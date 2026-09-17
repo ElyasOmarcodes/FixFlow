@@ -75,7 +75,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
             <rect x="19.5" y="16" width="8" height="8" rx="1.5" fill="white" fillOpacity="0.15" />
           </svg>
           <span className="text-[24px] font-semibold tracking-[-0.045em] text-[var(--pd-c-f0eff8)]">
-            Pixel<span className="text-[#9b8fff]">Deck</span>
+            Pixel<span className="text-[var(--pd-c-9b8fff)]">Deck</span>
           </span>
         </div>
 

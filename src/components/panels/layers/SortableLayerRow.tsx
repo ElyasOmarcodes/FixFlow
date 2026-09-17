@@ -123,7 +123,7 @@ export function SortableChild({ child, groupId, isSelected, onSelect, onRename }
         onClick={(e) => e.stopPropagation()}
       ><Icon name="grip" size={12} /></button>
 
-      <span className="shrink-0 flex w-4 justify-center text-[#7d7898]">
+      <span className="shrink-0 flex w-4 justify-center text-[var(--pd-c-777786)]">
         <Icon name={LAYER_ICON[child.type] ?? 'shape'} size={12} />
       </span>
       <button aria-label={t('actions.edit')} onClick={(event) => { event.stopPropagation(); onSelect(); if (child.type === 'text') useEditorStore.getState().startTextEdit(child.id); else window.dispatchEvent(new Event('pd-edit-layer')) }}><Icon name="settings" size={16} /></button>
@@ -211,11 +211,11 @@ export function SortableGroup({
           aria-label={isCollapsed ? `Expand ${layer.name}` : `Collapse ${layer.name}`}
           onClick={(e) => { e.stopPropagation(); onToggleCollapse() }}
           title={isCollapsed ? 'Expand group' : 'Collapse group'}
-          className="w-5 h-5 flex items-center justify-center text-[10px] rounded hover:bg-[var(--pd-fill-strong)] shrink-0 text-[#d8d2ff]"
+          className="w-5 h-5 flex items-center justify-center text-[10px] rounded hover:bg-[var(--pd-fill-strong)] shrink-0 text-[var(--pd-c-c4b5fd)]"
           style={{ transition: 'transform 0.15s', transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)' }}
         ><Icon name="chevron-down" size={12} /></button>
 
-        <span className="shrink-0 text-[#b6adff]"><Icon name="group" size={13} /></span>
+        <span className="shrink-0 text-[var(--pd-c-b8afff)]"><Icon name="group" size={13} /></span>
 
         <InlineEditableLabel renameButton
           value={layer.name}
@@ -224,7 +224,7 @@ export function SortableGroup({
           style={{ color: isSelected ? 'var(--pd-c-e8e8f0)' : '#d8d2ff', cursor: 'text' }}
         />
 
-        <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none border border-[rgba(124,110,246,0.28)] bg-[var(--pd-accent-wash)] text-[#b6adff]">
+        <span className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none border border-[rgba(124,110,246,0.28)] bg-[var(--pd-accent-wash)] text-[var(--pd-c-b8afff)]">
           {layer.children.length}
         </span>
 
@@ -238,7 +238,7 @@ export function SortableGroup({
         <button
           aria-label={`Open ${layer.name} layer menu`}
           onClick={(e) => { e.stopPropagation(); onMenuOpen(e, layer.id) }}
-          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100 text-[#8a84b6] hover:text-[var(--pd-c-e8e8f0)]"
+          className="w-5 h-5 flex items-center justify-center text-xs rounded hover:bg-[var(--pd-fill-strong)] shrink-0 opacity-0 group-hover:opacity-100 text-[var(--pd-c-8a86a0)] hover:text-[var(--pd-c-e8e8f0)]"
         ><Icon name="more-vertical" size={13} /></button>
       </div>
 

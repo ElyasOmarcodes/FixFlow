@@ -89,7 +89,7 @@ function LanguageSettingsContent() {
         })}
       </div>
 
-      <p className="mt-5 text-[11px] leading-relaxed text-[#575766]">{t('settings.languageRtlNote')}</p>
+      <p className="mt-5 text-[11px] leading-relaxed text-[var(--pd-c-525260)]">{t('settings.languageRtlNote')}</p>
     </div>
   )
 }
@@ -188,7 +188,7 @@ function PanoSettingsContent() {
         {/* Status summary */}
         <div className="rounded-lg border border-[var(--pd-fill-soft)] bg-[var(--pd-fill)] px-4 py-3">
           <p className="text-[11px] text-[var(--pd-c-6b6b7a)] leading-relaxed">
-            <span className="text-[#c4b5fd]">{t('settings.current')}</span>{' '}
+            <span className="text-[var(--pd-c-c4b5fd)]">{t('settings.current')}</span>{' '}
             {panoSettings.gapPx ?? 24}px{' '}
             {panoSettings.compensate
               ? t('settings.compensateOn')
@@ -222,7 +222,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
       footer={(
         <>
           <span className="text-[11px] text-[var(--pd-c-4a4a5a)] font-mono select-all">v{__APP_VERSION__}</span>
-          <span className="text-[#2a2a3a]">·</span>
+          <span className="text-[var(--pd-c-3a3a4a)]">·</span>
           <span className="text-[11px] text-[var(--pd-c-4a4a5a)] font-mono select-all" title="Git commit hash">{__GIT_HASH__}</span>
           <span className="flex-1" />
           <a href="https://github.com/ElyasOmarhs/PixelDeck" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[var(--pd-c-4a4a5a)] hover:text-[var(--pd-c-7c6ef6)] transition-colors">github.com/ElyasOmarhs/PixelDeck</a>
@@ -248,7 +248,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                     onClick={() => setTab(tabMeta.id)}
                     className={`w-full px-2 py-1.5 rounded-md text-xs transition-colors flex items-center gap-2 text-start ${
                       tab === tabMeta.id
-                        ? 'bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+                        ? 'bg-[var(--pd-accent-wash-strong)] text-[var(--pd-c-c4b5fd)]'
                         : 'text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-soft)]'
                     }`}
                   >

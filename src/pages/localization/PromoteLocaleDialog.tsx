@@ -43,14 +43,14 @@ export function PromoteLocaleDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full border border-[var(--pd-line)] bg-[var(--pd-line-subtle)] px-4 py-2 text-sm font-medium text-[#c9c9d5] transition hover:border-[var(--pd-line-loud)] hover:text-[var(--pd-c-f0eff8)]"
+            className="rounded-full border border-[var(--pd-line)] bg-[var(--pd-line-subtle)] px-4 py-2 text-sm font-medium text-[var(--pd-c-d8d8e2)] transition hover:border-[var(--pd-line-loud)] hover:text-[var(--pd-c-f0eff8)]"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-full border border-[var(--pd-c-7c6ef6)]/45 bg-[var(--pd-c-7c6ef6)]/16 px-4 py-2 text-sm font-medium text-[#f3f1ff] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/24"
+            className="rounded-full border border-[var(--pd-c-7c6ef6)]/45 bg-[var(--pd-c-7c6ef6)]/16 px-4 py-2 text-sm font-medium text-[var(--pd-c-c4b5fd)] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/24"
           >
             Promote to default
           </button>
@@ -59,10 +59,10 @@ export function PromoteLocaleDialog({
     >
       <div className="space-y-5">
         <div className="space-y-2">
-          <div className="inline-flex items-center rounded-full border border-[var(--pd-c-7c6ef6)]/25 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c4b5fd]">
+          <div className="inline-flex items-center rounded-full border border-[var(--pd-c-7c6ef6)]/25 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--pd-c-c4b5fd)]">
             {targetName} · {locale}
           </div>
-          <p className="text-sm leading-relaxed text-[#d6d6e2]">
+          <p className="text-sm leading-relaxed text-[var(--pd-c-d8d8e2)]">
             This will make <span className="font-semibold text-white">{targetName}</span> the new source language for the project.
           </p>
         </div>
@@ -73,7 +73,7 @@ export function PromoteLocaleDialog({
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--pd-c-6b6b7a)]">Translation coverage</div>
               <div className="mt-1 text-2xl font-semibold text-white">{complete}/{total}</div>
             </div>
-            <div className="text-end text-xs text-[#8d8ea0]">
+            <div className="text-end text-xs text-[var(--pd-c-8a86a0)]">
               {isComplete ? 'Everything is translated.' : `${total - complete} layers still need review.`}
             </div>
           </div>
@@ -94,15 +94,15 @@ export function PromoteLocaleDialog({
               <div className="mt-0.5 text-[var(--pd-warn-strong)]"><Icon name="alert-triangle" size={15} /></div>
               <div className="space-y-3">
                 <div>
-                  <div className="text-sm font-semibold text-[#fde68a]">Some layers are still incomplete</div>
-                  <p className="mt-1 text-sm leading-relaxed text-[#e7dbc0]">
+                  <div className="text-sm font-semibold text-[var(--pd-c-c4b5fd)]">Some layers are still incomplete</div>
+                  <p className="mt-1 text-sm leading-relaxed text-[var(--pd-c-c4b5fd)]">
                     Missing translations will keep their current <span className="font-medium text-white">{currentDefaultName}</span> content under the new default label. Review these layers before confirming if you want to avoid a mixed-language source.
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-111118)] px-3 py-3">
-                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d8ea0]">Affected layers</div>
-                  <ul className="space-y-2 text-sm text-[#d9d9e6]">
+                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pd-c-8a86a0)]">Affected layers</div>
+                  <ul className="space-y-2 text-sm text-[var(--pd-c-d8d8e2)]">
                     {incompleteLabels.map((label) => (
                       <li key={label} className="flex gap-2">
                         <span className="mt-1.5 text-[var(--pd-warn-strong)]"><Icon name="bullet" size={5} /></span>
@@ -111,7 +111,7 @@ export function PromoteLocaleDialog({
                     ))}
                   </ul>
                   {remainingCount > 0 && (
-                    <div className="mt-3 text-xs text-[#8d8ea0]">+{remainingCount} more</div>
+                    <div className="mt-3 text-xs text-[var(--pd-c-8a86a0)]">+{remainingCount} more</div>
                   )}
                 </div>
               </div>

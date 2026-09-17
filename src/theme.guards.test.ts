@@ -30,6 +30,20 @@ describe('theme tokens', () => {
     expect(offenders).toEqual([])
   })
 
+  it('never hardcodes a text colour in the chrome', () => {
+    // A literal light grey is legible on a near-black panel and almost
+    // invisible on a white one — which is what left Help's bold text washed
+    // out in light theme. Text colour has to come from a token that inverts.
+    const offenders: string[] = []
+    for (const file of chromeFiles()) {
+      const source = readFileSync(file, 'utf8')
+      for (const match of source.matchAll(/\btext-\[#[0-9a-fA-F]{3,8}\]/g)) {
+        offenders.push(`${file}: ${match[0]}`)
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+
   it('never hardcodes a dark surface hex in the chrome', () => {
     // Anything this dark is a dark-theme surface; in light theme it is a
     // black hole in the middle of a white panel — which is what the gradient

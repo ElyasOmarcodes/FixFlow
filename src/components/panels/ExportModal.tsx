@@ -263,7 +263,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
             ? `${exportProgress.formatLabel} · ${exportProgress.locale} — ${exportProgress.groupName}`
             : `${exportProgress.formatLabel} · ${exportProgress.locale}`
           return <div className="mb-3">
-            <p className="mb-1.5 text-[10px] text-[#8f90a3]">{context}</p>
+            <p className="mb-1.5 text-[10px] text-[var(--pd-c-8a86a0)]">{context}</p>
             <div
               role="progressbar"
               aria-valuemin={0}
@@ -303,7 +303,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
         ) : !isExporting && selectedExportLocales.length === 0 ? (
           <p className="mt-2 text-[10px] leading-snug text-[var(--pd-warn-strong)]">Select at least one locale to export.</p>
         ) : (
-          <p className="text-[10px] leading-snug text-[var(--pd-c-6b6b7a)] mt-2">ZIP and Folder preserve the <span className="text-[#8f90a3]">format/locale/file.png</span> structure.</p>
+          <p className="text-[10px] leading-snug text-[var(--pd-c-6b6b7a)] mt-2">ZIP and Folder preserve the <span className="text-[var(--pd-c-8a86a0)]">format/locale/file.png</span> structure.</p>
         )}
       </>}
     >
@@ -323,7 +323,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                   onClick={() => setExportScope(item.value)}
                   className={`text-start rounded border px-2.5 py-2 transition-colors ${exportScope === item.value
                     ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)] text-white'
-                    : 'border-[var(--pd-line-soft)] text-[#a6a7b8] hover:border-[var(--pd-line-loud)]'}`}
+                    : 'border-[var(--pd-line-soft)] text-[var(--pd-c-a0a0b0)] hover:border-[var(--pd-line-loud)]'}`}
                 >
                   <span className="block text-[11px] font-medium">{item.label}</span>
                   <span className="block text-[10px] text-[var(--pd-c-6b6b7a)] mt-0.5 truncate">{item.help}</span>
@@ -401,7 +401,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                     onClick={() => { if (!singleLocale) toggleExportLocale(locale) }}
                     className={`text-[11px] rounded-full border px-2 py-1 transition-colors ${checked
                       ? 'border-[var(--pd-c-7c6ef6)] bg-[rgba(124,110,246,0.16)] text-white'
-                      : 'border-[var(--pd-line-soft)] text-[#8f90a3] hover:text-[var(--pd-c-f0eff8)]'} ${singleLocale ? 'cursor-default opacity-80' : ''}`}
+                      : 'border-[var(--pd-line-soft)] text-[var(--pd-c-8a86a0)] hover:text-[var(--pd-c-f0eff8)]'} ${singleLocale ? 'cursor-default opacity-80' : ''}`}
                   >
                     {locale}
                   </button>
@@ -415,7 +415,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--pd-c-6b6b7a)] mb-3">Pano groups</p>
               <div className="rounded border border-[var(--pd-line-soft)] bg-[var(--pd-fill-subtle)] px-3 py-2">
-                <label className="flex items-center gap-2 text-[11px] text-[#a6a7b8]">
+                <label className="flex items-center gap-2 text-[11px] text-[var(--pd-c-a0a0b0)]">
                   <ToggleSwitch
                     variant="checkbox"
                     checked={compensatePanoExport}
@@ -462,7 +462,7 @@ export function ExportModal({ open, onClose, stageRef }: ExportModalProps) {
                     onClick={() => setExportOutput(item.value)}
                     className={`text-start rounded border px-2 py-1.5 transition-colors ${exportOutput === item.value
                       ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)] text-white'
-                      : 'border-[var(--pd-line-soft)] text-[#8f90a3] hover:text-[var(--pd-c-f0eff8)]'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                      : 'border-[var(--pd-line-soft)] text-[var(--pd-c-8a86a0)] hover:text-[var(--pd-c-f0eff8)]'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >
                     <span className="block text-[11px] font-medium">{item.label}</span>
                     <span className="block text-[9px] text-[var(--pd-c-6b6b7a)] mt-0.5">{item.help}</span>

@@ -166,7 +166,7 @@ export function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
     'text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider px-2 py-1 select-none'
   const itemBaseCls =
     'w-full text-start px-3 py-1.5 text-sm text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-soft)] transition-colors rounded'
-  const itemSelectedCls = 'bg-[var(--pd-accent-wash)] !text-[#c4b5fd]'
+  const itemSelectedCls = 'bg-[var(--pd-accent-wash)] !text-[var(--pd-c-c4b5fd)]'
   const itemActiveCls = 'bg-[var(--pd-fill-strong)] outline-none'
 
   const noResults =
@@ -224,7 +224,7 @@ export function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
                   onClick={() => { setScriptFilter(f.value); setActiveIdx(-1) }}
                   className={`rounded border px-1 py-1 text-[10px] transition-colors ${
                     scriptFilter === f.value
-                      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+                      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[var(--pd-c-c4b5fd)]'
                       : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)]'
                   }`}
                 >

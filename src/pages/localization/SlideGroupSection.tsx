@@ -82,18 +82,18 @@ export function SlideGroupSection({
         className="flex w-full items-center justify-between gap-4 px-6 py-5 text-start transition hover:bg-white/[0.03]"
       >
         <div className="flex items-center gap-3">
-          <span className="text-[#d5d2eb]"><Icon name={collapsed ? 'chevron-right' : 'chevron-down'} size={15} /></span>
+          <span className="text-[var(--pd-c-c4b5fd)]"><Icon name={collapsed ? 'chevron-right' : 'chevron-down'} size={15} /></span>
           <div>
-            <div className="text-xl text-[#f2efff]" style={{ fontFamily: 'Iowan Old Style, Palatino Linotype, serif' }}>
+            <div className="text-xl text-[var(--pd-c-c4b5fd)]" style={{ fontFamily: 'Iowan Old Style, Palatino Linotype, serif' }}>
               {slideGroup.name}
             </div>
-            <div className="mt-1 text-sm text-[#7f8094]">
+            <div className="mt-1 text-sm text-[var(--pd-c-8a86a0)]">
               {eligibleRows.length} localizable · {activeProgress}/{eligibleRows.length} complete for{' '}
-              <span className="font-medium text-[#bdb7f6]">{getLanguageName(activeLocale)}</span>
+              <span className="font-medium text-[var(--pd-c-c4b5fd)]">{getLanguageName(activeLocale)}</span>
             </div>
           </div>
         </div>
-        <div className="rounded-full border border-[var(--pd-line-soft)] bg-[var(--pd-line-subtle)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#8d8ea3]">
+        <div className="rounded-full border border-[var(--pd-line-soft)] bg-[var(--pd-line-subtle)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[var(--pd-c-8a86a0)]">
           {slideGroup.slideWidth} × {slideGroup.slideHeight}
         </div>
       </button>
@@ -107,7 +107,7 @@ export function SlideGroupSection({
           <div className="w-max">
             {/* Column headers */}
             <div
-              className="grid gap-3 pr-6 pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#78798b]"
+              className="grid gap-3 pr-6 pb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--pd-c-777786)]"
               style={{ gridTemplateColumns }}
             >
               <div className="py-2 pl-4 pr-3 sticky start-0 z-10 bg-[var(--pd-c-18181f)]">Layer</div>
@@ -152,7 +152,7 @@ export function SlideGroupSection({
                             <button
                               type="button"
                               onClick={() => onNavigateToLayer(row)}
-                              className="truncate font-medium text-[#d5d5df] text-sm hover:text-[var(--pd-c-f0eff8)] transition text-start w-full"
+                              className="truncate font-medium text-[var(--pd-c-d8d8e2)] text-sm hover:text-[var(--pd-c-f0eff8)] transition text-start w-full"
                               title="Go to layer in editor"
                             >
                               {row.layerName}

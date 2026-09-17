@@ -53,7 +53,7 @@ export function ImageOverrideCell({
           <div className="flex items-center gap-3">
             <img src={previewSrc} alt="base" className="h-12 w-9 rounded-lg border border-[var(--pd-line)] object-cover shrink-0" />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs text-[#ecebfa]">{getFileLabel(row.defaultImageRef)}</div>
+              <div className="truncate text-xs text-[var(--pd-c-c4b5fd)]">{getFileLabel(row.defaultImageRef)}</div>
               <div className="mt-1.5 flex items-center justify-between gap-2">
                 <button type="button" onClick={onUpload} className="text-[10px] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] transition">
                   Change
@@ -67,7 +67,7 @@ export function ImageOverrideCell({
             <button
               type="button"
               onClick={onUpload}
-              className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[#c5befd] transition hover:bg-[var(--pd-accent-wash-strong)]"
+              className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[var(--pd-c-c4b5fd)] transition hover:bg-[var(--pd-accent-wash-strong)]"
             >
               + Upload
             </button>
@@ -106,7 +106,7 @@ export function ImageOverrideCell({
             className="h-12 w-9 rounded-lg border border-[var(--pd-line)] object-cover shrink-0"
           />
           <div className="min-w-0 flex-1">
-            <div className="truncate text-xs text-[#ecebfa]">
+            <div className="truncate text-xs text-[var(--pd-c-c4b5fd)]">
               {row.layerType === 'phone'
                 ? getFileLabel(override?.screenshotPath ?? override?.screenshotDataUrl)
                 : getFileLabel(override?.src)}
@@ -126,7 +126,7 @@ export function ImageOverrideCell({
           <button
             type="button"
             onClick={onUpload}
-            className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[#c5befd] transition hover:bg-[var(--pd-accent-wash-strong)]"
+            className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-3 py-1.5 text-xs font-medium text-[var(--pd-c-c4b5fd)] transition hover:bg-[var(--pd-accent-wash-strong)]"
           >
             + Upload
           </button>

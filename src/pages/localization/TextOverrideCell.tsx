@@ -127,7 +127,7 @@ export function TextOverrideCell({
             <button
               type="button"
               onClick={onAiTranslate}
-              className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-2.5 py-1 text-xs text-[#c5befd] hover:bg-[var(--pd-accent-wash-strong)] transition"
+              className="rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.1)] px-2.5 py-1 text-xs text-[var(--pd-c-c4b5fd)] hover:bg-[var(--pd-accent-wash-strong)] transition"
             >
               <span className="flex items-center gap-1"><Icon name="sparkles" size={11} />{t('loc.translateAi')}</span>
             </button>
@@ -208,7 +208,7 @@ export function TextOverrideCell({
             <button
               type="button"
               onClick={() => clearLocaleContent(row.slideGroupId, row.layerId, locale)}
-              className="ml-auto text-xs font-medium text-[#b9b6c9] transition hover:text-[var(--pd-c-f0eff8)]"
+              className="ml-auto text-xs font-medium text-[var(--pd-c-b0b0c4)] transition hover:text-[var(--pd-c-f0eff8)]"
             >
               × Clear
             </button>

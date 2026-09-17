@@ -173,7 +173,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
                   key={preset.label}
                   type="button"
                   onClick={() => upd(preset.patch)}
-                  className="flex flex-col items-center gap-0.5 rounded border border-[var(--pd-line)] px-1 py-1.5 text-[10px] text-[#8f90a3] hover:border-[var(--pd-accent-soft)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-subtle)] transition-colors leading-tight text-center"
+                  className="flex flex-col items-center gap-0.5 rounded border border-[var(--pd-line)] px-1 py-1.5 text-[10px] text-[var(--pd-c-8a86a0)] hover:border-[var(--pd-accent-soft)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-subtle)] transition-colors leading-tight text-center"
                 >
                   {preset.icon && <Icon name={preset.icon} size={12} />}
                   {preset.label}

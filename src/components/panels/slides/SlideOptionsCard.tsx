@@ -47,7 +47,7 @@ export function SlideOptionsControls({
               className={`rounded border px-2 py-1 text-[11px] transition-colors ${
                 activeGroup.numSlides === value
                   ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-c-7c6ef6)] text-white'
-                  : 'border-[var(--pd-line-soft)] text-[#8f90a3] hover:border-[var(--pd-line)] hover:text-[var(--pd-c-e8e8f0)]'
+                  : 'border-[var(--pd-line-soft)] text-[var(--pd-c-8a86a0)] hover:border-[var(--pd-line)] hover:text-[var(--pd-c-e8e8f0)]'
               }`}
             >
               {suffix ?? t(labelKey)}
@@ -58,7 +58,7 @@ export function SlideOptionsControls({
       {/* Always rendered, even with no pano groups, so this column's height
           never shifts the slide-count buttons when switching between modes. */}
       <label
-        className={`flex items-center gap-1.5 text-[10px] ${hasPano ? 'text-[var(--pd-c-6b6b7a)]' : 'text-[#4a4a57]'}`}
+        className={`flex items-center gap-1.5 text-[10px] ${hasPano ? 'text-[var(--pd-c-6b6b7a)]' : 'text-[var(--pd-c-4a4a5a)]'}`}
       >
         <input
           type="checkbox"

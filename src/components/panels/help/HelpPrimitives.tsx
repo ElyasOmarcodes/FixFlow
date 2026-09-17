@@ -4,7 +4,7 @@ type ShortcutRow = { keys: ReactNode; desc: string }
 
 export function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-flex min-h-6 items-center whitespace-nowrap rounded-md border border-[var(--pd-line)] bg-[var(--pd-c-1e1e28)] px-1.5 font-mono text-[10px] font-medium text-[#c8c8d8] shadow-[inset_0_-1px_0_rgba(255,255,255,0.06)]">
+    <kbd className="inline-flex min-h-6 items-center whitespace-nowrap rounded-md border border-[var(--pd-line)] bg-[var(--pd-c-1e1e28)] px-1.5 font-mono text-[10px] font-medium text-[var(--pd-c-d8d8e2)] shadow-[inset_0_-1px_0_rgba(255,255,255,0.06)]">
       {children}
     </kbd>
   )
@@ -12,7 +12,7 @@ export function Kbd({ children }: { children: ReactNode }) {
 
 export function SectionHeader({ children }: { children: ReactNode }) {
   return (
-    <div className="mb-2.5 mt-7 border-b border-[var(--pd-line-subtle)] pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f82ff] first:mt-0">
+    <div className="mb-2.5 mt-7 border-b border-[var(--pd-line-subtle)] pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--pd-c-9b8fff)] first:mt-0">
       {children}
     </div>
   )
@@ -28,7 +28,7 @@ export function ShortcutTable({ rows }: { rows: ShortcutRow[] }) {
               <td className="w-[46%] border-r border-[var(--pd-line)] px-3 py-2.5 text-[var(--pd-c-777786)] sm:w-[42%]">
                 <span className="flex flex-wrap items-center gap-1">{row.keys}</span>
               </td>
-              <td className="px-3 py-2.5 text-[#b6b6c3]">{row.desc}</td>
+              <td className="px-3 py-2.5 text-[var(--pd-c-b0b0c4)]">{row.desc}</td>
             </tr>
           ))}
         </tbody>
@@ -38,7 +38,7 @@ export function ShortcutTable({ rows }: { rows: ShortcutRow[] }) {
 }
 
 export function GuideText({ children }: { children: ReactNode }) {
-  return <p className="m-0 text-[13px] leading-7 text-[#aaaab7]">{children}</p>
+  return <p className="m-0 text-[13px] leading-7 text-[var(--pd-c-b0b0c4)]">{children}</p>
 }
 
 export function P({ children }: { children: ReactNode }) {
@@ -46,7 +46,7 @@ export function P({ children }: { children: ReactNode }) {
 }
 
 export function GuideList({ children }: { children: ReactNode }) {
-  return <ul className="m-0 space-y-3.5 p-0 text-[13px] leading-6 text-[#a7a7b4]">{children}</ul>
+  return <ul className="m-0 space-y-3.5 p-0 text-[13px] leading-6 text-[var(--pd-c-a0a0b0)]">{children}</ul>
 }
 
 export function GuideItem({ children, tone = 'purple' }: { children: ReactNode; tone?: 'purple' | 'amber' | 'teal' }) {
@@ -64,14 +64,14 @@ export function Li({ children }: { children: ReactNode }) {
 }
 
 export function Strong({ children }: { children: ReactNode }) {
-  return <strong className="font-semibold text-[#dedee8]">{children}</strong>
+  return <strong className="font-semibold text-[var(--pd-c-d8d8e2)]">{children}</strong>
 }
 
 export function Callout({ children, tone = 'purple', label }: { children: ReactNode; tone?: 'purple' | 'amber' | 'teal'; label?: string }) {
   const styles = {
-    purple: 'border-[rgba(124,110,246,0.22)] bg-[rgba(124,110,246,0.065)] text-[#bcb5f5]',
-    amber: 'border-[rgba(242,184,75,0.22)] bg-[rgba(242,184,75,0.055)] text-[#d8b96f]',
-    teal: 'border-[rgba(72,199,191,0.22)] bg-[rgba(72,199,191,0.055)] text-[#7dcec8]',
+    purple: 'border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] text-[var(--pd-c-c4b5fd)]',
+    amber: 'border-[rgba(242,184,75,0.22)] bg-[rgba(242,184,75,0.055)] text-[var(--pd-warn)]',
+    teal: 'border-[rgba(72,199,191,0.22)] bg-[rgba(72,199,191,0.055)] text-[var(--pd-info)]',
   }
   return (
     <div className={`my-5 rounded-xl border px-4 py-3.5 text-[12px] leading-6 ${styles[tone]}`}>

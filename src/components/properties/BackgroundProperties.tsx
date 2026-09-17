@@ -223,7 +223,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
                 className={`flex w-full cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-start text-xs transition-colors ${
                   selectedAccentIndex === i
                     ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash)] text-[var(--pd-c-e8e8f0)]'
-                    : 'border-[var(--pd-line-soft)] text-[#9a9aaa] hover:border-[var(--pd-accent-soft)] hover:bg-[var(--pd-fill-subtle)]'
+                    : 'border-[var(--pd-line-soft)] text-[var(--pd-c-a0a0b0)] hover:border-[var(--pd-accent-soft)] hover:bg-[var(--pd-fill-subtle)]'
                 }`}
               >
                 <button

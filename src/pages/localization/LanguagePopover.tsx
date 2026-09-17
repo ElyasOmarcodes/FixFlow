@@ -76,12 +76,12 @@ function LanguageCombobox({
                 disabled
                   ? 'cursor-default text-[var(--pd-c-4a4a5a)]'
                   : already
-                    ? 'text-[#d9d9e6] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]'
-                  : 'text-[#d9d9e6] hover:bg-[var(--pd-line-subtle)] hover:text-[var(--pd-c-f0eff8)]'
+                    ? 'text-[var(--pd-c-d8d8e2)] hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]'
+                  : 'text-[var(--pd-c-d8d8e2)] hover:bg-[var(--pd-line-subtle)] hover:text-[var(--pd-c-f0eff8)]'
               }`}
             >
               <span>{lang.name}</span>
-              <span className={`text-xs font-mono ${disabled ? 'text-[#3a3a4a]' : already ? 'text-[var(--pd-c-9b8fff)]' : 'text-[var(--pd-c-6b6b7a)]'}`}>
+              <span className={`text-xs font-mono ${disabled ? 'text-[var(--pd-c-3a3a4a)]' : already ? 'text-[var(--pd-c-9b8fff)]' : 'text-[var(--pd-c-6b6b7a)]'}`}>
                 <span className="flex items-center gap-1">{already && <Icon name="check" size={10} strokeWidth={2.4} />}{lang.code}</span>
               </span>
             </button>
@@ -186,7 +186,7 @@ export function LanguagePopover({
           onCancel={onCancel}
         />
         {note && (
-          <div className="mt-2 w-72 rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-111118)] px-3 py-2 text-[10px] leading-relaxed text-[#7f8094] shadow-xl">
+          <div className="mt-2 w-72 rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-111118)] px-3 py-2 text-[10px] leading-relaxed text-[var(--pd-c-8a86a0)] shadow-xl">
             {note}
           </div>
         )}

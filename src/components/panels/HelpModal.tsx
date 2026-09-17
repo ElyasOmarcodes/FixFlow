@@ -54,7 +54,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
         <header className="relative shrink-0 overflow-hidden border-b border-[var(--pd-line)] px-5 py-4 sm:px-6">
           <div className="pointer-events-none absolute -top-16 start-12 h-32 w-64 rounded-full bg-[var(--pd-c-7c6ef6)] opacity-[0.08] blur-3xl" />
           <div className="relative flex items-center gap-3 pr-10">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[rgba(155,143,255,0.28)] bg-[var(--pd-accent-wash)] text-[#b8afff] shadow-[0_8px_24px_rgba(124,110,246,0.12)]">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[rgba(155,143,255,0.28)] bg-[var(--pd-accent-wash)] text-[var(--pd-c-b8afff)] shadow-[0_8px_24px_rgba(124,110,246,0.12)]">
               <span aria-hidden="true" className="text-base">?</span>
             </div>
             <div>
@@ -83,7 +83,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={t('help.search')}
                 aria-label={t('help.search')}
-                className="h-9 w-full rounded-lg border border-[var(--pd-line)] bg-[var(--pd-c-0f0f13)] pl-8 pr-3 text-[11px] text-[var(--pd-c-d8d8e2)] outline-none transition placeholder:text-[#4a4a57] focus:border-[rgba(124,110,246,0.52)] focus:ring-2 focus:ring-[rgba(124,110,246,0.08)]"
+                className="h-9 w-full rounded-lg border border-[var(--pd-line)] bg-[var(--pd-c-0f0f13)] pl-8 pr-3 text-[11px] text-[var(--pd-c-d8d8e2)] outline-none transition placeholder:text-[var(--pd-c-4a4a5a)] focus:border-[rgba(124,110,246,0.52)] focus:ring-2 focus:ring-[rgba(124,110,246,0.08)]"
               />
             </label>
           </div>
@@ -94,7 +94,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
               if (sections.length === 0) return null
               return (
                 <div key={groupLabels[group]} className="mb-4 last:mb-0">
-                  <p className="mb-1.5 px-2 text-[9px] font-semibold tracking-[0.18em] text-[#4e4e5b]">
+                  <p className="mb-1.5 px-2 text-[9px] font-semibold tracking-[0.18em] text-[var(--pd-c-4a4a5a)]">
                     {groupLabels[group]}
                   </p>
                   <div className="space-y-0.5">
@@ -108,12 +108,12 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                           aria-current={isActive ? 'page' : undefined}
                           className={`group relative flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-start text-[11px] transition-all ${
                             isActive
-                              ? 'bg-[var(--pd-accent-wash)] text-[#d4ceff]'
-                              : 'text-[var(--pd-c-777786)] hover:bg-[var(--pd-fill-subtle)] hover:text-[#d1d1dc]'
+                              ? 'bg-[var(--pd-accent-wash)] text-[var(--pd-c-c4b5fd)]'
+                              : 'text-[var(--pd-c-777786)] hover:bg-[var(--pd-fill-subtle)] hover:text-[var(--pd-c-d8d8e2)]'
                           }`}
                         >
                           {isActive && <span className="absolute inset-y-2 start-0 w-0.5 rounded-full bg-[#8f82ff]" />}
-                          <span className={`w-5 shrink-0 text-end font-mono text-[9px] ${isActive ? 'text-[#8f82ff]' : 'text-[#444451] group-hover:text-[#666675]'}`}>
+                          <span className={`w-5 shrink-0 text-end font-mono text-[9px] ${isActive ? 'text-[var(--pd-c-9b8fff)]' : 'text-[var(--pd-c-4a4a5a)] group-hover:text-[var(--pd-c-6b6b7a)]'}`}>
                             {String(section.number).padStart(2, '0')}
                           </span>
                           <span className="truncate">{section.title}</span>
@@ -125,12 +125,12 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
               )
             })}
             {filteredSections.length === 0 && (
-              <div className="px-2 py-8 text-center text-[11px] leading-relaxed text-[#555562]">
+              <div className="px-2 py-8 text-center text-[11px] leading-relaxed text-[var(--pd-c-525260)]">
                 {t('help.empty')}<br />“{query}”
               </div>
             )}
           </nav>
-          <div className="border-t border-[var(--pd-line)] px-5 py-3 text-[10px] text-[#454552]">
+          <div className="border-t border-[var(--pd-line)] px-5 py-3 text-[10px] text-[var(--pd-c-4a4a5a)]">
             {t('help.jump')}
           </div>
         </aside>
@@ -138,7 +138,7 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
         <main className="flex min-w-0 flex-1 flex-col bg-[var(--pd-c-18181f)]">
           <div className="shrink-0 border-b border-[var(--pd-line-subtle)] bg-[var(--pd-c-15151b)] px-4 py-2.5 md:hidden">
             <label className="flex items-center gap-3">
-              <span className="text-[10px] font-semibold tracking-[0.12em] text-[#575765]">{t('help.sections')}</span>
+              <span className="text-[10px] font-semibold tracking-[0.12em] text-[var(--pd-c-525260)]">{t('help.sections')}</span>
               <select
                 value={activeId}
                 onChange={(event) => selectSection(event.target.value as HelpSectionId)}
@@ -157,11 +157,11 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
           <div ref={contentRef} className="min-h-0 flex-1 overflow-y-auto scroll-smooth">
             <article className="mx-auto max-w-[760px] px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-10">
               <div className="mb-7 flex items-start gap-4 border-b border-[var(--pd-line)] pb-6">
-                <span className="mt-0.5 font-mono text-[11px] font-medium tracking-[0.12em] text-[#8f82ff]">
+                <span className="mt-0.5 font-mono text-[11px] font-medium tracking-[0.12em] text-[var(--pd-c-9b8fff)]">
                   {String(activeSection.number).padStart(2, '0')}
                 </span>
                 <div>
-                  <p className="mb-2 text-[9px] font-semibold tracking-[0.18em] text-[#565664]">
+                  <p className="mb-2 text-[9px] font-semibold tracking-[0.18em] text-[var(--pd-c-525260)]">
                     {groupLabels[activeSection.group]}
                   </p>
                   <h3 className="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-[var(--pd-c-f0eff8)] sm:text-2xl">
@@ -179,17 +179,17 @@ export function HelpModal({ open, onClose }: HelpModalProps) {
                   type="button"
                   disabled={activeIndex === 0}
                   onClick={() => selectSection(chapters[activeIndex - 1].id)}
-                  className="flex items-center gap-1.5 rounded-lg border border-[var(--pd-line-soft)] px-3 py-2 text-[11px] text-[#858594] transition hover:border-[var(--pd-line)] hover:text-[#e0e0e9] disabled:pointer-events-none disabled:opacity-0"
+                  className="flex items-center gap-1.5 rounded-lg border border-[var(--pd-line-soft)] px-3 py-2 text-[11px] text-[var(--pd-c-8a86a0)] transition hover:border-[var(--pd-line)] hover:text-[var(--pd-c-e8e8f0)] disabled:pointer-events-none disabled:opacity-0"
                 >
                   <Icon name="chevron-left" size={12} />
                   {t('help.previous')}
                 </button>
-                <span className="font-mono text-[9px] text-[#484855]">{activeIndex + 1} / {chapters.length}</span>
+                <span className="font-mono text-[9px] text-[var(--pd-c-4a4a5a)]">{activeIndex + 1} / {chapters.length}</span>
                 <button
                   type="button"
                   disabled={activeIndex === chapters.length - 1}
                   onClick={() => selectSection(chapters[activeIndex + 1].id)}
-                  className="flex items-center gap-1.5 rounded-lg border border-[rgba(124,110,246,0.22)] bg-[rgba(124,110,246,0.07)] px-3 py-2 text-[11px] text-[#aaa1f5] transition hover:border-[rgba(124,110,246,0.42)] hover:bg-[var(--pd-accent-wash)] disabled:pointer-events-none disabled:opacity-0"
+                  className="flex items-center gap-1.5 rounded-lg border border-[rgba(124,110,246,0.22)] bg-[rgba(124,110,246,0.07)] px-3 py-2 text-[11px] text-[var(--pd-c-b8afff)] transition hover:border-[rgba(124,110,246,0.42)] hover:bg-[var(--pd-accent-wash)] disabled:pointer-events-none disabled:opacity-0"
                 >
                   {t('help.next')}
                   <Icon name="chevron-right" size={12} />

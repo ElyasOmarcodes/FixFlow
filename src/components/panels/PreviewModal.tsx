@@ -150,10 +150,10 @@ export function PreviewModal({
       showCloseButton={false}
       header={<div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--pd-line-soft)] px-6 py-4">
           <div>
-            <h2 className="text-sm font-semibold text-[#f3f0ff]">Preview</h2>
+            <h2 className="text-sm font-semibold text-[var(--pd-c-c4b5fd)]">Preview</h2>
             {previewProgress.status === 'capturing' || previewProgress.status === 'preparing' ? (
               <div className="mt-1.5 w-48">
-                <div className="mb-1 flex items-center justify-between text-[10px] text-[#7d7a90]">
+                <div className="mb-1 flex items-center justify-between text-[10px] text-[var(--pd-c-777786)]">
                   <span>{previewProgress.completedSlides > 0 ? 'Updating previews' : 'Generating previews'}</span>
                   <span>{previewProgress.completedSlides} / {previewProgress.totalSlides}</span>
                 </div>
@@ -167,12 +167,12 @@ export function PreviewModal({
                 >
                   <div className="h-full bg-[var(--pd-c-7c6ef6)] transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${previewProgress.totalSlides ? (previewProgress.completedSlides / previewProgress.totalSlides) * 100 : 0}%` }} />
                 </div>
-                <p className="mt-1 text-[10px] text-[#7d7a90]">Slide {previewProgress.completedSlides} of {previewProgress.totalSlides}{previewProgress.currentGroupName ? ` · ${previewProgress.currentGroupName}` : ''}</p>
+                <p className="mt-1 text-[10px] text-[var(--pd-c-777786)]">Slide {previewProgress.completedSlides} of {previewProgress.totalSlides}{previewProgress.currentGroupName ? ` · ${previewProgress.currentGroupName}` : ''}</p>
               </div>
             ) : previewProgress.status === 'error' ? (
               <p className="mt-1 rounded border border-[rgba(248,113,113,0.35)] bg-[rgba(248,113,113,0.08)] px-2 py-1 text-xs text-[var(--pd-danger-soft)]">Preview generation failed</p>
             ) : (
-              <p className="mt-1 text-xs text-[#7d7a90]">
+              <p className="mt-1 text-xs text-[var(--pd-c-777786)]">
                 {totalSlides} slide{totalSlides !== 1 ? 's' : ''} · {slideGroups.length} group{slideGroups.length !== 1 ? 's' : ''}
               </p>
             )}
@@ -181,16 +181,16 @@ export function PreviewModal({
           <div className="flex flex-wrap items-center gap-2">
             {/* Platform selector */}
             {platformFormats.length > 1 && (
-              <SegmentedControl value={activeCanvasFormat} options={platformFormats.map((format) => ({ value: format, label: getFormatLabel(format, settings.customFormats) }))} onChange={selectFormat} className="flex items-center gap-0.5 rounded-lg border border-[var(--pd-line)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[#cbbfff] font-bold" inactiveClassName="bg-transparent text-[#7d7a90] font-medium" />
+              <SegmentedControl value={activeCanvasFormat} options={platformFormats.map((format) => ({ value: format, label: getFormatLabel(format, settings.customFormats) }))} onChange={selectFormat} className="flex items-center gap-0.5 rounded-lg border border-[var(--pd-line)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[var(--pd-c-c4b5fd)] font-bold" inactiveClassName="bg-transparent text-[var(--pd-c-777786)] font-medium" />
             )}
 
             {/* Locale selector */}
             {locales.length > 1 && (
-              <SegmentedControl value={activeLocale} options={locales.map((locale) => ({ value: locale, label: getLanguageName(locale), title: getLanguageName(locale) }))} onChange={selectLocale} className="flex items-center gap-0.5 rounded-lg border border-[var(--pd-line)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[#cbbfff] font-bold" inactiveClassName="bg-transparent text-[#7d7a90] font-medium" />
+              <SegmentedControl value={activeLocale} options={locales.map((locale) => ({ value: locale, label: getLanguageName(locale), title: getLanguageName(locale) }))} onChange={selectLocale} className="flex items-center gap-0.5 rounded-lg border border-[var(--pd-line)] p-1" optionClassName="rounded-md px-2.5 py-1 text-[11px] transition-colors" activeClassName="bg-[rgba(124,110,246,0.26)] text-[var(--pd-c-c4b5fd)] font-bold" inactiveClassName="bg-transparent text-[var(--pd-c-777786)] font-medium" />
             )}
 
             {hasPanoGroups && (
-              <label className="flex items-center gap-2 rounded-lg border border-[var(--pd-line)] px-2 py-1 text-[11px] text-[#8f90a3]">
+              <label className="flex items-center gap-2 rounded-lg border border-[var(--pd-line)] px-2 py-1 text-[11px] text-[var(--pd-c-8a86a0)]">
                 <ToggleSwitch
                   variant="checkbox"
                   checked={panoSettings.compensate}
@@ -223,7 +223,7 @@ export function PreviewModal({
 
             <button
               onClick={onClose}
-              className="rounded-md px-2 py-1 text-xl leading-none text-[#8d89a3] transition-colors hover:text-[var(--pd-c-f0eff8)]"
+              className="rounded-md px-2 py-1 text-xl leading-none text-[var(--pd-c-8a86a0)] transition-colors hover:text-[var(--pd-c-f0eff8)]"
               aria-label="Close preview"
             >
               ×

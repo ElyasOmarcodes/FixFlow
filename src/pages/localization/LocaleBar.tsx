@@ -69,7 +69,7 @@ export function LocaleBar({
                   <span className="font-semibold">{getLanguageName(locale)}</span>
                   <span className="ml-1.5 text-xs font-mono opacity-60">{locale}</span>
                   {isDefault ? (
-                    <span className="ml-2 text-xs text-[#9f98dc]">default</span>
+                    <span className="ml-2 text-xs text-[var(--pd-c-9b8fff)]">default</span>
                   ) : (
                     <span className="ml-2 text-xs" style={{ color: ratio >= 0.5 ? '#7c6ef6' : '#f59e0b' }}>
                       {progress.complete}/{progress.total}
@@ -83,7 +83,7 @@ export function LocaleBar({
                       setShowAddLocale(false)
                       setShowDefaultLocalePicker((open) => !open)
                     }}
-                    className="rounded-full border border-[var(--pd-c-7c6ef6)]/30 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-2 text-xs font-medium text-[#d8d2ff] transition hover:border-[var(--pd-c-7c6ef6)]/60 hover:bg-[var(--pd-c-7c6ef6)]/18 hover:text-[var(--pd-c-f0eff8)]"
+                    className="rounded-full border border-[var(--pd-c-7c6ef6)]/30 bg-[var(--pd-c-7c6ef6)]/10 px-3 py-2 text-xs font-medium text-[var(--pd-c-c4b5fd)] transition hover:border-[var(--pd-c-7c6ef6)]/60 hover:bg-[var(--pd-c-7c6ef6)]/18 hover:text-[var(--pd-c-f0eff8)]"
                     title="Change default language"
                   >
                     Change default
@@ -110,7 +110,7 @@ export function LocaleBar({
                 setShowDefaultLocalePicker(false)
                 setShowAddLocale((open) => !open)
               }}
-              className="rounded-full border border-dashed border-[var(--pd-line-strong)] bg-[var(--pd-fill)] px-4 py-2 text-sm font-medium text-[#b7b7c7] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
+              className="rounded-full border border-dashed border-[var(--pd-line-strong)] bg-[var(--pd-fill)] px-4 py-2 text-sm font-medium text-[var(--pd-c-b0b0c4)] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
             >
               + Add language
             </button>
@@ -123,7 +123,7 @@ export function LocaleBar({
                 type="button"
                 onClick={() => onPreview(activeLocale)}
                 title={`Preview slides in ${getLanguageName(activeLocale)}`}
-                className="flex items-center gap-2 rounded-full border border-[var(--pd-c-7c6ef6)]/40 bg-[var(--pd-c-7c6ef6)]/10 px-4 py-2 text-sm font-medium text-[#cbbfff] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/20 hover:text-[var(--pd-c-f0eff8)]"
+                className="flex items-center gap-2 rounded-full border border-[var(--pd-c-7c6ef6)]/40 bg-[var(--pd-c-7c6ef6)]/10 px-4 py-2 text-sm font-medium text-[var(--pd-c-c4b5fd)] transition hover:border-[var(--pd-c-7c6ef6)]/70 hover:bg-[var(--pd-c-7c6ef6)]/20 hover:text-[var(--pd-c-f0eff8)]"
               >
                 <Icon name="play" size={12} />
                 {t('loc.preview')}
@@ -132,7 +132,7 @@ export function LocaleBar({
             <button
               type="button"
               onClick={onBack}
-              className="flex items-center gap-2 rounded-full border border-[var(--pd-line)] bg-[var(--pd-line-subtle)] px-5 py-2 text-sm font-medium text-[#d7d7e3] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
+              className="flex items-center gap-2 rounded-full border border-[var(--pd-line)] bg-[var(--pd-line-subtle)] px-5 py-2 text-sm font-medium text-[var(--pd-c-d8d8e2)] transition hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
             >
               <Icon name="arrow-left" size={14} />
               {t('loc.backToEditor')}

@@ -43,7 +43,7 @@ export function BulkTranslateBar({
             onChange={(e) => setOverwriteExisting(e.target.checked)}
             className="accent-[var(--pd-c-7c6ef6)] w-3 h-3"
           />
-          <span className="text-xs text-[#8f90a3]">Overwrite existing</span>
+          <span className="text-xs text-[var(--pd-c-8a86a0)]">Overwrite existing</span>
         </label>
 
         <button
@@ -57,7 +57,7 @@ export function BulkTranslateBar({
                 ? 'border-[var(--pd-accent-soft)] text-[var(--pd-c-9b8fff)] cursor-wait'
                 : bulkEligibleCount === 0
                   ? 'border-[var(--pd-line-soft)] text-[var(--pd-c-4a4a5a)] cursor-not-allowed'
-                  : 'border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] text-[#c5befd] hover:bg-[rgba(124,110,246,0.22)] hover:text-[var(--pd-c-f0eff8)]'
+                  : 'border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] text-[var(--pd-c-c4b5fd)] hover:bg-[rgba(124,110,246,0.22)] hover:text-[var(--pd-c-f0eff8)]'
           }`}
           title={!hasApiKey ? 'Configure an AI API key in AI Settings' : undefined}
         >

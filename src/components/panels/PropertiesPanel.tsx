@@ -117,7 +117,7 @@ function AlignmentSection({
     }
   }
 
-  const btnCls = 'flex items-center justify-center rounded border border-[var(--pd-line)] p-1.5 text-[#8f90a3] hover:border-[var(--pd-accent-soft)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-subtle)] transition-colors'
+  const btnCls = 'flex items-center justify-center rounded border border-[var(--pd-line)] p-1.5 text-[var(--pd-c-8a86a0)] hover:border-[var(--pd-accent-soft)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill-subtle)] transition-colors'
 
   // SVG icons for alignment axes
   const icons: Record<AlignAxis, React.ReactNode> = {
@@ -241,7 +241,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
                 className={`h-[30px] w-[30px] flex items-center justify-center rounded border text-sm transition-colors ${
                   layer.visible
                     ? 'border-[var(--pd-line-strong)] text-[var(--pd-c-e8e8f0)]'
-                    : 'border-[var(--pd-line-subtle)] text-[#3a3a4a]'
+                    : 'border-[var(--pd-line-subtle)] text-[var(--pd-c-3a3a4a)]'
                 } hover:border-[var(--pd-line)]`}
               >
                 <Icon name={layer.visible ? 'eye' : 'eye-off'} size={14} />
@@ -280,7 +280,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
                   className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
                     isVisible
                       ? 'border-[var(--pd-line)] text-[var(--pd-c-e8e8f0)] bg-[var(--pd-fill)]'
-                      : 'border-[var(--pd-line-subtle)] text-[#555665] line-through'
+                      : 'border-[var(--pd-line-subtle)] text-[var(--pd-c-525260)] line-through'
                   }`}
                 >
                   {getFormatLabel(fmtId, project.settings.customFormats)}
@@ -578,7 +578,7 @@ export function PropertiesPanel() {
                   className={`text-[10px] px-2 py-1 rounded border transition-colors ${
                     styleClipboard.layerType === selectedLayer.type
                       ? 'border-[var(--pd-accent-soft)] text-[var(--pd-c-9b8fff)] hover:text-[var(--pd-c-f0eff8)] hover:border-[var(--pd-c-7c6ef6)] hover:bg-[var(--pd-accent-wash)]'
-                      : 'border-[var(--pd-line-subtle)] text-[#3a3a4a] cursor-not-allowed'
+                      : 'border-[var(--pd-line-subtle)] text-[var(--pd-c-3a3a4a)] cursor-not-allowed'
                   }`}
                 >
                   Paste Style
@@ -614,7 +614,7 @@ export function PropertiesPanel() {
         ) : (
           <>
             {editingGroupId && selection?.layerId && (
-              <div className="mb-4 flex items-center gap-2 rounded-xl border border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] px-3 py-2 text-xs text-[#c4b5fd]">
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-[var(--pd-accent-soft)] bg-[var(--pd-accent-wash)] px-3 py-2 text-xs text-[var(--pd-c-c4b5fd)]">
                 <Icon name="group" size={13} />
                 {t('props.editingInsideGroup')}
               </div>
@@ -623,12 +623,12 @@ export function PropertiesPanel() {
             {rawSelectedLayer && !isBaseFormat && rawSelectedLayer.ownerFormat === activeCanvasFormat && (
               <div className="mb-3 rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.08)] px-3 py-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-[#c4b5fd]">
+                  <span className="text-[10px] text-[var(--pd-c-c4b5fd)]">
                     Only in {activeFormatInfo.label} · Added specifically for this format
                   </span>
                   <button
                     onClick={() => makeLayerShared(rawSelectedLayer!.id)}
-                    className="text-[10px] text-[#c4b5fd] hover:text-[var(--pd-c-f0eff8)] underline shrink-0"
+                    className="text-[10px] text-[var(--pd-c-c4b5fd)] hover:text-[var(--pd-c-f0eff8)] underline shrink-0"
                   >
                     Make shared
                   </button>

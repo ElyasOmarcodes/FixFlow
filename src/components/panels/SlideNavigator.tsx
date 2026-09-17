@@ -372,7 +372,7 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
           aria-label={t('slides.options')}
           className="pd-slide-options flex w-[196px] shrink-0 flex-col gap-1.5 border-e border-[var(--pd-line-subtle)] pe-3 min-[1440px]:w-[212px]"
         >
-          <p className="text-[10px] text-[#8f90a3]">{t('slides.title')}</p>
+          <p className="text-[10px] text-[var(--pd-c-8a86a0)]">{t('slides.title')}</p>
           <SlideOptionsControls
             activeGroup={activeGroup}
             hasPano={hasPano}

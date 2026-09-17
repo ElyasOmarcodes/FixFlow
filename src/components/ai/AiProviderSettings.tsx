@@ -150,7 +150,7 @@ export function AiProviderSettings() {
               }}
               className={`rounded-lg border px-2 py-2 text-xs transition-colors text-start ${
                 provider === item.id
-                  ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+                  ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[var(--pd-c-c4b5fd)]'
                   : 'border-[var(--pd-line)] text-[var(--pd-c-6b6b7a)] hover:text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)]'
               }`}
             >
@@ -210,7 +210,7 @@ export function AiProviderSettings() {
         </button>
         {visibleTestState === 'success' && (
           <div className="mt-2 rounded-lg border border-[rgba(74,222,128,0.25)] bg-[rgba(74,222,128,0.08)] px-3 py-3">
-            <p className="flex items-start gap-1.5 text-xs text-[#86efac] leading-relaxed">
+            <p className="flex items-start gap-1.5 text-xs text-[var(--pd-c-b8afff)] leading-relaxed">
               <Icon name="check" size={12} strokeWidth={2.4} className="mt-0.5" />
               <span>Connection works — translated &quot;Hello, world!&quot; to Spanish: &quot;{testResult}&quot;</span>
             </p>
@@ -258,7 +258,7 @@ export function AiProviderSettings() {
                 <p className="text-xs text-[var(--pd-danger-soft)] leading-relaxed">
                   Could not load models from {activeProvider.label}: {activeModelError}
                 </p>
-                <p className="mt-1 text-[11px] text-[#9ca3af]">No hardcoded fallback models are shown. Check the key/provider and retry.</p>
+                <p className="mt-1 text-[11px] text-[var(--pd-c-a0a0b0)]">No hardcoded fallback models are shown. Check the key/provider and retry.</p>
                 <button
                   type="button"
                   onClick={() => setModelLoadNonce((value) => value + 1)}
@@ -284,8 +284,8 @@ export function AiProviderSettings() {
                       onClick={() => setModel(provider, model.id)}
                       className={`block w-full text-start px-3 py-2 border-b border-[var(--pd-line-subtle)] last:border-b-0 transition-colors ${
                         activeModel === model.id
-                          ? 'bg-[rgba(124,110,246,0.16)] text-[#c4b5fd]'
-                          : 'text-[#b8b8c8] hover:bg-[var(--pd-fill-soft)]'
+                          ? 'bg-[rgba(124,110,246,0.16)] text-[var(--pd-c-c4b5fd)]'
+                          : 'text-[var(--pd-c-b0b0c4)] hover:bg-[var(--pd-fill-soft)]'
                       }`}
                     >
                       <span className="block text-xs font-medium">{model.name}</span>

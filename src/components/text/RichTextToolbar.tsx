@@ -13,7 +13,7 @@ const resumeTemporal = () => useEditorStore.temporal.getState().resume()
 const toolbarBtnCls = (active: boolean) =>
   `h-7 min-w-7 px-1.5 flex items-center justify-center rounded border text-xs transition-colors ${
     active
-      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[#c4b5fd]'
+      ? 'border-[var(--pd-c-7c6ef6)] bg-[var(--pd-accent-wash-strong)] text-[var(--pd-c-c4b5fd)]'
       : 'border-[var(--pd-line)] text-[var(--pd-c-a0a0b0)] hover:text-[var(--pd-c-e8e8f0)] hover:border-[var(--pd-line)]'
   }`
 

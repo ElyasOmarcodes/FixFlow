@@ -47,7 +47,7 @@ export function HelpMarkdown({ source }: { source: string }) {
           const value = String(children).replace(/\n$/, '')
           if (value.includes('\n')) {
             return (
-              <code className={`block whitespace-pre-wrap rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-3 font-mono text-[11px] leading-5 text-[#c8c3ef] ${className ?? ''}`}>
+              <code className={`block whitespace-pre-wrap rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-3 font-mono text-[11px] leading-5 text-[var(--pd-c-c4b5fd)] ${className ?? ''}`}>
                 {value}
               </code>
             )
@@ -66,7 +66,7 @@ export function HelpMarkdown({ source }: { source: string }) {
           <tr className="odd:bg-[var(--pd-fill)] even:bg-transparent">{children}</tr>
         ),
         td: ({ children }) => (
-          <td className="px-3 py-2.5 text-[#b6b6c3] first:w-[46%] first:border-r first:border-[var(--pd-line)] first:text-[var(--pd-c-777786)] sm:first:w-[42%]">
+          <td className="px-3 py-2.5 text-[var(--pd-c-b0b0c4)] first:w-[46%] first:border-r first:border-[var(--pd-line)] first:text-[var(--pd-c-777786)] sm:first:w-[42%]">
             {children}
           </td>
         ),

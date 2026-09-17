@@ -588,8 +588,8 @@ export function LocalizationView({ onBack, embedded = false, onPreview }: Locali
 
               {groups.every((g) => g.rows.length === 0) && (
                 <div className="rounded-2xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-18181f)]/78 px-8 py-16 text-center">
-                  <div className="mb-4 flex justify-center text-[#4d4d60]"><Icon name="globe" size={38} strokeWidth={1.4} /></div>
-                  <div className="text-lg text-[#d5d5df] mb-2">{t('loc.empty')}</div>
+                  <div className="mb-4 flex justify-center text-[var(--pd-c-525260)]"><Icon name="globe" size={38} strokeWidth={1.4} /></div>
+                  <div className="text-lg text-[var(--pd-c-d8d8e2)] mb-2">{t('loc.empty')}</div>
                   <div className="text-sm text-[var(--pd-c-6b6b7a)]">{t('loc.emptyHint')}</div>
                 </div>
               )}
@@ -607,9 +607,9 @@ export function LocalizationView({ onBack, embedded = false, onPreview }: Locali
               <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-[var(--pd-c-6b6b7a)]">
                 {t('loc.textStyling')}
               </div>
-              <div className="mb-3 truncate text-xs text-[#c4b5fd]" title={editingTextCell.layerName}>
+              <div className="mb-3 truncate text-xs text-[var(--pd-c-c4b5fd)]" title={editingTextCell.layerName}>
                 <Icon name="text" size={12} className="inline-block align-[-2px]" /> {editingTextCell.layerName}
-                <span className="ml-1.5 text-[#8f90a3]">· {getLanguageName(editingTextCell.locale)}</span>
+                <span className="ml-1.5 text-[var(--pd-c-8a86a0)]">· {getLanguageName(editingTextCell.locale)}</span>
               </div>
               <div ref={setToolbarSlotEl} />
               <p className="mt-3 text-[10px] leading-relaxed text-[var(--pd-c-6b6b7a)]">

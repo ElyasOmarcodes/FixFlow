@@ -238,12 +238,12 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
           </div>
         </button>
         <div className={`flex items-center gap-1 px-1.5 py-1 ${large ? 'py-2' : ''}`}>
-          <span className={`min-w-0 flex-1 truncate text-[#9b9bad] ${large ? 'text-xs' : 'text-[9px]'}`}>{displayName}</span>
+          <span className={`min-w-0 flex-1 truncate text-[var(--pd-c-a0a0b0)] ${large ? 'text-xs' : 'text-[9px]'}`}>{displayName}</span>
           <button
             type="button"
             aria-label={`Add ${asset.filename} to canvas`}
             onClick={() => { void addAssetToCanvas(asset.filename, asset.dataUrl) }}
-            className="rounded px-1 text-[10px] text-[#a89cf6] hover:bg-[rgba(124,110,246,0.16)] hover:text-[var(--pd-c-f0eff8)]"
+            className="rounded px-1 text-[10px] text-[var(--pd-c-9b8fff)] hover:bg-[rgba(124,110,246,0.16)] hover:text-[var(--pd-c-f0eff8)]"
             title="Add image to canvas"
           >
             +
@@ -252,7 +252,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
             type="button"
             aria-label={`Remove ${asset.filename}`}
             onClick={() => removeAsset(asset.filename)}
-            className="rounded px-1 text-[10px] text-[#7f8094] hover:bg-[rgba(248,113,113,0.16)] hover:text-[var(--pd-danger)]"
+            className="rounded px-1 text-[10px] text-[var(--pd-c-8a86a0)] hover:bg-[rgba(248,113,113,0.16)] hover:text-[var(--pd-danger)]"
             title="Remove asset"
           >
             ×
@@ -305,10 +305,10 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
             >
               <path d="M1 3a1 1 0 0 1 1-1h2.382a1 1 0 0 1 .894.553L5.618 3H10a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3Z" />
             </svg>
-            <span className={`flex-1 truncate font-medium text-[#c4c0e0] ${large ? 'text-xs' : 'text-[10px]'}`}>
+            <span className={`flex-1 truncate font-medium text-[var(--pd-c-d8d8e2)] ${large ? 'text-xs' : 'text-[10px]'}`}>
               {group.label}
             </span>
-            <span className="shrink-0 rounded-full bg-[var(--pd-accent-wash)] px-1.5 py-px text-[9px] tabular-nums text-[#a89cf6]">
+            <span className="shrink-0 rounded-full bg-[var(--pd-accent-wash)] px-1.5 py-px text-[9px] tabular-nums text-[var(--pd-c-9b8fff)]">
               {group.assets.length}
             </span>
           </button>
@@ -341,13 +341,13 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
             {t('layers.assets')}
           </button>
           <div className="flex items-center gap-1">
-            <span className="rounded-full bg-[rgba(124,110,246,0.16)] px-2 py-0.5 text-[10px] text-[#a89cf6]">{assetCount}</span>
+            <span className="rounded-full bg-[rgba(124,110,246,0.16)] px-2 py-0.5 text-[10px] text-[var(--pd-c-9b8fff)]">{assetCount}</span>
             <button
               type="button"
               aria-label={t('layers.assetsBrowser')}
               onClick={() => setAssetsModalOpen(true)}
               disabled={assetEntries.length === 0}
-              className="rounded px-1.5 py-0.5 text-[10px] text-[#8f90a3] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-f0eff8)] disabled:opacity-35 disabled:cursor-not-allowed"
+              className="rounded px-1.5 py-0.5 text-[10px] text-[var(--pd-c-8a86a0)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-f0eff8)] disabled:opacity-35 disabled:cursor-not-allowed"
               title={t('layers.assetsBrowser')}
             >
               <Icon name="maximize" size={12} />
@@ -401,13 +401,13 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
             <div className="flex items-start justify-between gap-4 border-b border-[var(--pd-line-soft)] px-4 py-3">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--pd-c-7c6ef6)]">Asset Browser</div>
-                <div className="mt-1 text-xs leading-5 text-[#9b9bad]">Drag to the visible canvas, or click to use with the current selection.</div>
+                <div className="mt-1 text-xs leading-5 text-[var(--pd-c-a0a0b0)]">Drag to the visible canvas, or click to use with the current selection.</div>
               </div>
               <button
                 type="button"
                 aria-label="Close asset browser"
                 onClick={() => setAssetsModalOpen(false)}
-                className="shrink-0 rounded-full border border-[var(--pd-line)] px-2.5 py-1 text-xs text-[#d7d7e3] hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
+                className="shrink-0 rounded-full border border-[var(--pd-line)] px-2.5 py-1 text-xs text-[var(--pd-c-d8d8e2)] hover:border-[var(--pd-c-7c6ef6)]/50 hover:bg-[var(--pd-c-7c6ef6)]/10 hover:text-[var(--pd-c-f0eff8)]"
               >
                 ×
               </button>
