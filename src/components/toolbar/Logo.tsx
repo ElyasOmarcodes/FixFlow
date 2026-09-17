@@ -1,11 +1,14 @@
 /**
- * PixelDeck brand mark + wordmark.
+ * The FixFlow mark and wordmark.
  *
- * Icon: two portrait screenshot cards (left = purple, right = violet→pink),
- * representing a "deck" of App Store screenshots.
+ * The mark is one Material Symbol — `auto_awesome_mosaic`, rounded, filled —
+ * on the brand gradient: three panels, one tall and two stacked, which is
+ * what this app lays out. It is the same drawing as `public/brand-mark.svg`,
+ * which `scripts/build-brand-assets.mjs` renders into the launcher icons, so
+ * the thing in the toolbar and the thing on a home screen cannot drift apart.
  *
- * SVG gradient IDs use the unique prefix `pd-lc-` to avoid conflicts when
- * multiple SVGs are present in the document.
+ * The gradient id is prefixed `ff-lc-` because several SVGs share the
+ * document and a duplicate id would let one of them repaint the others.
  */
 export function Logo() {
   return (
@@ -18,52 +21,32 @@ export function Logo() {
         flexShrink: 0,
       }}
     >
-      {/* Icon mark */}
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 32 32"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
-          <linearGradient id="pd-lc-left" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#b49eff" />
-            <stop offset="100%" stopColor="#7c3aed" />
-          </linearGradient>
-          <linearGradient id="pd-lc-right" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#9d6ef6" />
-            <stop offset="100%" stopColor="#ec4899" />
+          <linearGradient id="ff-lc-mark" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#8B7CFF" />
+            <stop offset="55%" stopColor="#7C6EF6" />
+            <stop offset="100%" stopColor="#EC4899" />
           </linearGradient>
         </defs>
-
-        {/* Left card — purple */}
-        <rect x="2" y="3" width="13" height="26" rx="3" fill="url(#pd-lc-left)" />
-        <rect x="4.5" y="9" width="8" height="1.5" rx="0.75" fill="white" fillOpacity="0.6" />
-        <rect x="4.5" y="12" width="5.5" height="1.5" rx="0.75" fill="white" fillOpacity="0.35" />
-        <rect x="4.5" y="16" width="8" height="8" rx="1.5" fill="white" fillOpacity="0.15" />
-
-        {/* Right card — violet → pink */}
-        <rect x="17" y="3" width="13" height="26" rx="3" fill="url(#pd-lc-right)" />
-        <rect x="19.5" y="9" width="8" height="1.5" rx="0.75" fill="white" fillOpacity="0.6" />
-        <rect x="19.5" y="12" width="6" height="1.5" rx="0.75" fill="white" fillOpacity="0.35" />
-        <rect x="19.5" y="16" width="8" height="8" rx="1.5" fill="white" fillOpacity="0.15" />
+        <rect width="32" height="32" rx="7" fill="url(#ff-lc-mark)" />
+        <g transform="translate(3.5, 28.5) scale(0.026042)" fill="#ffffff">
+          <path d="M440-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240v720Zm80-400v-320h240q33 0 56.5 23.5T840-760v240H520Zm0 400v-320h320v240q0 33-23.5 56.5T760-120H520Z" />
+        </g>
       </svg>
 
-      {/* Wordmark */}
       <span
         style={{
           fontSize: 13,
           lineHeight: 1,
           letterSpacing: '-0.01em',
           fontWeight: 300,
-          color: '#c8c8d8',
+          color: 'var(--pd-c-c8c8d8, #c8c8d8)',
           whiteSpace: 'nowrap',
         }}
       >
-        Pixel
-        <span style={{ fontWeight: 700, color: '#a78bfa' }}>Deck</span>
+        Fix
+        <span style={{ fontWeight: 700, color: '#a78bfa' }}>Flow</span>
       </span>
     </div>
   )

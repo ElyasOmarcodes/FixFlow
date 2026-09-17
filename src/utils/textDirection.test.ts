@@ -6,13 +6,13 @@ describe('paragraph direction', () => {
     expect(textDirection('سلام دنیا 2026')).toBe('rtl')
   })
   it('keeps English-led mixed content left to right', () => {
-    expect(textDirection('PixelDeck سلام')).toBe('ltr')
+    expect(textDirection('FixFlow سلام')).toBe('ltr')
     expect(textDirection('123 !')).toBe('ltr')
   })
 })
 
 it('preserves shaping for Arabic embedded in English-led paragraphs', () => {
-  expect(textDirection('PixelDeck سلام نړۍ')).toBe('ltr')
-  expect(hasJoiningScript('PixelDeck سلام نړۍ')).toBe(true)
-  expect(hasJoiningScript('PixelDeck 2026')).toBe(false)
+  expect(textDirection('FixFlow سلام نړۍ')).toBe('ltr')
+  expect(hasJoiningScript('FixFlow سلام نړۍ')).toBe(true)
+  expect(hasJoiningScript('FixFlow 2026')).toBe(false)
 })

@@ -8,8 +8,8 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!-- Primary meta -->
-    <title>PixelDeck — App Store Screenshot Designer</title>
-    <meta name="description" content="Design polished App Store screenshot layouts with PixelDeck — a visual editor for iOS and Android screenshots." />
+    <title>FixFlow — App Store Screenshot Designer</title>
+    <meta name="description" content="Design polished App Store screenshot layouts with FixFlow — a visual editor for iOS and Android screenshots." />
     <meta name="theme-color" content="#0f0f13" />
 
     <!--
@@ -23,6 +23,8 @@
     <script>
       (function () {
         try {
+          // Still the old key: the app was renamed, the browsers people
+          // already use it in were not. See src/store/idb-storage.ts.
           var saved = localStorage.getItem('pixeldeck.theme');
           var pref = saved === 'light' || saved === 'dark' ? saved : 'system';
           var resolved = pref === 'system'
@@ -36,13 +38,13 @@
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="PixelDeck — App Store Screenshot Designer" />
-    <meta property="og:description" content="Design polished App Store screenshot layouts with PixelDeck — a visual editor for iOS and Android screenshots." />
+    <meta property="og:title" content="FixFlow — App Store Screenshot Designer" />
+    <meta property="og:description" content="Design polished App Store screenshot layouts with FixFlow — a visual editor for iOS and Android screenshots." />
     <meta property="og:image" content="/logo.svg" />
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="PixelDeck" />
+    <meta name="twitter:title" content="FixFlow" />
     <meta name="twitter:description" content="Visual editor for App Store screenshot layouts." />
 
     <!-- Fonts -->

@@ -14,7 +14,7 @@ export function WorkspaceTools({ onProperties }: { onProperties: () => void }) {
     if (id) store.startTextEdit(id)
   }
   return <nav className="pd-workspace-tools" aria-label={t('workspace.tools')}>
-    <button title={t('workspace.fit')} onClick={() => window.dispatchEvent(new Event('pixeldeck:fit'))}><Icon name="maximize" size={20} /><span>{t('workspace.fit')}</span></button>
+    <button title={t('workspace.fit')} onClick={() => window.dispatchEvent(new Event('fixflow:fit'))}><Icon name="maximize" size={20} /><span>{t('workspace.fit')}</span></button>
     <button title={t('workspace.addText')} onClick={addText}><Icon name="text" size={20} /><span>{t('workspace.addText')}</span></button>
     <button title={t('workspace.image')} onClick={() => input.current?.click()}><Icon name="image" size={20} /><span>{t('workspace.image')}</span></button>
     <button title={t('workspace.shape')} onClick={() => { useEditorStore.getState().addShape(); onProperties() }}><Icon name="shape" size={20} /><span>{t('workspace.shape')}</span></button>

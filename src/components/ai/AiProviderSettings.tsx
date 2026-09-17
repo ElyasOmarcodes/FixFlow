@@ -237,7 +237,7 @@ export function AiProviderSettings() {
         </div>
         {!hasActiveKey ? (
           <p className="rounded-lg border border-[var(--pd-line-soft)] px-3 py-4 text-xs text-[var(--pd-c-6b6b7a)] text-center">
-            Add an API key to connect to {activeProvider.label}. PixelDeck will load the model list from the provider after the connection is available.
+            Add an API key to connect to {activeProvider.label}. FixFlow will load the model list from the provider after the connection is available.
           </p>
         ) : (
           <>

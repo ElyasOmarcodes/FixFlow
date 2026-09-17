@@ -1,12 +1,12 @@
-# Contributing to PixelDeck
+# Contributing to FixFlow
 
-Thanks for helping improve PixelDeck. This project welcomes thoughtful human and AI-assisted contributions that keep the editor stable, understandable, and easy to maintain.
+Thanks for helping improve FixFlow. This project welcomes thoughtful human and AI-assisted contributions that keep the editor stable, understandable, and easy to maintain.
 
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-username>/pixeldeck.git
-cd pixeldeck
+git clone https://github.com/<your-username>/fixflow.git
+cd fixflow
 npm install
 npm run dev
 ```
@@ -69,7 +69,7 @@ Examples:
 
 ## Branching & releases
 
-PixelDeck follows **GitHub Flow** — `main` is the only long-lived branch (there is no `dev`).
+FixFlow follows **GitHub Flow** — `main` is the only long-lived branch (there is no `dev`).
 
 - Create a short-lived branch per change, open a PR against `main`, delete the branch after merge.
 - `main` is protected: PRs only, no direct pushes (no exceptions, including for maintainers). Required checks: `Quality · Node 20.x`/`22.x` (lint, typecheck, build, test) and `CLI smoke test`. Linear history is required, so PRs are **squash-merged** using the PR title as the resulting commit message — keep PR titles as valid Conventional Commits (`feat: ...`, `fix: ...`, etc.), the same rule as [Commit style](#commit-style) above. This is enforced automatically by `.github/workflows/pr-title-lint.yml` (kept as a lightweight convention check, independent of any release tooling).

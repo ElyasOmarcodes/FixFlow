@@ -51,7 +51,7 @@ describe('zipFileNameFor', () => {
   })
 
   it('falls back for an empty project name', () => {
-    expect(zipFileNameFor('')).toBe('pixeldeck-export.zip')
+    expect(zipFileNameFor('')).toBe('fixflow-export.zip')
   })
 
   it('preserves the existing dash replacement behavior for punctuation', () => {

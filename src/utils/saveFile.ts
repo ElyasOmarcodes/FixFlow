@@ -6,7 +6,7 @@ const NativeFile = registerPlugin<{
   append(options: { session: string; data: string }): Promise<void>
   finish(options: { session: string; filename: string; mimeType: string }): Promise<{ cancelled: boolean }>
   cancel(options: { session: string }): Promise<void>
-}>('PixelDeckFile')
+}>('FixFlowFile')
 
 export function isNativeApp(): boolean {
   return isTauri() || Capacitor.isNativePlatform()

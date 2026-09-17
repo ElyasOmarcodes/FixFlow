@@ -1,11 +1,31 @@
 # Changelog
 
-All notable changes to PixelDeck are documented here.
+All notable changes to FixFlow are documented here.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.13.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.13.0) - 2026-09-17
+
+### Changed
+
+- **The app is now FixFlow.** New name, new mark, new package identifier (`com.fixflow.app`) — one Material Symbol, `auto_awesome_mosaic`, on the brand gradient: three panels, one tall and two stacked, which is what this app lays out. The mark lives in one SVG that a script renders into every launcher icon and splash, so the icon on a home screen and the one in the toolbar cannot drift apart. Projects already on a machine are untouched: the storage keys keep their old names on purpose, because renaming them would not migrate that data, it would hide it. On Android the new identifier means this installs alongside the old app rather than over it.
+- **The colour control is a picker, not a wall.** It was a native `<input type="color">` beside a raw hex box, under two rows of swatches, under a recents strip — all always open, in a 280px sidebar, and repeated for every gradient stop. There was no way to actually *choose* a colour; you either knew its hex or you clicked through to the operating system's own dialog. It is now one row until you open it, and then a saturation/brightness field, a hue rail, the hex, the eyedropper where the browser has one, and swatches organised behind brand / recent / palette tabs.
+- **Every group of properties says what it is.** The panel was a stack of identical unlabelled cards — a blur slider and a shadow toggle shared one anonymous box — so there was no way to tell which control belonged to which idea. Each group now has a heading, an icon and a fold, and remembers which ones you keep closed. Several dozen labels that had never been translated now are, in all three languages.
+
+### Added
+
+- **The whole Google icon catalogue, browsable.** The online picker drew every cell as its own request, so it showed 120 of 4,403 and the rest were reachable only by guessing the right search term. It now loads one Material Symbols font — ~320 KB, every glyph — and virtualises the grid, so the entire catalogue scrolls at the cost of the thirty cells on screen. About 144 names the font has no ligature for fall back to the image endpoint rather than being spelled out in letters across their neighbours.
+- **Online icons on a chip.** The chip picker was library-only because a chip drew its glyph as strokes on a fixed 24-grid. It now reads the glyph's own coordinate box and paint mode, so all three styles and seven weights work there too.
+- **Translate the whole design in one action.** The localisation view keeps one design in many locales side by side, which is the wrong shape for "this is in English, make it Pashto" — that meant retyping every layer by hand, and chips could not be translated at all. The toolbar now collects every string on the canvas, chips and grouped layers included, translates a slide's worth per request so the wording stays consistent, and writes it all back as a single undo step.
+
+### Fixed
+
+- **Copying a style onto an icon or a chip does something.** Neither layer type had an entry in the style table, so the copy took an empty style and the paste silently did nothing.
+- **The app follows the system theme on a phone.** Applying the theme lived in a control that is not mounted on narrow screens, so a phone stayed dark until the overflow menu was opened once. The theme is now applied before the first frame, and the status and navigation bars are tinted to match it.
+- **The switches in the mobile properties sheet are the right shape.** A coarse-pointer rule raised the minimum height of every button in the panel, which stretched a 44×20 switch into a 44×40 lozenge. Touch targets are now grown with a transparent overlay instead, so a control stays the size it was drawn.
 
 ## [0.12.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.12.0) - 2026-09-17
 
@@ -43,7 +63,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **A start screen.** PixelDeck opens on a launch page — recent projects first, the template gallery second, a new blank project or an imported `.json` one click away — instead of dropping you into whichever project happened to be open last. It layers over the editor rather than replacing it, so the Konva stage and its observers stay mounted and dismissing it is instant. Escape leaves, Android Back leaves, the toolbar logo brings it back, and a checkbox at the foot turns it off for good. While it is up the editor's shortcuts are held, so <kbd>Delete</kbd> cannot remove a layer nobody can see.
+- **A start screen.** FixFlow opens on a launch page — recent projects first, the template gallery second, a new blank project or an imported `.json` one click away — instead of dropping you into whichever project happened to be open last. It layers over the editor rather than replacing it, so the Konva stage and its observers stay mounted and dismissing it is instant. Escape leaves, Android Back leaves, the toolbar logo brings it back, and a checkbox at the foot turns it off for good. While it is up the editor's shortcuts are held, so <kbd>Delete</kbd> cannot remove a layer nobody can see.
 - **Chip is a real layer type.** It used to be a group holding a rounded rect with a text layer parked on top, which meant every edit was a trip into group-edit mode and the pill never re-fitted its own label. A chip is now one layer whose box is derived from its text, padding and optional glyph, with its own inspector for label, font, text colour, background fill, corner radius, padding and the icon's side, size, gap and colour. Chip labels also appear in the localization view and the CLI manifest alongside text layers — a chip on a store screenshot is copy, and copy gets translated.
 - **An icon layer, with 155 bundled glyphs across 17 categories.** Drawn as vector geometry rather than a bitmap, so it stays sharp at a 1290px export and its colour and line weight remain properties rather than baked pixels. An optional backing plate sits behind it with its own fill, padding and corner radius.
 - **Google Material Symbols in the icon picker.** A second tab fetches any of 159 verified symbols straight from `fonts.gstatic.com`, which answers with `access-control-allow-origin: *` — no proxy and no server. The bundled library stays the default because it works offline, in the desktop shell and in the headless exporter. A fetched glyph's path, viewBox and paint mode are stored on the layer, so a project that travels to another machine renders without the network; the two sets are not interchangeable (library glyphs are stroked on a 24-grid, Material's are filled shapes on `0 -960 960 960`) and the renderer reads which it has rather than assuming.
@@ -90,7 +110,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Every emoji and Unicode dingbat used as a UI icon is now a real SVG icon.** The editor drew its chrome with characters like 📱 🎨 ◉ ✕ ▾ ⠿ ⌫, which render differently on every platform, ignore the theme colour and look nothing like a native control. `src/components/ui/Icon.tsx` is a single hand-rolled 24×24 stroke sprite (no icon-font or runtime dependency added) wired through the toolbar, layers panel, assets, slide navigator, properties inspector, projects/templates/settings/help modals, canvas overlays, editing-context bar and the localization view. Emoji that are actual canvas *content* — the emoji-layer palette and the emoji layer's default value — are untouched.
 - **Native browser widgets restyled to read as app chrome.** Scrollbars are overlay pills on a transparent track (with Firefox `scrollbar-color` and no stepper arrows); `<select>` gets the app's own chevron instead of the OS dropdown button, mirrored under RTL; range sliders render one flat rail and accent knob across WebKit and Gecko; checkboxes are custom boxes with drawn check and indeterminate states; colour inputs are flat chips instead of the inset native swatch; number spinners, autofill tinting, search-clear and password-reveal chrome are suppressed; the platform focus ring is replaced by an accent `:focus-visible` ring; and chrome no longer drag-selects like a document while inputs and contenteditable surfaces stay selectable. The rules live inside `@layer base` so component Tailwind utilities still win over them.
 
-## [0.8.3](https://github.com/Pr0xS/PixelDeck/compare/v0.8.2...v0.8.3) - 2026-08-14
+## [0.8.3](https://github.com/Pr0xS/FixFlow/compare/v0.8.2...v0.8.3) - 2026-08-14
 
 ### Fixed
 
@@ -98,23 +118,23 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Export format checkboxes now respond correctly when clicking directly on the checkbox, not just its label text. A redundant click handler on the wrapping `<label>` (with `preventDefault()`) was firing alongside the checkbox's own `onChange`, double-toggling the selection back to its original state when clicking the tick itself.
 - Export formats and locales can now be freely checked/unchecked, including down to zero of either. Previously the last checked item silently refused to uncheck with no visible reason. The Export button now disables itself (with a clear "Select at least one format/locale to export" hint) instead of blocking the interaction.
 
-## [0.8.2](https://github.com/Pr0xS/PixelDeck/compare/v0.8.1...v0.8.2) - 2026-08-14
+## [0.8.2](https://github.com/Pr0xS/FixFlow/compare/v0.8.1...v0.8.2) - 2026-08-14
 
 ### Security
 
 - `js-yaml` bumped from 4.3.0 to 4.3.1, fixing a high-severity quadratic-CPU-consumption DoS in `!!omap` resolution ([GHSA-5p4m-2wfm-xmqj](https://github.com/advisories/GHSA-5p4m-2wfm-xmqj)).
-- Transitive `nanoid` (pulled in by `postcss`/vite's toolchain) pinned to `^3.3.18` via `overrides`, fixing an infinite-loop DoS when a custom generator's `size` is zero ([GHSA-2v37-7h3g-55p8](https://github.com/advisories/GHSA-2v37-7h3g-55p8)). PixelDeck's own runtime `nanoid` (v5, used for layer IDs) is unaffected and untouched.
+- Transitive `nanoid` (pulled in by `postcss`/vite's toolchain) pinned to `^3.3.18` via `overrides`, fixing an infinite-loop DoS when a custom generator's `size` is zero ([GHSA-2v37-7h3g-55p8](https://github.com/advisories/GHSA-2v37-7h3g-55p8)). FixFlow's own runtime `nanoid` (v5, used for layer IDs) is unaffected and untouched.
 - Transitive `brace-expansion` (pulled in by `eslint`'s `minimatch`) pinned to `^5.0.9` via `overrides`, fixing three high-severity DoS advisories ([GHSA-3jxr-9vmj-r5cp](https://github.com/advisories/GHSA-3jxr-9vmj-r5cp), [GHSA-mh99-v99m-4gvg](https://github.com/advisories/GHSA-mh99-v99m-4gvg), [GHSA-rgw5-rvv9-x895](https://github.com/advisories/GHSA-rgw5-rvv9-x895)).
 - `npm audit` now reports 0 vulnerabilities (was 3 high).
 
-## [0.8.1](https://github.com/Pr0xS/PixelDeck/compare/v0.8.0...v0.8.1) - 2026-08-14
+## [0.8.1](https://github.com/Pr0xS/FixFlow/compare/v0.8.0...v0.8.1) - 2026-08-14
 
 ### Fixed
 
 - Preview modal loading bar now reflects real per-slide capture progress (e.g. "3 of 7") instead of a static animated placeholder, and only blurs the slide group currently regenerating instead of every thumbnail.
 - Export now shows real progress across format × locale combinations (e.g. "iPad · Italian") with a live percentage, and can be cancelled mid-export via a new Cancel button without corrupting editor or stage state.
 
-## [0.8.0](https://github.com/Pr0xS/PixelDeck/compare/v0.7.1...v0.8.0) - 2026-07-30
+## [0.8.0](https://github.com/Pr0xS/FixFlow/compare/v0.7.1...v0.8.0) - 2026-07-30
 
 ### Added
 
@@ -135,13 +155,13 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Switching formats within the same family now does a relative pan + zoom rescale instead of a hard reset.
 - Responsive format/locale bar and editor chrome at small screens.
 
-## [0.7.1](https://github.com/Pr0xS/PixelDeck/compare/v0.7.0...v0.7.1) - 2026-07-26
+## [0.7.1](https://github.com/Pr0xS/FixFlow/compare/v0.7.0...v0.7.1) - 2026-07-26
 
 ### Fixed
 
 - Nav thumbnails no longer go permanently blank after a tab is backgrounded for a long time (or the browser restarts and the tab is revisited). The capture polling loops (`waitForStage`/`waitForStageSettled`) were bounded by wall-clock time but could only advance via `requestAnimationFrame`, which browsers fully suspend for hidden tabs — on resume the clock had already passed the timeout before a single frame fired, so the capture silently gave up with no retry path. Thumbnails are now silently re-captured on `visibilitychange` when the tab becomes visible again.
 
-## [0.7.0](https://github.com/Pr0xS/PixelDeck/compare/v0.6.1...v0.7.0) - 2026-07-25
+## [0.7.0](https://github.com/Pr0xS/FixFlow/compare/v0.6.1...v0.7.0) - 2026-07-25
 
 ### Added
 
@@ -158,7 +178,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - A per-format locale layout adjustment no longer goes stale when the shared base layout or a format override is edited afterward — it now tracks those upstream edits instead of silently freezing at whatever value it was pinned to.
 - Localization table: renamed "Change source" button to "Change default"; default phone layer name changed from "iPhone 16 Pro" to generic "Phone"; fixed sticky Layer column peek-through and scroll jump; synced horizontal scroll across all slide-group sections; added a real trailing gutter after the last locale column; kept the edited text cell fully visible when the docked styling panel opens.
 
-## [0.6.1](https://github.com/Pr0xS/PixelDeck/compare/v0.6.0...v0.6.1) - 2026-07-20
+## [0.6.1](https://github.com/Pr0xS/FixFlow/compare/v0.6.0...v0.6.1) - 2026-07-20
 
 ### Added
 
@@ -177,7 +197,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Preview and precache captures no longer restore a stale active slide group if the project changes mid-capture.
 - Slide navigator thumbnail spacing: pano/strip sub-slides now cluster with a tighter, consistent gap so they read as one continuous unit, distinct groups have clearer separation, and a group's name label no longer widens narrow thumbnail strips into uneven gutters.
 
-## [0.6.0](https://github.com/Pr0xS/PixelDeck/compare/v0.5.2...v0.6.0) - 2026-07-19
+## [0.6.0](https://github.com/Pr0xS/FixFlow/compare/v0.5.2...v0.6.0) - 2026-07-19
 
 ### Added
 
@@ -198,7 +218,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Arrow-key nudging now reads the resolved (format/locale-aware) position instead of raw base coordinates, fixing a position jump on the first nudge when a format or locale override was already active.
 - Editing a layer's layout while on the Base format tab with a non-default locale active now shows an explicit warning that layout changes won't apply there, instead of silently reverting with no explanation.
 
-## [0.5.2](https://github.com/Pr0xS/PixelDeck/compare/v0.5.1...v0.5.2) - 2026-07-19
+## [0.5.2](https://github.com/Pr0xS/FixFlow/compare/v0.5.1...v0.5.2) - 2026-07-19
 
 ### Added
 
@@ -223,7 +243,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added consistent CLI validation and error reporting with non-zero exit codes.
 - Preserved project update timestamps when clearing format-specific state.
 
-## [0.5.1](https://github.com/Pr0xS/PixelDeck/compare/v0.4.1...v0.5.1) - 2026-07-16
+## [0.5.1](https://github.com/Pr0xS/FixFlow/compare/v0.4.1...v0.5.1) - 2026-07-16
 
 ### Added
 
@@ -244,27 +264,27 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Prevented project-library saves from persisting large inline screenshot data URLs.
 - Prevented template exports from including project screenshots, image layers, background images, or brand logos.
 
-## [0.4.1](https://github.com/Pr0xS/PixelDeck/compare/v0.4.0...v0.4.1) (2026-07-12)
+## [0.4.1](https://github.com/Pr0xS/FixFlow/compare/v0.4.0...v0.4.1) (2026-07-12)
 
 ### Bug Fixes
 
-* support multiple simultaneous custom canvas formats ([#37](https://github.com/Pr0xS/PixelDeck/pull/37)) ([f3e8280](https://github.com/Pr0xS/PixelDeck/commit/f3e8280a0b9074e7704486592ad48aacc255f8f2))
+* support multiple simultaneous custom canvas formats ([#37](https://github.com/Pr0xS/FixFlow/pull/37)) ([f3e8280](https://github.com/Pr0xS/FixFlow/commit/f3e8280a0b9074e7704486592ad48aacc255f8f2))
 
-## [0.4.0](https://github.com/Pr0xS/PixelDeck/compare/v0.3.3...v0.4.0) (2026-07-07)
+## [0.4.0](https://github.com/Pr0xS/FixFlow/compare/v0.3.3...v0.4.0) (2026-07-07)
 
 
 ### Features
 
-* add checkmark shape type ([170f1b9](https://github.com/Pr0xS/PixelDeck/commit/170f1b9d10c22766ba815133ccd192ab942a0017))
-* show real slide background behind text previews in LocalizationView ([30fd536](https://github.com/Pr0xS/PixelDeck/commit/30fd53634aa8d8ee520ae91a08a6dbdf803cf133))
+* add checkmark shape type ([170f1b9](https://github.com/Pr0xS/FixFlow/commit/170f1b9d10c22766ba815133ccd192ab942a0017))
+* show real slide background behind text previews in LocalizationView ([30fd536](https://github.com/Pr0xS/FixFlow/commit/30fd53634aa8d8ee520ae91a08a6dbdf803cf133))
 
 
 ### Bug Fixes
 
-* apply text weight through rich-text mark system with selection support ([b5e713d](https://github.com/Pr0xS/PixelDeck/commit/b5e713d515a36e2f987d8097623954429722ad71))
-* correct noise toggle knob alignment in Background properties ([688f34f](https://github.com/Pr0xS/PixelDeck/commit/688f34fd5fb0a23b01e4213b49bfa17902e44871))
-* cross-slide paste offset cascade + add test coverage for export/import and geometry ([#35](https://github.com/Pr0xS/PixelDeck/issues/35)) ([5b048e5](https://github.com/Pr0xS/PixelDeck/commit/5b048e53ccd6f407e3afdf42b154d22dd17b0eac))
-* keep release-please tags on bare vX.Y.Z format ([#33](https://github.com/Pr0xS/PixelDeck/issues/33)) ([1459d94](https://github.com/Pr0xS/PixelDeck/commit/1459d94465c7b6f5975fa20c1e69228b339dc183))
+* apply text weight through rich-text mark system with selection support ([b5e713d](https://github.com/Pr0xS/FixFlow/commit/b5e713d515a36e2f987d8097623954429722ad71))
+* correct noise toggle knob alignment in Background properties ([688f34f](https://github.com/Pr0xS/FixFlow/commit/688f34fd5fb0a23b01e4213b49bfa17902e44871))
+* cross-slide paste offset cascade + add test coverage for export/import and geometry ([#35](https://github.com/Pr0xS/FixFlow/issues/35)) ([5b048e5](https://github.com/Pr0xS/FixFlow/commit/5b048e53ccd6f407e3afdf42b154d22dd17b0eac))
+* keep release-please tags on bare vX.Y.Z format ([#33](https://github.com/Pr0xS/FixFlow/issues/33)) ([1459d94](https://github.com/Pr0xS/FixFlow/commit/1459d94465c7b6f5975fa20c1e69228b339dc183))
 
 ## [0.2.3] - 2026-06-14
 
@@ -272,7 +292,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Logo and favicon: new SVG brand mark (two portrait screenshot cards with purple→pink gradient) replaces the generic bolt icon; added `public/logo.svg` wordmark for use in README and OG metadata.
 - Current project name displayed in the toolbar between the logo and the Projects button — click to rename inline (Enter to confirm, Escape to cancel).
-- README now shows the PixelDeck logo at the top, linked to the live demo.
+- README now shows the FixFlow logo at the top, linked to the live demo.
 - Richer `index.html` metadata: page title, description, theme-color, Open Graph, and Twitter/X card tags.
 
 ### Fixed
@@ -357,8 +377,8 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Preview modal: full-project filmstrip preview with high-res thumbnail capture
 - Slide navigator: thumbnail-based navigation with per-slide index
 
-[Unreleased]: https://github.com/Pr0xS/PixelDeck/compare/v0.5.1...HEAD
-[0.2.2]: https://github.com/Pr0xS/PixelDeck/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/Pr0xS/PixelDeck/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/Pr0xS/PixelDeck/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/Pr0xS/PixelDeck/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Pr0xS/FixFlow/compare/v0.5.1...HEAD
+[0.2.2]: https://github.com/Pr0xS/FixFlow/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/Pr0xS/FixFlow/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/Pr0xS/FixFlow/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/Pr0xS/FixFlow/releases/tag/v0.1.0

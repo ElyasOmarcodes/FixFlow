@@ -20,7 +20,7 @@ const PROGUARD = 'android/app/proguard-rules.pro'
 
 /** Keep rules for the classes Android instantiates reflectively. */
 const KEEP_RULES = `
-# ─── PixelDeck ───────────────────────────────────────────────────────────────
+# ─── FixFlow ───────────────────────────────────────────────────────────────
 # Capacitor resolves plugins and the bridge by name at runtime, so R8 must not
 # rename or drop them even though nothing references them statically.
 -keep class com.getcapacitor.** { *; }
@@ -62,7 +62,7 @@ if (/minifyEnabled\s+true/.test(gradle)) {
 
 if (existsSync(PROGUARD)) {
   const rules = readFileSync(PROGUARD, 'utf8')
-  if (rules.includes('PixelDeck')) {
+  if (rules.includes('FixFlow')) {
     console.log('[shrink-android-release] Keep rules already present.')
   } else {
     appendFileSync(PROGUARD, KEEP_RULES)

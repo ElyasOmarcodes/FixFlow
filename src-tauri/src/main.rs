@@ -6,5 +6,5 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .run(tauri::generate_context!())
-        .expect("failed to start the PixelDeck window");
+        .expect("failed to start the FixFlow window");
 }

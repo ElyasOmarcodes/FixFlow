@@ -5,14 +5,14 @@ title: Formats & Families
 group: ADAPT
 ---
 
-PixelDeck adapts one design along two independent axes: **format families** (which kind of device you're designing for) and **formats** (the exact canvas size within that family). Locale layers on top of both — see the next two sections.
+FixFlow adapts one design along two independent axes: **format families** (which kind of device you're designing for) and **formats** (the exact canvas size within that family). Locale layers on top of both — see the next two sections.
 
 ## Format families
 
 - A **format family** is a device category: **Phone**, **Tablet**, **Watch**, **Desktop**, **TV**, **VR**, or **Game**. Every slide group belongs to exactly one family.
 - Each family has its own Base authoring canvas and its own default device mockup — switch to Tablet and Phone mockups rebase onto iPad/Android Tablet automatically; switch to Watch and they rebase onto Apple Watch/Wear OS, and so on.
 - The family switcher in the editing bar swaps your whole workspace to that family's slide groups, active format, and last-viewed zoom. It never touches another family's layouts or content.
-- **Creating a new family** forks your current design into it: pick a source (Base or an existing format), and PixelDeck scales a copy of those slide groups to fit the new family's anchor canvas. From then on the two families are fully independent — edit one without affecting the other.
+- **Creating a new family** forks your current design into it: pick a source (Base or an existing format), and FixFlow scales a copy of those slide groups to fit the new family's anchor canvas. From then on the two families are fully independent — edit one without affecting the other.
 - Slides keep a stable identity across families, so "Slide 2" in Phone and "Slide 2" in Tablet are recognized as the same conceptual slide even once their layouts diverge completely. This is what makes **Bring content from…**, below, possible.
 
 ## Formats within a family

@@ -5,14 +5,14 @@ title: AI Features
 group: DELIVER
 ---
 
-PixelDeck can use an AI model you supply to do two jobs: **translate the text
+FixFlow can use an AI model you supply to do two jobs: **translate the text
 on your screenshots**, and **redraw a screenshot with its text in another
 language**. Both are optional. The editor is complete without a key — AI only
 removes the typing.
 
 Your key is stored in your browser (or in the app's local storage on desktop
 and Android) and is sent **straight to the provider you chose**. It never
-passes through a PixelDeck server, because there isn't one.
+passes through a FixFlow server, because there isn't one.
 
 ## What a key gets you
 

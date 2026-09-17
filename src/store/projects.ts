@@ -25,7 +25,7 @@ let bootstrapAbandoned = false
 let pagehideListenerRegistered = false
 
 function warnStorageFailure(err: unknown): void {
-  console.warn('[PixelDeck] Project library save failed', err)
+  console.warn('[FixFlow] Project library save failed', err)
   if (storageWarningShown || typeof window === 'undefined') return
   storageWarningShown = true
   window.setTimeout(() => {
@@ -55,7 +55,7 @@ async function loadProjectById(id: string, opts?: { checkAbandonment?: boolean }
   try {
     useEditorStore.getState().importProject(json)
   } catch (err) {
-    console.warn('[PixelDeck] Failed to load project', err)
+    console.warn('[FixFlow] Failed to load project', err)
     return false
   }
   await getProjectStorage().setActiveProjectId(id)
@@ -158,7 +158,7 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
       // This also writes the pointer when no project was loaded (empty or unreadable library paths).
       await getProjectStorage().setActiveProjectId(useEditorStore.getState().project.id)
     } catch (err) {
-      console.warn('[PixelDeck] Project library initialization failed', err)
+      console.warn('[FixFlow] Project library initialization failed', err)
     } finally {
       set({ initialized: true })
     }
@@ -276,9 +276,9 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
       try {
         await useAssetStore.getState().setActiveProject(oldProjectId)
       } catch (restoreErr) {
-        console.error('[PixelDeck] Failed to restore conflicted project assets', restoreErr)
+        console.error('[FixFlow] Failed to restore conflicted project assets', restoreErr)
       }
-      console.error('[PixelDeck] Failed to save conflicted project as a copy', err)
+      console.error('[FixFlow] Failed to save conflicted project as a copy', err)
       if (typeof window !== 'undefined') alert('Could not save a copy of this project. Please try again.')
     }
   },

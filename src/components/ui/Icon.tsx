@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactElement } from 'react'
 
 /**
- * PixelDeck icon set — a single inline-SVG sprite for the whole UI.
+ * FixFlow icon set — a single inline-SVG sprite for the whole UI.
  *
  * Why hand-rolled instead of an icon package: the editor ships as a static SPA
  * (and as a desktop/Android shell), so an extra runtime dependency for ~80

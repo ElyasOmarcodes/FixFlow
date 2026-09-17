@@ -1,4 +1,4 @@
-# PixelDeck batch export config
+# FixFlow batch export config
 # Run: node cli/index.mjs export --config=batch.yaml
 
 jobs:

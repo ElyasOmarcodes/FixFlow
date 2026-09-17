@@ -1,31 +1,31 @@
 <p align="center">
-  <a href="https://pr0xs.github.io/PixelDeck/" aria-label="Try PixelDeck in your browser">
-    <img src="public/logo.svg" alt="PixelDeck" width="260" />
+  <a href="https://elyasomarcodes.github.io/FixFlow/" aria-label="Try FixFlow in your browser">
+    <img src="public/logo.svg" alt="FixFlow" width="260" />
   </a>
 </p>
 
-# PixelDeck
+# FixFlow
 
 ### App Store & Play Store Screenshot Generator — Visual Editor + CLI
 
-[![GitHub stars](https://img.shields.io/github/stars/Pr0xS/PixelDeck?style=social)](https://github.com/Pr0xS/PixelDeck/stargazers)
-[![Try the App](https://img.shields.io/badge/try%20it-in%20browser-success.svg)](https://pr0xs.github.io/PixelDeck/)
+[![GitHub stars](https://img.shields.io/github/stars/ElyasOmarcodes/FixFlow?style=social)](https://github.com/ElyasOmarcodes/FixFlow/stargazers)
+[![Try the App](https://img.shields.io/badge/try%20it-in%20browser-success.svg)](https://elyasomarcodes.github.io/FixFlow/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/Pr0xS/PixelDeck/actions/workflows/ci.yml/badge.svg)](https://github.com/Pr0xS/PixelDeck/actions)
+[![CI](https://github.com/ElyasOmarcodes/FixFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/ElyasOmarcodes/FixFlow/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![AI Agent Friendly](https://img.shields.io/badge/AI%20agents-welcome%20🤖-7c6ef6)](AGENTS.md)
 
 **Design beautiful App Store and Play Store screenshots in your browser, then batch-export them from the CLI. Free, open-source, and 100% local — no account, no subscription, no server.**
 
-PixelDeck is a free **App Store screenshot generator** and **device mockup maker** for indie developers and mobile teams. Create polished App Store and Google Play screenshots with a layer-based canvas editor — drag device mockups, headlines, gradients, and shapes onto your screens — then automate PNG export for every screen, locale, and device size from a headless CLI. Free, open-source, and 100% local.
+FixFlow is a free **App Store screenshot generator** and **device mockup maker** for indie developers and mobile teams. Create polished App Store and Google Play screenshots with a layer-based canvas editor — drag device mockups, headlines, gradients, and shapes onto your screens — then automate PNG export for every screen, locale, and device size from a headless CLI. Free, open-source, and 100% local.
 
-### 🚀 [Try the App →](https://pr0xs.github.io/PixelDeck/)
+### 🚀 [Try the App →](https://elyasomarcodes.github.io/FixFlow/)
 
 No install, no sign-up. Everything runs in your browser.
 
 <!--
   TODO: add a hero screenshot or GIF here once available, e.g.:
-  ![PixelDeck App Store screenshot generator editor with device mockups and panoramic canvas](docs/media/hero.gif)
+  ![FixFlow App Store screenshot generator editor with device mockups and panoramic canvas](docs/media/hero.gif)
 -->
 
 ---
@@ -38,9 +38,9 @@ No install, no sign-up. Everything runs in your browser.
 
 ---
 
-## Why PixelDeck?
+## Why FixFlow?
 
-Most screenshot tools give you a fixed template: one background, one phone, one headline. PixelDeck is a **full layer-based canvas editor** — the same mental model as Figma or Photoshop, purpose-built for App Store and Play Store screenshots.
+Most screenshot tools give you a fixed template: one background, one phone, one headline. FixFlow is a **full layer-based canvas editor** — the same mental model as Figma or Photoshop, purpose-built for App Store and Play Store screenshots.
 
 - 🖼️ **Panoramic multi-slide layouts** — design across 2, 3, or more store slides on a single canvas. A phone mockup can span the seam between screenshots for that premium storefront look that no template tool can produce.
 - 🎨 **Full layer system** — stack phone mockups, rich text, images, shapes, chip badges, brand lockups, and groups. Every layer is independently movable, resizable, and styleable.
@@ -113,7 +113,7 @@ Export at any pixel ratio via the CLI. Match `slideWidth`/`slideHeight` to your 
 
 ## Quick Start
 
-The fastest way to try PixelDeck is the **[hosted app](https://pr0xs.github.io/PixelDeck/)**, with nothing to install.
+The fastest way to try FixFlow is the **[hosted app](https://elyasomarcodes.github.io/FixFlow/)**, with nothing to install.
 
 ### Run locally
 
@@ -183,7 +183,7 @@ and how the size is kept down.
 ## Project Structure
 
 ```text
-pixeldeck/
+fixflow/
 ├── cli/          # Headless Playwright export CLI and batch config examples
 ├── public/       # Static assets and bundled templates (public/templates/)
 ├── resources/    # Icon and splash sources for the native app builds
@@ -198,14 +198,14 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full system design, data model,
 
 ## FAQ
 
-**Is PixelDeck free?**
+**Is FixFlow free?**
 Yes, completely. MIT-licensed, no freemium tier, no hidden limits.
 
 **Do I need an account or internet connection?**
 No account required. The editor runs entirely in your browser. An internet connection is only needed to load Google Fonts on first use.
 
 **Does it work for Google Play screenshots?**
-Yes. PixelDeck supports both App Store (iOS) and Google Play (Android) screenshot formats, with device mockups for both platforms.
+Yes. FixFlow supports both App Store (iOS) and Google Play (Android) screenshot formats, with device mockups for both platforms.
 
 **Can I use it in a CI pipeline with fastlane?**
 Yes. The headless CLI (`node cli/index.mjs export`) renders PNGs via Playwright and can be integrated into any CI pipeline alongside fastlane, GitHub Actions, or Bitrise.
@@ -214,7 +214,7 @@ Yes. The headless CLI (`node cli/index.mjs export`) renders PNGs via Playwright 
 The canvas size is fully configurable. Set `slideWidth`/`slideHeight` to any resolution — e.g. 1290 × 2796 for iPhone 6.7", 1242 × 2688 for iPhone 5.8", or 1080 × 1920 for Android. The CLI exports at the canvas's logical size.
 
 **Can I export multiple languages/locales?**
-Yes. PixelDeck has built-in localization: define per-locale text and image overrides, then the CLI exports each locale to its own folder in one command.
+Yes. FixFlow has built-in localization: define per-locale text and image overrides, then the CLI exports each locale to its own folder in one command.
 
 **Is my data private?**
 Yes. Everything stays on your machine. No telemetry, no backend, no cloud sync. Projects are saved to `localStorage`; imported images are stored in IndexedDB.
@@ -223,13 +223,13 @@ Yes. Everything stays on your machine. No telemetry, no backend, no cloud sync. 
 Yes. Run `npm run build` and serve the `dist/` folder from any static host (GitHub Pages, Netlify, Vercel, S3, etc.).
 
 **Do AI providers work on static hosts?**
-Most providers can be called directly with your own key, but some APIs block browser CORS. For those, deploy a small proxy and build with `VITE_AI_PROXY_BASE_URL=https://your-proxy.example.com`; PixelDeck will route AI calls through `/{provider}` and model listing through `/{provider}/models`. OpenCode Go is disabled in GitHub Pages/no-proxy builds because it does not allow direct browser requests.
+Most providers can be called directly with your own key, but some APIs block browser CORS. For those, deploy a small proxy and build with `VITE_AI_PROXY_BASE_URL=https://your-proxy.example.com`; FixFlow will route AI calls through `/{provider}` and model listing through `/{provider}/models`. OpenCode Go is disabled in GitHub Pages/no-proxy builds because it does not allow direct browser requests.
 
 ---
 
 ## For AI Agents
 
-PixelDeck is designed to be extended by AI coding agents. [`AGENTS.md`](AGENTS.md) maps every file, lists the 6-step recipe for adding a new layer type, documents non-obvious behaviors, and defines a verification contract. Agent contributions are explicitly welcome; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+FixFlow is designed to be extended by AI coding agents. [`AGENTS.md`](AGENTS.md) maps every file, lists the 6-step recipe for adding a new layer type, documents non-obvious behaviors, and defines a verification contract. Agent contributions are explicitly welcome; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 
@@ -237,10 +237,10 @@ PixelDeck is designed to be extended by AI coding agents. [`AGENTS.md`](AGENTS.m
 
 Bug reports, feature ideas, docs improvements, and pull requests are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a PR.
 
-⭐ If PixelDeck is useful to you, consider starring the repo — it helps others find it.
+⭐ If FixFlow is useful to you, consider starring the repo — it helps others find it.
 
 ---
 
 ## License
 
-PixelDeck is released under the [MIT License](LICENSE).
+FixFlow is released under the [MIT License](LICENSE).

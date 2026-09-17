@@ -2,7 +2,8 @@ import { useEditorStore } from '@/store'
 import type { ShapeLayer, Layer } from '@/types'
 import { SliderField } from '@/components/properties/PropertyControls'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
-import { labelCls, panelSectionCls, pauseTemporal, resumeTemporal } from '@/components/properties/panelConstants'
+import { labelCls, pauseTemporal, resumeTemporal } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { useT } from '@/i18n'
 
@@ -35,8 +36,8 @@ export function ShapeProperties({ layer }: { layer: ShapeLayer }) {
   const upd = (patch: Partial<ShapeLayer>) => updateLayer(layer.id, patch as Partial<Layer>)
 
   return (
-    <div className="space-y-4">
-      <div className={panelSectionCls}>
+    <div className="space-y-3">
+      <PropertySection id="shape-type" title={t('props.secShape')} icon="shape">
         <label className={labelCls}>{t('shape.type')}</label>
         <SegmentedControl
           value={layer.shapeType}
@@ -60,12 +61,12 @@ export function ShapeProperties({ layer }: { layer: ShapeLayer }) {
           }}
           optionClassName="rounded-lg border px-2 py-2 text-xs transition-colors flex flex-col items-center gap-0.5"
         />
-      </div>
+      </PropertySection>
 
       {layer.shapeType === 'rect' && (
-        <div className={panelSectionCls}>
+        <PropertySection id="shape-corner" title={t('shape.cornerRadius')} icon="shape">
           <SliderField
-            label="Corner Radius"
+            label={t('shape.cornerRadius')}
             value={layer.cornerRadius}
             min={0}
             max={500}
@@ -75,13 +76,13 @@ export function ShapeProperties({ layer }: { layer: ShapeLayer }) {
             onInteractionEnd={resumeTemporal}
             className="!mb-0"
           />
-        </div>
+        </PropertySection>
       )}
 
       {layer.shapeType === 'star' && (
-        <div className={panelSectionCls}>
+        <PropertySection id="shape-star" title={t('shape.star')} icon="shape">
           <SliderField
-            label="Points"
+            label={t('shape.starPoints')}
             value={layer.starPoints ?? 5}
             min={3}
             max={12}
@@ -90,7 +91,7 @@ export function ShapeProperties({ layer }: { layer: ShapeLayer }) {
             onInteractionEnd={resumeTemporal}
           />
           <SliderField
-            label="Inner Ratio"
+            label={t('shape.starInnerRatio')}
             value={Math.round((layer.starInnerRatio ?? 0.4) * 100)}
             min={10}
             max={90}
@@ -100,12 +101,11 @@ export function ShapeProperties({ layer }: { layer: ShapeLayer }) {
             onInteractionEnd={resumeTemporal}
             className="!mb-0"
           />
-        </div>
+        </PropertySection>
       )}
 
       {layer.shapeType === 'arrow' && (
-        <div className={panelSectionCls}>
-          <label className={labelCls}>{t('shape.direction')}</label>
+        <PropertySection id="shape-arrow" title={t('shape.direction')} icon="shape">
           <SegmentedControl
             value={layer.arrowDirection ?? 'right'}
             options={ARROW_DIRECTIONS.map(({ dir, label, icon }) => ({
@@ -117,7 +117,7 @@ export function ShapeProperties({ layer }: { layer: ShapeLayer }) {
             className="grid grid-cols-4 gap-2"
             optionClassName="rounded-lg border py-2 transition-colors"
           />
-        </div>
+        </PropertySection>
       )}
     </div>
   )

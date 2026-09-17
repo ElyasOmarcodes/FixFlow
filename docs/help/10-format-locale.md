@@ -5,7 +5,7 @@ title: Format × Locale editing
 group: ADAPT
 ---
 
-This is how PixelDeck lets you fine-tune a design for one specific platform, one specific language, or both — without affecting anything else.
+This is how FixFlow lets you fine-tune a design for one specific platform, one specific language, or both — without affecting anything else.
 
 - The top editing bar has two scopes: **amber = Format**, **teal = Locale**. A floating alert appears over the canvas whenever you're not on the fully shared Base + Default view, telling you exactly what's currently scoped.
 

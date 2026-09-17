@@ -44,14 +44,14 @@ try {
     })
     const errors = []
     page.on('pageerror', (error) => errors.push(error.message))
-    await page.goto(process.env.PIXELDECK_TEST_URL || 'http://127.0.0.1:5173')
+    await page.goto(process.env.FIXFLOW_TEST_URL || 'http://127.0.0.1:5173')
     await page.waitForTimeout(3500)
     if (width < 1024) await page.locator('.pd-mobile-nav button').first().click()
     await page.getByRole('button', { name: 'New layer', exact: true }).click()
     await page.getByRole('menuitem', { name: 'Text', exact: true }).click()
     const editor = page.locator('[contenteditable=true]').filter({ visible: true }).first()
     await expect(editor).toBeVisible()
-    await editor.fill('سلام نړۍ — PixelDeck 2026')
+    await editor.fill('سلام نړۍ — FixFlow 2026')
     await expect(editor).toHaveAttribute('dir', 'rtl')
     if (width < 1024) {
       await expect(page.getByRole('dialog', { name: 'Edit text' })).toBeVisible()
@@ -162,9 +162,9 @@ try {
     } else {
       await page.getByTitle('Help & keyboard shortcuts').click()
     }
-    await expect(page.getByRole('dialog', { name: 'PixelDeck user guide' })).toBeVisible()
+    await expect(page.getByRole('dialog', { name: 'FixFlow user guide' })).toBeVisible()
     await page.screenshot({ path: `test-results/editor/guide-${width}.png` })
-    await page.getByRole('dialog', { name: 'PixelDeck user guide' })
+    await page.getByRole('dialog', { name: 'FixFlow user guide' })
       .getByRole('button', { name: 'Close', exact: true }).click()
     for (const [lang, title, aiTitle] of [
       ['ps', await uiString('ps', 'help.title'), await helpChapterTitle('ps', '14-ai-features.md')],

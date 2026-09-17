@@ -8,6 +8,9 @@
  * falls back to showing the screen, which is the recoverable direction.
  */
 
+// Still `pixeldeck`: the app was renamed, the data on people's machines was
+// not. Renaming a storage key does not migrate it — it reads a different,
+// empty one. See src/store/idb-storage.ts.
 const KEY = 'pixeldeck:start-screen'
 
 export function shouldShowStartScreenOnLaunch(): boolean {

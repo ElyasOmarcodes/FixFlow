@@ -64,7 +64,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
       onClose()
     } catch (err) {
       if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
-      else console.error('[PixelDeck] Failed to open project', err)
+      else console.error('[FixFlow] Failed to open project', err)
     } finally {
       setOpeningId(null)
     }
@@ -113,7 +113,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
       setDeleteId(null)
     } catch (err) {
       if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
-      else console.error('[PixelDeck] Failed to delete project', err)
+      else console.error('[FixFlow] Failed to delete project', err)
     } finally {
       setDeletingBusy(false)
     }
@@ -127,7 +127,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
       await saveFile(blob, `${slug}.json`)
     } catch (err) {
       if (isSaveCancelled(err)) return
-      console.error('[PixelDeck] Failed to export project', err)
+      console.error('[FixFlow] Failed to export project', err)
       alert('Failed to export this project. Please try again.')
     }
   }
@@ -409,7 +409,7 @@ export function ProjectsModal({ open, onClose }: ProjectsModalProps) {
                         onCommit={(name) => {
                           renameProject(p.id, name).catch((err) => {
                             if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
-                            else console.error('[PixelDeck] Rename failed', err)
+                            else console.error('[FixFlow] Rename failed', err)
                           })
                         }}
                         inputStyle={{

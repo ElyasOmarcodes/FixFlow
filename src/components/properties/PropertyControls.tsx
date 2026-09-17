@@ -8,6 +8,7 @@ import { useBrandColors } from '@/hooks/useBrandColors'
 import { isBrandToken, resolveBrandColor } from '@/utils/brandColors'
 import { fillToCss } from '@/utils/gradients'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
+import { useT } from '@/i18n'
 
 const labelCls = 'text-[11px] text-[var(--pd-c-6b6b7a)] mb-1 block uppercase tracking-[0.08em]'
 const rowCls = 'flex gap-2 mb-3'
@@ -159,6 +160,7 @@ const GRADIENT_PRESETS: Array<{ label: string; fill: LinearGradient }> = [
 ]
 
 export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, onInteractionEnd = () => {} }: GradientEditorProps) {
+  const t = useT()
   const brandColors = useBrandColors()
   const savedGradients = useEditorStore((s) => s.project.savedGradients) ?? []
   const updateProject = useEditorStore((s) => s.updateProject)
@@ -259,13 +261,12 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
 
   return (
     <div className="space-y-3">
-      <RecentFills fill={fill} onChange={onChange} />
       <SegmentedControl
         value={mode}
         options={[
-          { value: 'solid', label: 'Solid' },
-          { value: 'linear', label: 'Linear' },
-          { value: 'radial', label: 'Radial' },
+          { value: 'solid', label: t('fill.solid') },
+          { value: 'linear', label: t('fill.linear') },
+          { value: 'radial', label: t('fill.radial') },
         ]}
         onChange={switchMode}
         className="grid grid-cols-3 gap-1 rounded-lg border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-1"
@@ -274,20 +275,22 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
         inactiveClassName="text-[var(--pd-c-6b6b7a)] hover:bg-[var(--pd-fill)] hover:text-[var(--pd-c-e8e8f0)]"
       />
 
+      <RecentFills fill={fill} onChange={onChange} />
+
       {mode !== 'solid' && (
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className={labelCls}>Presets</span>
+            <span className={labelCls}>{t('fill.presets')}</span>
             <button
               type="button"
-              title="Save current gradient"
+              title={t('fill.save')}
               onClick={() => {
                 if (typeof fill === 'string') return
                 updateProject({ savedGradients: [...savedGradients, fill] })
               }}
               className="text-[10px] text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] hover:border-[var(--pd-accent)]"
             >
-              + Save
+              + {t('fill.save')}
             </button>
           </div>
           {/* Built-in presets */}
@@ -306,7 +309,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
           {/* Saved gradients (non-string only — strings live in Swatches tray) */}
           {savedGradients.filter((g) => typeof g !== 'string').length > 0 && (
             <div className="mt-2">
-              <span className="text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider">Custom</span>
+              <span className="text-[10px] text-[var(--pd-c-4a4a5a)] uppercase tracking-wider">{t('fill.custom')}</span>
             </div>
           )}
           {savedGradients.filter((g) => typeof g !== 'string').length > 0 && (
@@ -315,14 +318,14 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 <div key={i} className="relative group">
                   <button
                     type="button"
-                    title="Apply saved gradient"
+                    title={t('fill.presets')}
                     onClick={() => onChange(g)}
                     className="h-5 w-9 rounded border border-[var(--pd-line-strong)] hover:border-[var(--pd-accent)] transition-all hover:scale-105"
                     style={{ background: fillToCss(g) }}
                   />
                   <button
                     type="button"
-                    title="Remove"
+                    title={t('fill.remove')}
                     onClick={() => updateProject({ savedGradients: savedGradients.filter((sg) => sg !== g) })}
                     className="absolute -top-1 -right-1 hidden group-hover:flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--pd-panel)] border border-[var(--pd-line-loud)] text-[8px] text-[var(--pd-danger)] hover:text-[var(--pd-c-f0eff8)] leading-none"
                   >
@@ -359,13 +362,13 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
       ) : gradient && selectedStop ? (
         <>
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-[var(--pd-c-6b6b7a)] uppercase tracking-[0.08em]">Stops</span>
+            <span className="text-[11px] text-[var(--pd-c-6b6b7a)] uppercase tracking-[0.08em]">{t('fill.stops')}</span>
             <button
               type="button"
               onClick={addStop}
               className="text-[11px] text-[var(--pd-c-7c6ef6)] hover:text-[var(--pd-c-9b8fff)] transition-colors px-1.5 py-0.5 rounded border border-[var(--pd-accent-soft)] hover:border-[var(--pd-accent)]"
             >
-              + Add stop
+              + {t('fill.addStop')}
             </button>
           </div>
 
@@ -424,7 +427,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
 
           <div className="rounded-xl border border-[var(--pd-line-soft)] bg-[var(--pd-c-0f0f13)] p-3 space-y-3">
             <div>
-              <label className={labelCls}>Color</label>
+              <label className={labelCls}>{t('fill.stopColour')}</label>
               <ColorField
                 value={selectedStop.color}
                 onChange={(value) => {
@@ -439,7 +442,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
             {!isEndStop(selectedStop) && (
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <label className={labelCls + ' !mb-0'}>Position</label>
+                  <label className={labelCls + ' !mb-0'}>{t('fill.position')}</label>
                   <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(selectedStop.offset * 100)}%</span>
                 </div>
                 <input
@@ -464,19 +467,19 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 onClick={deleteStop}
                 className="text-xs text-[var(--pd-danger)] hover:text-[var(--pd-danger-soft)] transition-colors"
               >
-                Delete stop ×
+                {t('fill.deleteStop')}
               </button>
             )}
 
             {isEndStop(selectedStop) && (
-              <p className="text-[10px] text-[var(--pd-c-6b6b7a)]">Fixed stop — position locked</p>
+              <p className="text-[10px] text-[var(--pd-c-6b6b7a)]">{t('fill.fixedStop')}</p>
             )}
           </div>
 
           {gradient.type === 'linear' && (
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <label className={labelCls + ' !mb-0'}>Angle</label>
+                <label className={labelCls + ' !mb-0'}>{t('fill.angle')}</label>
                 <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.angle)}°</span>
               </div>
               <input
@@ -493,7 +496,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
               <div className={rowCls}>
                 <div className={fieldCls}>
                   <div className="mb-1 flex items-center justify-between">
-                    <label className={labelCls + ' !mb-0'}>Center X</label>
+                    <label className={labelCls + ' !mb-0'}>{t('fill.centerX')}</label>
                     <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.cx * 100)}%</span>
                   </div>
                   <input type="range" min={0} max={100} value={Math.round(gradient.cx * 100)}
@@ -503,7 +506,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
                 </div>
                 <div className={fieldCls}>
                   <div className="mb-1 flex items-center justify-between">
-                    <label className={labelCls + ' !mb-0'}>Center Y</label>
+                    <label className={labelCls + ' !mb-0'}>{t('fill.centerY')}</label>
                     <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.cy * 100)}%</span>
                   </div>
                   <input type="range" min={0} max={100} value={Math.round(gradient.cy * 100)}
@@ -514,7 +517,7 @@ export function GradientEditor({ fill, onChange, onInteractionStart = () => {}, 
               </div>
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <label className={labelCls + ' !mb-0'}>Radius</label>
+                  <label className={labelCls + ' !mb-0'}>{t('fill.radius')}</label>
                   <span className="text-xs text-[var(--pd-c-e8e8f0)]">{Math.round(gradient.radius * 100)}%</span>
                 </div>
                 <input type="range" min={0} max={200} value={Math.round(gradient.radius * 100)}

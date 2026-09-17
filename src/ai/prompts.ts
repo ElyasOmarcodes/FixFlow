@@ -6,7 +6,7 @@
  * new AI feature, define its prompt(s) here and import them from the feature
  * module (`src/ai/features/*`). Do not inline prompt strings elsewhere.
  *
- * Prompt design principles for PixelDeck:
+ * Prompt design principles for FixFlow:
  *  1. Give the model the FULL design context (all slides, all texts, roles,
  *     layout) so it can infer the intent of each message — see
  *     `buildDesignContext()` in `src/ai/context.ts`.

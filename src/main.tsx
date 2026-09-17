@@ -49,7 +49,7 @@ async function mount(): Promise<void> {
         }),
       ])
     } catch (err) {
-      console.error('[PixelDeck] Project bootstrap failed', err)
+      console.error('[FixFlow] Project bootstrap failed', err)
     } finally {
       if (bootstrapTimer) clearTimeout(bootstrapTimer)
     }
@@ -66,4 +66,4 @@ async function mount(): Promise<void> {
   )
 }
 
-mount().catch((err) => console.error('[PixelDeck] fatal mount error', err))
+mount().catch((err) => console.error('[FixFlow] fatal mount error', err))

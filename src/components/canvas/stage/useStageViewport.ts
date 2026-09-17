@@ -211,8 +211,8 @@ export function useStageViewport({
   }, [group, containerSize.w, containerSize.h, setZoom, setViewportPosition, panoCompensate, panoCompensationPx])
 
   useEffect(() => {
-    window.addEventListener('pixeldeck:fit', handleFit)
-    return () => window.removeEventListener('pixeldeck:fit', handleFit)
+    window.addEventListener('fixflow:fit', handleFit)
+    return () => window.removeEventListener('fixflow:fit', handleFit)
   }, [handleFit])
 
   // Switching device family (e.g. phone -> watch/vr) spans very different canvas

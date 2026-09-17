@@ -42,7 +42,7 @@ try {
   await page.addInitScript(() => {
     try { window.localStorage.setItem('pixeldeck:start-screen', 'off') } catch { /* private window */ }
   })
-  await page.goto(process.env.PIXELDECK_TEST_URL || `http://127.0.0.1:${PORT}`)
+  await page.goto(process.env.FIXFLOW_TEST_URL || `http://127.0.0.1:${PORT}`)
   await page.waitForTimeout(3500)
 
   // Adding an icon layer opens the picker on the bundled library.

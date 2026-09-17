@@ -1,6 +1,6 @@
 {
-  "name": "pixeldeck",
-  "version": "0.12.0",
+  "name": "fixflow",
+  "version": "0.13.0",
   "private": true,
   "description": "Visual editor for designing polished App Store & Play Store screenshots. Drag-and-drop device mockups, text, shapes, and gradients, then export PNGs from the browser or batch-export via CLI.",
   "keywords": [
@@ -23,18 +23,18 @@
     "rtl"
   ],
   "license": "MIT",
-  "author": "PixelDeck contributors",
+  "author": "FixFlow contributors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Pr0xS/PixelDeck.git"
+    "url": "https://github.com/ElyasOmarcodes/FixFlow.git"
   },
-  "homepage": "https://github.com/Pr0xS/PixelDeck#readme",
+  "homepage": "https://github.com/ElyasOmarcodes/FixFlow#readme",
   "bugs": {
-    "url": "https://github.com/Pr0xS/PixelDeck/issues"
+    "url": "https://github.com/ElyasOmarcodes/FixFlow/issues"
   },
   "type": "module",
   "bin": {
-    "pixeldeck": "./cli/index.mjs"
+    "fixflow": "./cli/index.mjs"
   },
   "scripts": {
     "dev": "vite",

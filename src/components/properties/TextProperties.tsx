@@ -8,10 +8,10 @@ import { useFontStore } from '@/store/fontStore'
 import {
   inputCls,
   labelCls,
-  panelSectionCls,
   pauseTemporal,
   resumeTemporal,
 } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
 import { LayerTextToolbar } from '@/components/text/LayerTextToolbar'
 import { Icon } from '@/components/ui/Icon'
 import { useT, type TranslationKey } from '@/i18n'
@@ -367,11 +367,10 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
   const customFonts = project.customFonts ?? []
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
 
       {/* ── Text styling toolbar — always visible ── */}
-      <div className={`${panelSectionCls} !border-[rgba(124,110,246,0.35)]`}>
-        <label className={`${labelCls} flex items-center gap-1.5`}><Icon name="text" size={12} />{t('text.styling')}</label>
+      <PropertySection id="text-styling" title={t('text.styling')} icon="text">
         {editingThis ? (
           // Canvas editor is active: it portals RichTextToolbar into this slot
           <div id="rich-text-toolbar-slot" />
@@ -379,11 +378,10 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
           // No canvas editor: show always-functional toolbar that applies to the whole text
           <LayerTextToolbar layer={layer} />
         )}
-      </div>
+      </PropertySection>
 
       {/* ── Font ── */}
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('text.font')}</label>
+      <PropertySection id="text-font" title={t('text.font')} icon="text">
         <FontPicker
           value={layer.fontFamily}
           customFonts={customFonts}
@@ -462,11 +460,10 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
         {/* Spacing */}
         <SliderField label={t('text.letterSpacing')} value={layer.letterSpacing} min={-20} max={100} step={1} onChange={(v) => upd({ letterSpacing: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
         <SliderField label={t('text.lineHeight')} value={layer.lineHeight} min={0.5} max={4} step={0.05} unit="×" onChange={(v) => upd({ lineHeight: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
-      </div>
+      </PropertySection>
 
       {/* ── Align ── */}
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('text.alignment')}</label>
+      <PropertySection id="text-spacing" title={t('text.alignment')} icon="text">
         <div className="grid grid-cols-3 gap-2">
           {([
             { value: 'left',   label: t('text.alignLeft'),   icon: 'align-left' },
@@ -520,7 +517,7 @@ export function TextProperties({ layer }: { layer: TextLayer }) {
             </div>
           </div>
         )}
-      </div>
+      </PropertySection>
 
 
     </div>

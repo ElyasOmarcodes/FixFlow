@@ -27,12 +27,12 @@ describe('AI auth headers', () => {
     expect(buildOpenAiCompatibleHeaders('openrouter', 'sk-or-test')).toEqual({
       Authorization: 'Bearer sk-or-test',
       'HTTP-Referer': 'http://localhost:5173',
-      'X-OpenRouter-Title': 'PixelDeck',
+      'X-OpenRouter-Title': 'FixFlow',
     })
   })
 
   it('falls back to a stable origin outside the browser', () => {
     vi.unstubAllGlobals()
-    expect(getAiRequestOrigin()).toBe('https://pixeldeck.local')
+    expect(getAiRequestOrigin()).toBe('https://fixflow.local')
   })
 })

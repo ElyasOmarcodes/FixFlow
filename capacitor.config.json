@@ -1,6 +1,6 @@
 {
-  "appId": "com.pixeldeck.app",
-  "appName": "PixelDeck",
+  "appId": "com.fixflow.app",
+  "appName": "FixFlow",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "android": {

@@ -20,5 +20,5 @@ export async function buildExportZipBlob(results: ProjectImageExportResult[]): P
 
 /** Sanitize a project name into a safe filename stem for the exported zip. */
 export function zipFileNameFor(projectName: string): string {
-  return `${projectName.replace(/[^a-z0-9_-]/gi, '-').toLowerCase() || 'pixeldeck'}-export.zip`
+  return `${projectName.replace(/[^a-z0-9_-]/gi, '-').toLowerCase() || 'fixflow'}-export.zip`
 }

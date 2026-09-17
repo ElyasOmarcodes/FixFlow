@@ -631,12 +631,12 @@ const DIR = 'public/templates'
 for (const brand of BRANDS) {
   const template = {
     id: `tpl-${brand.slug}`,
-    kind: 'pixeldeck-template',
+    kind: 'fixflow-template',
     schemaVersion: 1,
     name: brand.name,
     description: brand.description,
     category: brand.category,
-    author: 'PixelDeck',
+    author: 'FixFlow',
     createdAt: '2026-01-01T00:00:00.000Z',
     settings: {
       defaultSlideWidth: W,

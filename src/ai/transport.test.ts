@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { chat, editImage } from '@/ai/client'
-import { getPixelDeckConfig } from '@/config'
+import { getFixFlowConfig } from '@/config'
 import { transportChat, transportEditImage } from './transport'
 import type { AiTransport } from './transport'
 
@@ -10,12 +10,12 @@ vi.mock('@/ai/client', () => ({
 }))
 
 vi.mock('@/config', () => ({
-  getPixelDeckConfig: vi.fn(),
+  getFixFlowConfig: vi.fn(),
 }))
 
 const mockedChat = vi.mocked(chat)
 const mockedEditImage = vi.mocked(editImage)
-const mockedGetPixelDeckConfig = vi.mocked(getPixelDeckConfig)
+const mockedGetFixFlowConfig = vi.mocked(getFixFlowConfig)
 
 const chatOptions = {
   provider: 'openai' as const,
@@ -33,8 +33,8 @@ const imageEditOptions = {
 beforeEach(() => {
   mockedChat.mockReset()
   mockedEditImage.mockReset()
-  mockedGetPixelDeckConfig.mockReset()
-  mockedGetPixelDeckConfig.mockReturnValue({})
+  mockedGetFixFlowConfig.mockReset()
+  mockedGetFixFlowConfig.mockReturnValue({})
 })
 
 describe('AI transport', () => {
@@ -54,7 +54,7 @@ describe('AI transport', () => {
       chat: vi.fn().mockResolvedValue('injected chat'),
       editImage: vi.fn().mockResolvedValue('injected image'),
     }
-    mockedGetPixelDeckConfig.mockReturnValue({ aiTransport: injectedTransport })
+    mockedGetFixFlowConfig.mockReturnValue({ aiTransport: injectedTransport })
 
     await expect(transportChat(chatOptions)).resolves.toBe('injected chat')
     await expect(transportEditImage(imageEditOptions)).resolves.toBe('injected image')
@@ -71,7 +71,7 @@ describe('AI transport', () => {
       chat: vi.fn().mockRejectedValue(error),
       editImage: vi.fn(),
     }
-    mockedGetPixelDeckConfig.mockReturnValue({ aiTransport: injectedTransport })
+    mockedGetFixFlowConfig.mockReturnValue({ aiTransport: injectedTransport })
 
     await expect(transportChat(chatOptions)).rejects.toBe(error)
   })

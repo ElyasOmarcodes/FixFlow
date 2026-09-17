@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="FixFlow">
+  <!--
+    The FixFlow mark.
+
+    One Material Symbol — `auto_awesome_mosaic`, rounded, filled — on the
+    brand gradient. The glyph is three panels: one tall, two stacked. That is
+    literally what this app lays out, so the mark says what the app does
+    without a metaphor in the way.
+
+    This file is the single source: scripts/build-brand-assets.mjs renders it
+    to the platform icons, so the app icon can never drift from the favicon.
+  -->
+  <defs>
+    <linearGradient id="ff-mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8B7CFF"/>
+      <stop offset="55%" stop-color="#7C6EF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#ff-mark)"/>
+  <g transform="translate(56, 456) scale(0.41667)" fill="#ffffff">
+    <path d="M440-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240v720Zm80-400v-320h240q33 0 56.5 23.5T840-760v240H520Zm0 400v-320h320v240q0 33-23.5 56.5T760-120H520Z"/>
+  </g>
+</svg>

@@ -1,11 +1,11 @@
 {
   "id": "tpl-noor-editorial",
-  "kind": "pixeldeck-template",
+  "kind": "fixflow-template",
   "schemaVersion": 1,
   "name": "Noor · Editorial",
   "description": "Warm paper-and-ink reading set: serif hero, a library panorama across two slides, feature cards, a two-device showcase and a gold close. Swap in your own screenshots.",
   "category": "Books & Reference",
-  "author": "PixelDeck",
+  "author": "FixFlow",
   "createdAt": "2026-01-01T00:00:00.000Z",
   "settings": {
     "defaultSlideWidth": 1320,

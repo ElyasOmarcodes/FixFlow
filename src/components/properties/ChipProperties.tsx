@@ -9,8 +9,9 @@ import { IconPickerModal } from '@/components/panels/IconPickerModal'
 import { Icon } from '@/components/ui/Icon'
 import { getIconGlyph } from '@/assets/icons/library'
 import {
-  inputCls, labelCls, panelSectionCls, subtleButtonCls, pauseTemporal, resumeTemporal,
+  inputCls, labelCls, subtleButtonCls, pauseTemporal, resumeTemporal,
 } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
 import { ensureFontReady, getFontWeights } from '@/utils/fonts'
 import { useT } from '@/i18n'
 
@@ -41,9 +42,8 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
     : layer.icon?.replace(/-/g, ' ')
 
   return (
-    <div className="space-y-4">
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('chip.label')}</label>
+    <div className="space-y-3">
+      <PropertySection id="chip-label" title={t('chip.label')} icon="chip">
         <input
           type="text"
           value={layer.text}
@@ -51,10 +51,9 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
           className={inputCls}
           placeholder={t('chip.labelPlaceholder')}
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('text.font')}</label>
+      <PropertySection id="chip-font" title={t('text.font')} icon="text">
         <FontPicker
           value={layer.fontFamily}
           customFonts={project.customFonts ?? []}
@@ -86,30 +85,27 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
           onInteractionEnd={resumeTemporal}
           className="!mb-0"
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('chip.textColor')}</label>
+      <PropertySection id="chip-textcolor" title={t('chip.textColor')} icon="palette">
         <ColorField
           value={layer.textColor}
           onChange={(value) => upd({ textColor: value })}
           onInteractionStart={pauseTemporal}
           onInteractionEnd={resumeTemporal}
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('chip.background')}</label>
+      <PropertySection id="chip-fill" title={t('chip.background')} icon="palette">
         <FillControl
           fill={layer.fill}
           onChange={(fill) => upd({ fill })}
           onInteractionStart={pauseTemporal}
           onInteractionEnd={resumeTemporal}
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('chip.shape')}</label>
+      <PropertySection id="chip-shape" title={t('chip.shape')} icon="shape">
         <SliderField
           label={t('chip.cornerRadius')}
           value={layer.cornerRadius}
@@ -135,10 +131,9 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
           onInteractionEnd={resumeTemporal}
           className="!mb-0"
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('chip.icon')}</label>
+      <PropertySection id="chip-icon" title={t('chip.icon')} icon="sparkles">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -224,7 +219,7 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
             />
           </>
         )}
-      </div>
+      </PropertySection>
 
       <IconPickerModal
         open={pickerOpen}

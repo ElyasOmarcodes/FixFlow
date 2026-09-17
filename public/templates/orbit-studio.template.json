@@ -1,11 +1,11 @@
 {
   "id": "tpl-orbit-studio",
-  "kind": "pixeldeck-template",
+  "kind": "fixflow-template",
   "schemaVersion": 1,
   "name": "Orbit · Studio",
   "description": "Midnight studio set: neon-gradient hero, a two-slide canvas panorama, feature cards, a tilted two-device showcase and a violet close. Brand Kit wired.",
   "category": "Graphics & Design",
-  "author": "PixelDeck",
+  "author": "FixFlow",
   "createdAt": "2026-01-01T00:00:00.000Z",
   "settings": {
     "defaultSlideWidth": 1320,

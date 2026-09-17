@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "PixelDeck",
+  "productName": "FixFlow",
   "version": "../package.json",
-  "identifier": "com.pixeldeck.app",
+  "identifier": "com.fixflow.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "PixelDeck",
+        "title": "FixFlow",
         "width": 1440,
         "height": 900,
         "minWidth": 360,
@@ -45,7 +45,7 @@
     "category": "GraphicsAndDesign",
     "shortDescription": "App Store screenshot designer",
     "longDescription": "Design App Store and Play Store screenshots on a layer-based canvas, then export PNGs for every screen, locale and device size. Runs entirely offline.",
-    "copyright": "MIT \u00a9 PixelDeck contributors",
+    "copyright": "MIT \u00a9 FixFlow contributors",
     "linux": {
       "deb": {
         "depends": [

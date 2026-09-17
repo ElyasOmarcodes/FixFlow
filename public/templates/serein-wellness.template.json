@@ -1,11 +1,11 @@
 {
   "id": "tpl-serein-wellness",
-  "kind": "pixeldeck-template",
+  "kind": "fixflow-template",
   "schemaVersion": 1,
   "name": "Serein · Wellness",
   "description": "Soft sage-and-sand wellness set: calm hero, a breathing panorama across two slides, habit cards, a progress showcase and a deep-green close.",
   "category": "Health & Fitness",
-  "author": "PixelDeck",
+  "author": "FixFlow",
   "createdAt": "2026-01-01T00:00:00.000Z",
   "settings": {
     "defaultSlideWidth": 1320,

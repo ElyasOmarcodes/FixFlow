@@ -19,12 +19,11 @@ import type {
 } from '@/types'
 import { ColorField, FillControl, SliderField } from '@/components/properties/PropertyControls'
 import { OverrideDot } from '@/components/properties/OverrideDot'
+import { PropertySection } from '@/components/properties/PropertySection'
 import { DEFAULT_TEXT_WIDTH } from '@/utils/textRendering'
 import {
   inputCls,
   labelCls,
-  rowCls,
-  fieldCls,
   panelSectionCls,
   pauseTemporal,
   resumeTemporal,
@@ -129,20 +128,25 @@ function AlignmentSection({
     'bottom':   <svg viewBox="0 0 16 16" className="w-4 h-4" fill="currentColor"><rect x="2" y="13" width="12" height="2" rx="0.5"/><rect x="4" y="4" width="3" height="8" rx="0.5"/><rect x="9" y="1" width="3" height="11" rx="0.5"/></svg>,
   }
 
+  // Two different jobs behind the same six buttons: with one layer selected
+  // they align it to the slide, with several they align those to each other.
+  // The tooltip has to say which, or the buttons are a coin toss.
   const titles: Record<AlignAxis, string> = {
-    'left':     isMulti ? 'Align left edges' : 'Align to slide left',
-    'center-h': isMulti ? 'Center horizontally' : 'Center on slide (H)',
-    'right':    isMulti ? 'Align right edges' : 'Align to slide right',
-    'top':      isMulti ? 'Align top edges' : 'Align to slide top',
-    'center-v': isMulti ? 'Center vertically' : 'Center on slide (V)',
-    'bottom':   isMulti ? 'Align bottom edges' : 'Align to slide bottom',
+    'left':     isMulti ? t('align.left') : t('align.slideLeft'),
+    'center-h': isMulti ? t('align.centerH') : t('align.slideCenterH'),
+    'right':    isMulti ? t('align.right') : t('align.slideRight'),
+    'top':      isMulti ? t('align.top') : t('align.slideTop'),
+    'center-v': isMulti ? t('align.centerV') : t('align.slideCenterV'),
+    'bottom':   isMulti ? t('align.bottom') : t('align.slideBottom'),
   }
 
   return (
-    <div className={panelSectionCls}>
-      <label className={labelCls}>
-        {isMulti ? `${t('props.alignToSlide')} (${selectedLayerIds.length})` : t('props.alignToSlide')}
-      </label>
+    <PropertySection
+      id="align"
+      icon="align-center"
+      title={isMulti ? t('align.multi', { count: selectedLayerIds.length }) : t('props.alignToSlide')}
+      hint={isMulti ? t('align.multiHint') : undefined}
+    >
       <div className="grid grid-cols-6 gap-1">
         {(['left', 'center-h', 'right', 'top', 'center-v', 'bottom'] as AlignAxis[]).map((axis) => (
           <button
@@ -156,10 +160,7 @@ function AlignmentSection({
           </button>
         ))}
       </div>
-      {isMulti && (
-        <p className="mt-1.5 text-[10px] text-[var(--pd-c-6b6b7a)]">Aligns selected layers to each other</p>
-      )}
-    </div>
+    </PropertySection>
   )
 }
 
@@ -219,9 +220,9 @@ function LayoutTab({ layer }: { layer: Layer }) {
     ?? getProjectActiveFormats(project)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Name + visibility/lock */}
-      <div className={panelSectionCls}>
+      <PropertySection id="layer" title={t('props.secLayer')} icon="layers">
         <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
             <label className={labelCls}>{t('props.name')}</label>
@@ -261,12 +262,11 @@ function LayoutTab({ layer }: { layer: Layer }) {
             </div>
           )}
         </div>
-      </div>
+      </PropertySection>
 
       {/* Platform visibility — only shown when multiple formats are active and layer is not format-owned */}
       {!isBackground && activeFormats.length > 1 && !rawLayer?.ownerFormat && (
-        <div className={panelSectionCls}>
-          <label className={labelCls}>{t('props.visibleIn')}</label>
+        <PropertySection id="formats" title={t('props.secFormats')} icon="grid" hint={t('props.secFormatsHint')}>
           <div className="flex flex-wrap gap-1.5">
             {activeFormats.map((fmtId) => {
               const vis = rawLayer?.formatVisibility?.[fmtId]
@@ -288,12 +288,11 @@ function LayoutTab({ layer }: { layer: Layer }) {
               )
             })}
           </div>
-          <p className="mt-1.5 text-[10px] text-[var(--pd-c-6b6b7a)]">Click to hide/show this layer in a format</p>
-        </div>
+        </PropertySection>
       )}
 
       {/* Position / Size / Rotation — not applicable for background */}
-      <div className={panelSectionCls}>
+      <PropertySection id="transform" title={isBackground ? t('props.opacity') : t('props.secTransform')} icon="maximize">
         {!isBackground && (
           <>
             <SliderField label={t('props.x')} value={layer.x} min={xMin} max={xMax} unit="px" onChange={(v) => upd({ x: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} labelAddon={<OverrideDot layerId={layer.id} propKey="x" />} />
@@ -312,7 +311,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
                     <label className={labelCls + ' !mb-0'}>{t('props.height')}</label>
                     <button
                       type="button"
-                      title={(layer as TextLayer).height != null ? 'Switch to automatic height (box grows with content)' : 'Box height is automatic'}
+                      title={(layer as TextLayer).height != null ? t('props.autoHeightOff') : t('props.autoHeightOn')}
                       onClick={() => upd({ height: undefined } as Partial<Layer>)}
                       className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
                         (layer as TextLayer).height == null
@@ -336,7 +335,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
           </>
         )}
         <SliderField label={t('props.opacity')} value={Math.round(layer.opacity * 100)} min={0} max={100} unit="%" onChange={(v) => upd({ opacity: v / 100 })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
-      </div>
+      </PropertySection>
 
       {/* Alignment — all non-background layers */}
       {!isBackground && (
@@ -354,6 +353,7 @@ function LayoutTab({ layer }: { layer: Layer }) {
 // ─── Style Tab ────────────────────────────────────────────────────────────────
 
 function StyleTab({ layer }: { layer: Layer }) {
+  const t = useT()
   const updateLayer = useEditorStore((s) => s.updateLayer)
   const upd = (patch: Partial<Layer>) => updateLayer(layer.id, patch)
 
@@ -366,11 +366,10 @@ function StyleTab({ layer }: { layer: Layer }) {
     : null
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Fill — background, text, shape */}
       {fillValue !== null && (
-        <div className={panelSectionCls}>
-          <label className={labelCls}>Fill</label>
+        <PropertySection id="fill" title={t('props.secFill')} icon="palette">
           {/* key=layer.id resets editor state (selected stop, drag) when switching layers */}
           <FillControl
             key={layer.id}
@@ -379,42 +378,40 @@ function StyleTab({ layer }: { layer: Layer }) {
             onInteractionStart={pauseTemporal}
             onInteractionEnd={resumeTemporal}
           />
-        </div>
+        </PropertySection>
       )}
 
       {/* Shape: stroke */}
       {layer.type === 'shape' && (
-        <div className={panelSectionCls}>
-          <div className={rowCls + ' !mb-0'}>
-            <div className={fieldCls}>
-              <label className={labelCls}>Stroke</label>
-              <ColorField value={(layer as ShapeLayer).stroke ?? '#FFFFFF'} onChange={(value) => upd({ stroke: value } as Partial<Layer>)} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
-            </div>
-            <div className={fieldCls}>
-              <SliderField label="Width" value={(layer as ShapeLayer).strokeWidth ?? 0} min={0} max={50} unit="px" onChange={(v) => upd({ strokeWidth: v } as Partial<Layer>)} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
-            </div>
-          </div>
-        </div>
+        <PropertySection id="stroke" title={t('props.secStroke')} icon="pencil">
+          <label className={labelCls}>{t('props.stroke')}</label>
+          <ColorField value={(layer as ShapeLayer).stroke ?? '#FFFFFF'} onChange={(value) => upd({ stroke: value } as Partial<Layer>)} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
+          <SliderField label={t('props.strokeWidth')} value={(layer as ShapeLayer).strokeWidth ?? 0} min={0} max={50} unit="px" onChange={(v) => upd({ strokeWidth: v } as Partial<Layer>)} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0 mt-3" />
+        </PropertySection>
       )}
 
       {/* Blur + Shadow — all layers */}
-      <div className={panelSectionCls}>
-        <SliderField label="Blur" value={layer.blur ?? 0} min={0} max={100} unit="px" onChange={(v) => upd({ blur: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
+      <PropertySection id="effects" title={t('props.secEffects')} icon="sparkles">
+        <SliderField label={t('props.blur')} value={layer.blur ?? 0} min={0} max={100} unit="px" onChange={(v) => upd({ blur: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
         <ShadowControls layer={layer} />
-      </div>
+      </PropertySection>
     </div>
   )
 }
 
 // ─── Content Tab (per-type router) ────────────────────────────────────────────
 
-function ContentTab({ layer }: { layer: Layer }) {
-  if (layer.type === 'background') return (
-    <div className={panelSectionCls}>
-      <p className="text-sm text-[var(--pd-c-e8e8f0)]">Background</p>
-      <p className="mt-1 text-xs text-[var(--pd-c-6b6b7a)]">The background layer is always at the bottom. Edit its fill, presets, and accent bubbles in the Style tab.</p>
-    </div>
+function BackgroundBlurb() {
+  const t = useT()
+  return (
+    <PropertySection id="background-note" title={t('props.secBackground')} icon="image">
+      <p className="pd-prop-hint !mb-0">{t('props.backgroundHint')}</p>
+    </PropertySection>
   )
+}
+
+function ContentTab({ layer }: { layer: Layer }) {
+  if (layer.type === 'background') return <BackgroundBlurb />
   if (layer.type === 'phone') return <PhoneProperties layer={layer as PhoneLayer} />
   if (layer.type === 'text') return <TextProperties layer={layer as TextLayer} />
   if (layer.type === 'image') return <ImageProperties layer={layer as ImageLayer} />
@@ -608,9 +605,13 @@ export function PropertiesPanel() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-3" onFocusCapture={handlePanelFocus} onBlurCapture={handlePanelBlur}>
+      <div className="flex-1 space-y-3 overflow-y-auto px-3 py-3" onFocusCapture={handlePanelFocus} onBlurCapture={handlePanelBlur}>
         {!selectedLayer ? (
-          null
+          <div className="pd-prop-empty">
+            <Icon name="layers" size={22} />
+            <strong className="text-xs uppercase tracking-[0.08em]">{t('props.nothingSelected')}</strong>
+            <p>{t('props.nothingSelectedHint')}</p>
+          </div>
         ) : (
           <>
             {editingGroupId && selection?.layerId && (
@@ -624,13 +625,13 @@ export function PropertiesPanel() {
               <div className="mb-3 rounded-lg border border-[var(--pd-accent-soft)] bg-[rgba(124,110,246,0.08)] px-3 py-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-[var(--pd-c-c4b5fd)]">
-                    Only in {activeFormatInfo.label} · Added specifically for this format
+                    {t('props.onlyIn', { format: activeFormatInfo.label })}
                   </span>
                   <button
                     onClick={() => makeLayerShared(rawSelectedLayer!.id)}
                     className="text-[10px] text-[var(--pd-c-c4b5fd)] hover:text-[var(--pd-c-f0eff8)] underline shrink-0"
                   >
-                    Make shared
+                    {t('props.makeShared')}
                   </button>
                 </div>
               </div>
@@ -640,11 +641,14 @@ export function PropertiesPanel() {
               <div className="mb-3 rounded-lg border border-[rgba(245,158,11,0.25)] bg-[rgba(245,158,11,0.06)] px-3 py-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-[var(--pd-warn)]">
-                    {Object.keys(rawSelectedLayer.formatOverrides?.[activeCanvasFormat] ?? {}).length} layout adjustments for {activeFormatInfo.label}
+                    {t('props.formatOverrides', {
+                      count: Object.keys(rawSelectedLayer.formatOverrides?.[activeCanvasFormat] ?? {}).length,
+                      format: activeFormatInfo.label,
+                    })}
                   </span>
                   <div className="flex gap-1.5">
-                    <button onClick={() => clearLayerFormatOverride(rawSelectedLayer!.id)} className="text-[10px] text-[var(--pd-warn)] hover:text-[var(--pd-c-f0eff8)] underline">Reset</button>
-                    <button onClick={() => syncLayerFormatToShared(rawSelectedLayer!.id)} className="text-[10px] text-[var(--pd-warn)] hover:text-[var(--pd-c-f0eff8)] underline">Share</button>
+                    <button onClick={() => clearLayerFormatOverride(rawSelectedLayer!.id)} className="text-[10px] text-[var(--pd-warn)] hover:text-[var(--pd-c-f0eff8)] underline">{t('common.reset')}</button>
+                    <button onClick={() => syncLayerFormatToShared(rawSelectedLayer!.id)} className="text-[10px] text-[var(--pd-warn)] hover:text-[var(--pd-c-f0eff8)] underline">{t('props.share')}</button>
                   </div>
                 </div>
               </div>
@@ -660,24 +664,25 @@ export function PropertiesPanel() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px]" style={{ color: isBaseFormat ? '#9d90f8' : '#22d3ee' }}>
-                    {localeAdjustCount} locale layout adjustment{localeAdjustCount !== 1 ? 's' : ''} for {activeLocaleLabel} · {isBaseFormat ? 'Base (applies on top of every format, including ones with their own overrides)' : activeFormatInfo.label}
+                    {isBaseFormat
+                      ? t('props.localeAdjustBase', { count: localeAdjustCount, locale: activeLocaleLabel })
+                      : t('props.localeAdjustFormat', { count: localeAdjustCount, locale: activeLocaleLabel, format: activeFormatInfo.label })}
                   </span>
                   <button
                     onClick={() => clearLayerLocaleAdjust(rawSelectedLayer!.id, activeLocale, activeCanvasFormat)}
                     className="shrink-0 text-[10px] underline hover:text-[var(--pd-c-f0eff8)]"
                     style={{ color: isBaseFormat ? '#9d90f8' : '#22d3ee' }}
                   >
-                    Reset
+                    {t('common.reset')}
                   </button>
                 </div>
               </div>
             )}
 
             {isBackgroundSelected ? (
-              <div className={panelSectionCls}>
-                <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--pd-c-6b6b7a)]">Background</div>
+              <PropertySection id="background" title={t('props.secBackground')} icon="image">
                 <BackgroundProperties layer={selectedLayer as BackgroundLayer} />
-              </div>
+              </PropertySection>
             ) : (
               <>
                 {activeTab === 'layout' && <LayoutTab layer={selectedLayer} />}

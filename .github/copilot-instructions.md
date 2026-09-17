@@ -1,6 +1,6 @@
 # AI IDE Instructions
 
-PixelDeck is a React + TypeScript visual editor for designing App Store and Play Store screenshot layouts. It uses Konva/react-konva for the canvas, Zustand/zundo for editor state and undo, a separate asset store, Vite for the GUI, and Playwright for headless CLI PNG export.
+FixFlow is a React + TypeScript visual editor for designing App Store and Play Store screenshot layouts. It uses Konva/react-konva for the canvas, Zustand/zundo for editor state and undo, a separate asset store, Vite for the GUI, and Playwright for headless CLI PNG export.
 
 Read [`AGENTS.md`](../AGENTS.md) first before making changes. It is the canonical AI navigation guide for file locations, layer patterns, store API, export behavior, and hard-won decisions.
 

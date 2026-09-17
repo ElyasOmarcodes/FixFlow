@@ -1,10 +1,10 @@
 [package]
-name = "pixeldeck"
+name = "fixflow"
 version = "0.0.0" # real version comes from ../package.json via tauri.conf.json
 description = "Visual editor for App Store & Play Store screenshots"
-authors = ["PixelDeck contributors"]
+authors = ["FixFlow contributors"]
 license = "MIT"
-repository = "https://github.com/Pr0xS/PixelDeck"
+repository = "https://github.com/ElyasOmarcodes/FixFlow"
 edition = "2021"
 rust-version = "1.77.2"
 

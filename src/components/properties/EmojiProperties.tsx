@@ -1,7 +1,9 @@
 import { useEditorStore } from '@/store'
 import type { EmojiLayer, Layer } from '@/types'
 import { SliderField } from '@/components/properties/PropertyControls'
-import { labelCls, panelSectionCls, pauseTemporal, resumeTemporal } from '@/components/properties/panelConstants'
+import { pauseTemporal, resumeTemporal } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
+import { useT } from '@/i18n'
 
 // Common emoji categories for quick picking
 const EMOJI_CATEGORIES = [
@@ -14,26 +16,26 @@ const EMOJI_CATEGORIES = [
 ]
 
 export function EmojiProperties({ layer }: { layer: EmojiLayer }) {
+  const t = useT()
   const updateLayer = useEditorStore((s) => s.updateLayer)
   const upd = (patch: Partial<EmojiLayer>) => updateLayer(layer.id, patch as Partial<Layer>)
 
   return (
-    <div className="space-y-4">
-      <div className={panelSectionCls}>
-        <label className={labelCls}>Emoji</label>
+    <div className="space-y-3">
+      <PropertySection id="emoji-glyph" title={t('emoji.title')} icon="emoji">
         <input
           type="text"
           value={layer.emoji}
           onChange={(e) => upd({ emoji: e.target.value })}
           className="w-full rounded-lg border border-[var(--pd-line)] bg-[var(--pd-fill-soft)] px-3 py-2 text-2xl text-center text-[var(--pd-c-e8e8f0)] outline-none focus:border-[var(--pd-c-7c6ef6)] transition-colors"
-          placeholder="Type or paste an emoji"
+          placeholder={t('emoji.placeholder')}
           maxLength={8}
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
+      <PropertySection id="emoji-size" title={t('props.secSize')} icon="maximize">
         <SliderField
-          label="Size"
+          label={t('emoji.size')}
           value={layer.fontSize}
           min={10}
           max={500}
@@ -43,11 +45,10 @@ export function EmojiProperties({ layer }: { layer: EmojiLayer }) {
           onInteractionEnd={resumeTemporal}
           className="!mb-0"
         />
-      </div>
+      </PropertySection>
 
       {EMOJI_CATEGORIES.map((cat) => (
-        <div key={cat.label} className={panelSectionCls}>
-          <label className={labelCls}>{cat.label}</label>
+        <PropertySection key={cat.label} id={`emoji-${cat.label}`} title={cat.label} icon="emoji" defaultCollapsed>
           <div className="grid grid-cols-8 gap-1">
             {cat.emojis.map((emoji) => (
               <button
@@ -61,7 +62,7 @@ export function EmojiProperties({ layer }: { layer: EmojiLayer }) {
               </button>
             ))}
           </div>
-        </div>
+        </PropertySection>
       ))}
     </div>
   )

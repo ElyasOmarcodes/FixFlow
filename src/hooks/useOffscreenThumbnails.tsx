@@ -84,7 +84,7 @@ export function useOffscreenThumbnails(options: {
         if (!stage || cancelled || abortRef.current) return
         await nextFrame()
         await nextFrame()
-        const timingLabel = `[PixelDeck] offscreen thumbnail ${currentRequest.groupId}`
+        const timingLabel = `[FixFlow] offscreen thumbnail ${currentRequest.groupId}`
         console.time(timingLabel)
         try {
           const settled = await waitForStageCaptureReady(stage, { quietFrames: 2, timeoutMs: 4000 })

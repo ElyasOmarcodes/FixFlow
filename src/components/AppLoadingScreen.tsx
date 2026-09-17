@@ -22,7 +22,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
     <div
       role="status"
       aria-live="polite"
-      aria-label="Loading PixelDeck"
+      aria-label="Loading FixFlow"
       className={`fixed inset-0 z-[var(--pd-z-splash)] flex items-center justify-center overflow-hidden bg-[var(--pd-c-0f0f13)] transition-opacity duration-200 ease-out ${
         visible ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
@@ -41,7 +41,7 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
       />
 
       <div className="relative flex -translate-y-2 flex-col items-center">
-        <div className="pixeldeck-loader-enter flex items-center gap-3.5">
+        <div className="fixflow-loader-enter flex items-center gap-3.5">
           <svg
             width="40"
             height="40"
@@ -52,38 +52,27 @@ export function AppLoadingScreen({ visible }: AppLoadingScreenProps) {
             style={{ filter: 'drop-shadow(0 14px 32px rgba(0,0,0,0.4)) drop-shadow(0 0 24px rgba(124,110,246,0.25))' }}
           >
             <defs>
-              <linearGradient id="pd-loader-left" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#b49eff" />
-                <stop offset="100%" stopColor="#7c3aed" />
-              </linearGradient>
-              <linearGradient id="pd-loader-right" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#9d6ef6" />
-                <stop offset="100%" stopColor="#ec4899" />
+              <linearGradient id="ff-loader-mark" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#8B7CFF" />
+                <stop offset="55%" stopColor="#7C6EF6" />
+                <stop offset="100%" stopColor="#EC4899" />
               </linearGradient>
             </defs>
-
-            {/* Left card — purple */}
-            <rect x="2" y="3" width="13" height="26" rx="3" fill="url(#pd-loader-left)" />
-            <rect x="4.5" y="9" width="8" height="1.5" rx="0.75" fill="white" fillOpacity="0.6" />
-            <rect x="4.5" y="12" width="5.5" height="1.5" rx="0.75" fill="white" fillOpacity="0.35" />
-            <rect x="4.5" y="16" width="8" height="8" rx="1.5" fill="white" fillOpacity="0.15" />
-
-            {/* Right card — violet → pink */}
-            <rect x="17" y="3" width="13" height="26" rx="3" fill="url(#pd-loader-right)" />
-            <rect x="19.5" y="9" width="8" height="1.5" rx="0.75" fill="white" fillOpacity="0.6" />
-            <rect x="19.5" y="12" width="6" height="1.5" rx="0.75" fill="white" fillOpacity="0.35" />
-            <rect x="19.5" y="16" width="8" height="8" rx="1.5" fill="white" fillOpacity="0.15" />
+            <rect width="32" height="32" rx="7" fill="url(#ff-loader-mark)" />
+            <g transform="translate(3.5, 28.5) scale(0.026042)" fill="#ffffff">
+              <path d="M440-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240v720Zm80-400v-320h240q33 0 56.5 23.5T840-760v240H520Zm0 400v-320h320v240q0 33-23.5 56.5T760-120H520Z" />
+            </g>
           </svg>
           <span className="text-[24px] font-semibold tracking-[-0.045em] text-[var(--pd-c-f0eff8)]">
-            Pixel<span className="text-[var(--pd-c-9b8fff)]">Deck</span>
+            Fix<span className="text-[var(--pd-c-9b8fff)]">Flow</span>
           </span>
         </div>
 
-        <div className="pixeldeck-loader-enter pixeldeck-loader-enter-delay mt-7 flex w-full flex-col items-center gap-[13px]">
-          <div className="pixeldeck-loader-words" aria-hidden="true">
-            <span className="pixeldeck-loader-label">loading</span>
-            <span className="pixeldeck-loader-window">
-              <span className="pixeldeck-loader-word-track">
+        <div className="fixflow-loader-enter fixflow-loader-enter-delay mt-7 flex w-full flex-col items-center gap-[13px]">
+          <div className="fixflow-loader-words" aria-hidden="true">
+            <span className="fixflow-loader-label">loading</span>
+            <span className="fixflow-loader-window">
+              <span className="fixflow-loader-word-track">
                 <span>assets</span>
                 <span>layouts</span>
                 <span>slides</span>

@@ -15,10 +15,10 @@ import { useT } from '@/i18n'
 import {
   inputCls,
   labelCls,
-  panelSectionCls,
   pauseTemporal,
   resumeTemporal,
 } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
 
 // ─── Locale Screenshot Row ────────────────────────────────────────────────────
 
@@ -117,8 +117,8 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
   const hasStatusBar = getPhoneSpec(layer.model).statusBar.height > 0
 
   return (
-    <div className="space-y-4">
-      <div className={panelSectionCls}>
+    <div className="space-y-3">
+      <PropertySection id="phone-model" title={t('phone.model')} icon="phone">
         <div className="flex items-center mb-1">
           <label className={labelCls + ' !mb-0'}>{t('phone.model')}</label>
           <OverrideDot layerId={layer.id} propKey="model" />
@@ -144,7 +144,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
             <option key={m.id} value={m.id}>{m.label}</option>
           ))}
         </select>
-      </div>
+      </PropertySection>
 
       {/* Position presets */}
       {(() => {
@@ -165,8 +165,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
         ]
 
         return (
-          <div className={panelSectionCls}>
-            <label className={labelCls}>{t('phone.composition')}</label>
+          <PropertySection id="phone-composition" title={t('phone.composition')} icon="layers">
             <div className="grid grid-cols-5 gap-1">
               {presets.map((preset) => (
                 <button
@@ -180,12 +179,12 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
                 </button>
               ))}
             </div>
-          </div>
+          </PropertySection>
         )
       })()}
 
       {hasStatusBar && (
-        <div className={panelSectionCls}>
+        <PropertySection id="phone-statusbar" title={t('phone.statusBar')} icon="phone">
           {/* Status bar toggle */}
           <div className="mb-3 flex items-center justify-between">
             <label className={labelCls + ' !mb-0'}>{t('phone.statusBar')}</label>
@@ -242,19 +241,18 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
               </div>
             </div>
           )}
-        </div>
+        </PropertySection>
       )}
 
-      <div className={panelSectionCls}>
+      <PropertySection id="phone-scale" title={t('phone.scale')} icon="maximize">
         <div className="mb-1 flex items-center justify-between">
           <label className={labelCls + ' !mb-0'}>{t('phone.scale')}</label>
           <span className="text-xs text-[var(--pd-c-e8e8f0)]">{layer.scale.toFixed(2)}×</span>
         </div>
         <input type="range" min={0.5} max={4} step={0.05} value={layer.scale} onChange={(e) => upd({ scale: Number(e.target.value) })} onMouseDown={pauseTemporal} onMouseUp={resumeTemporal} className="w-full accent-[var(--pd-c-7c6ef6)]" />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('phone.screenshot')}</label>
+      <PropertySection id="phone-screenshot" title={t('phone.screenshot')} icon="image">
         <FileUploadButton
           ref={screenshotInputRef}
           variant="dropzone"
@@ -270,10 +268,9 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
           {previewSrc ? <img src={previewSrc} alt="Screenshot" className="mx-auto max-h-24 rounded-lg object-contain" /> : <span className="text-xs text-[var(--pd-c-6b6b7a)]">{t('phone.screenshotDropzone')}</span>}
         </FileUploadButton>
         {screenshotLabel && <p className="mt-2 truncate text-[10px] text-[var(--pd-c-6b6b7a)]">{screenshotLabel}</p>}
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('phone.fit')}</label>
+      <PropertySection id="phone-fit" title={t('phone.fit')} icon="maximize">
         <SegmentedControl
           value={layer.screenshotFit}
           options={([
@@ -283,17 +280,16 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
           ] as const).map(([fit, label]) => ({ value: fit, label }))}
           onChange={(fit) => upd({ screenshotFit: fit })}
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <SliderField label="Offset X" value={layer.screenshotOffsetX} min={-500} max={500} unit="px" onChange={(v) => upd({ screenshotOffsetX: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
-        <SliderField label="Offset Y" value={layer.screenshotOffsetY} min={-500} max={500} unit="px" onChange={(v) => upd({ screenshotOffsetY: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
-      </div>
+      <PropertySection id="phone-offset" title={t('phone.offset')} icon="maximize">
+        <SliderField label={t('phone.offsetX')} value={layer.screenshotOffsetX} min={-500} max={500} unit="px" onChange={(v) => upd({ screenshotOffsetX: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} />
+        <SliderField label={t('phone.offsetY')} value={layer.screenshotOffsetY} min={-500} max={500} unit="px" onChange={(v) => upd({ screenshotOffsetY: v })} onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
+      </PropertySection>
 
       {/* Screenshot border */}
-      <div className={panelSectionCls}>
-        <div className="mb-3 flex items-center justify-between">
-          <label className={labelCls + ' !mb-0'}>Border</label>
+      <PropertySection id="phone-border" title={t('phone.border')} icon="shape">
+        <div className="mb-3 flex items-center justify-end">
           <ToggleSwitch
             checked={Boolean(layer.border)}
             onChange={(checked) => upd({ border: checked ? { color: '#FFFFFF', width: 2, opacity: 0.5 } : undefined })}
@@ -316,7 +312,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
               onInteractionStart={pauseTemporal} onInteractionEnd={resumeTemporal} className="!mb-0" />
           </div>
         )}
-      </div>
+      </PropertySection>
 
       {/* Per-locale screenshots */}
       {(() => {
@@ -324,8 +320,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
         const nonDefaultLocales = locales.filter((l) => l !== project.settings.defaultLocale)
         if (nonDefaultLocales.length === 0) return null
         return (
-          <div className={panelSectionCls}>
-            <label className={labelCls}>Localized Screenshots</label>
+          <PropertySection id="phone-localized" title={t('phone.localized')} icon="languages">
             <div className="space-y-2">
               {nonDefaultLocales.map((locale) => {
                 const override = layer.localeContent?.[locale]
@@ -346,7 +341,7 @@ export function PhoneProperties({ layer }: { layer: PhoneLayer }) {
                 )
               })}
             </div>
-          </div>
+          </PropertySection>
         )
       })()}
     </div>

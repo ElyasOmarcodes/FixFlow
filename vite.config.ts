@@ -5,8 +5,8 @@ import path from 'path'
 import { execSync } from 'child_process'
 import { createRequire } from 'module'
 
-// GitHub Pages deploys to /PixelDeck/ — set GITHUB_PAGES=true in the deploy workflow.
-const base = process.env.GITHUB_PAGES === 'true' ? '/PixelDeck/' : '/'
+// GitHub Pages deploys to /FixFlow/ — set GITHUB_PAGES=true in the deploy workflow.
+const base = process.env.GITHUB_PAGES === 'true' ? '/FixFlow/' : '/'
 
 const require = createRequire(import.meta.url)
 const pkg = require('./package.json') as { version: string }

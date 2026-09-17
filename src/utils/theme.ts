@@ -12,6 +12,9 @@
 export type ThemePreference = 'light' | 'dark' | 'system'
 export type ResolvedTheme = 'light' | 'dark'
 
+// Still `pixeldeck`: the app was renamed, the data on people's machines was
+// not. Renaming a storage key does not migrate it — it reads a different,
+// empty one. See src/store/idb-storage.ts.
 const KEY = 'pixeldeck.theme'
 
 export function readThemePreference(): ThemePreference {

@@ -21,7 +21,7 @@ function readProjectList(): ProjectMeta[] {
   try {
     return JSON.parse(raw) as ProjectMeta[]
   } catch (err) {
-    console.warn('[PixelDeck] Project list is corrupt; using an empty list.', err)
+    console.warn('[FixFlow] Project list is corrupt; using an empty list.', err)
     return []
   }
 }
@@ -94,7 +94,7 @@ export const localStorageAdapter: ProjectStorageAdapter = {
         project.id === id ? { ...project, name, updatedAt: now } : project
       ))))
     } catch (err) {
-      console.warn('[PixelDeck] Project rename failed', err)
+      console.warn('[FixFlow] Project rename failed', err)
       throw err
     }
   },

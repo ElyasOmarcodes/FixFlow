@@ -44,6 +44,9 @@ export const useFontStore = create<FontStoreState>()(
       listFonts: () => Object.values(get().fonts),
     }),
     {
+      // Still `pixeldeck`: the app was renamed, the data on people's machines was
+      // not. Renaming a storage key does not migrate it — it reads a different,
+      // empty one. See src/store/idb-storage.ts.
       name: 'pixeldeck-fonts',
       storage: createJSONStorage(() => idbStorage),
     }

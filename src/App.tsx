@@ -273,7 +273,7 @@ export default function App() {
         } else if (e.key === '0') {
           // Ctrl+0: fit — delegate to canvas by resetting centering flag
           e.preventDefault()
-          window.dispatchEvent(new Event('pixeldeck:fit'))
+          window.dispatchEvent(new Event('fixflow:fit'))
         } else if (e.key === '1') {
           e.preventDefault()
           useEditorStore.getState().setZoom(1)

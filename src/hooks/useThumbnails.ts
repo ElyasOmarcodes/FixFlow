@@ -219,7 +219,7 @@ export function useThumbnails(stageRef: RefObject<Konva.Stage | null>, hasComple
       usePreviewCache.getState().invalidate(group.id)
       return true
     } catch (err) {
-      console.error('[PixelDeck] active-group thumbnail capture failed', err)
+      console.error('[FixFlow] active-group thumbnail capture failed', err)
       return false
     }
   }, [activeSlideGroupId, stageRef])
@@ -507,7 +507,7 @@ export function useThumbnails(stageRef: RefObject<Konva.Stage | null>, hasComple
           })
         } catch (err) {
           setPreviewProgress((progress) => ({ ...progress, status: 'error', currentGroupName: null }))
-          console.error('[PixelDeck] preview capture failed', err)
+          console.error('[FixFlow] preview capture failed', err)
         } finally {
           const currentState = useEditorStore.getState()
           if (shouldRestoreCapturedSlideGroup(currentState, {

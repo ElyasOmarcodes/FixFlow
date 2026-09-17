@@ -200,7 +200,7 @@ export function AssetsSection({ imageInputRef, selectedLayer, addImage, updateLa
 
   const handleAssetDragStart = (event: React.DragEvent, filename: string) => {
     event.dataTransfer.effectAllowed = 'copy'
-    event.dataTransfer.setData('application/x-pixeldeck-asset', filename)
+    event.dataTransfer.setData('application/x-fixflow-asset', filename)
     event.dataTransfer.setData('text/plain', filename)
   }
 

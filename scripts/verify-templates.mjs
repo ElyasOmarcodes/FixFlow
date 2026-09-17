@@ -38,9 +38,9 @@ try {
     page.on('pageerror', (error) => errors.push(error.message))
     await page.goto('http://127.0.0.1:4175')
 
-    await expect(page.getByRole('dialog', { name: 'PixelDeck', exact: true })).toBeVisible({ timeout: 15000 })
+    await expect(page.getByRole('dialog', { name: 'FixFlow', exact: true })).toBeVisible({ timeout: 15000 })
     await page.locator('.pd-start-template', { hasText: entry.name }).first().click()
-    await expect(page.getByRole('dialog', { name: 'PixelDeck', exact: true })).toBeHidden({ timeout: 20000 })
+    await expect(page.getByRole('dialog', { name: 'FixFlow', exact: true })).toBeHidden({ timeout: 20000 })
     await page.waitForTimeout(2500)
 
     // Walk the slide strip, screenshotting the canvas for each slide group.

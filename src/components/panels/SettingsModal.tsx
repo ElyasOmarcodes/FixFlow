@@ -225,7 +225,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
           <span className="text-[var(--pd-c-3a3a4a)]">·</span>
           <span className="text-[11px] text-[var(--pd-c-4a4a5a)] font-mono select-all" title="Git commit hash">{__GIT_HASH__}</span>
           <span className="flex-1" />
-          <a href="https://github.com/ElyasOmarhs/PixelDeck" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[var(--pd-c-4a4a5a)] hover:text-[var(--pd-c-7c6ef6)] transition-colors">github.com/ElyasOmarhs/PixelDeck</a>
+          <a href="https://github.com/ElyasOmarhs/FixFlow" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[var(--pd-c-4a4a5a)] hover:text-[var(--pd-c-7c6ef6)] transition-colors">github.com/ElyasOmarhs/FixFlow</a>
         </>
       )}
     >

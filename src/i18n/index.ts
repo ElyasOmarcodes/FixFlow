@@ -35,6 +35,9 @@ export const UI_LANGUAGES: UiLanguageMeta[] = [
 
 const DICTIONARIES: Record<UiLanguage, Record<TranslationKey, string>> = { en, ps, fa }
 
+// Still `pixeldeck`: the app was renamed, the data on people's machines was
+// not. Renaming a storage key does not migrate it — it reads a different,
+// empty one. See src/store/idb-storage.ts.
 const STORAGE_KEY = 'pixeldeck.ui-language'
 
 export function getLanguageMeta(code: UiLanguage): UiLanguageMeta {

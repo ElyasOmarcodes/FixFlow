@@ -1,4 +1,4 @@
-# PixelDeck CLI
+# FixFlow CLI
 
 Batch-export App Store screenshots from the command line using a headless Playwright browser.
 

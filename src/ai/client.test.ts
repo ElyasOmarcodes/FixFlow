@@ -135,7 +135,7 @@ describe('chat', () => {
     await chat({ provider: 'openrouter', apiKey: 'sk-or-test', messages: [{ role: 'user', content: 'hi' }] })
     const headers = fetchMock.mock.calls[0][1].headers as Record<string, string>
     expect(headers['HTTP-Referer']).toBe('http://localhost:5173')
-    expect(headers['X-OpenRouter-Title']).toBe('PixelDeck')
+    expect(headers['X-OpenRouter-Title']).toBe('FixFlow')
   })
 
   it('posts custom requests to the provided base URL with only standard headers', async () => {

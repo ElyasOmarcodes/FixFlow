@@ -376,7 +376,7 @@ async function chatWithOpenAiCompatible(
   const finishReason = choice?.finish_reason
   if (typeof content !== 'string') throw new Error(`${provider} returned an empty response.`)
   if (!content.trim()) {
-    console.error(`[PixelDeck] ${provider} returned empty content. finish_reason=${finishReason}`, data)
+    console.error(`[FixFlow] ${provider} returned empty content. finish_reason=${finishReason}`, data)
     throw new Error(`${provider} returned empty content (finish_reason: ${finishReason ?? 'unknown'}).`)
   }
   return content.trim()

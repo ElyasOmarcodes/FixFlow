@@ -4,7 +4,7 @@
 
 ## What This Codebase Does
 
-PixelDeck is a React + TypeScript visual editor for designing App Store screenshot layouts. It has two runtime modes: an interactive GUI editor (Vite SPA), and a headless CLI export path (Playwright). Designs are stored as JSON `Project` documents and exported as PNGs.
+FixFlow is a React + TypeScript visual editor for designing App Store screenshot layouts. It has two runtime modes: an interactive GUI editor (Vite SPA), and a headless CLI export path (Playwright). Designs are stored as JSON `Project` documents and exported as PNGs.
 
 ---
 

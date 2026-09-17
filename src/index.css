@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════════════════════════════════════
-   PixelDeck stylesheet
+   FixFlow stylesheet
    ─────────────────────────────────────────────────────────────────────────
    Order matters; sections are additive and never re-open an earlier one:
 
@@ -624,12 +624,12 @@
 
 /* ─── App loading screen ──────────────────────────────────────────────── */
 
-@keyframes pixeldeck-loader-enter {
+@keyframes fixflow-loader-enter {
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pixeldeck-loader-words {
+@keyframes fixflow-loader-words {
   0%, 11% { transform: translateY(0); }
   16.667%, 27.667% { transform: translateY(-14.286%); }
   33.333%, 44.333% { transform: translateY(-28.571%); }
@@ -639,14 +639,14 @@
   100% { transform: translateY(-85.714%); }
 }
 
-.pixeldeck-loader-enter {
-  animation: pixeldeck-loader-enter 380ms var(--pd-ease-decel) both;
+.fixflow-loader-enter {
+  animation: fixflow-loader-enter 380ms var(--pd-ease-decel) both;
 }
 
-.pixeldeck-loader-enter-delay { animation-delay: 90ms; }
+.fixflow-loader-enter-delay { animation-delay: 90ms; }
 
-.pixeldeck-loader-words {
-  --pixeldeck-loader-bg: var(--pd-panel);
+.fixflow-loader-words {
+  --fixflow-loader-bg: var(--pd-panel);
   display: flex;
   align-items: center;
   height: 42px;
@@ -654,16 +654,16 @@
   overflow: hidden;
   border: 1px solid rgba(203,191,255,0.09);
   border-radius: 12px;
-  background: var(--pixeldeck-loader-bg);
+  background: var(--fixflow-loader-bg);
   box-shadow: 0 12px 34px rgba(0,0,0,0.22), 0 0 22px rgba(124,110,246,0.055);
   font-size: 14px;
   font-weight: 500;
   line-height: 24px;
 }
 
-.pixeldeck-loader-label { color: #7d7a90; }
+.fixflow-loader-label { color: #7d7a90; }
 
-.pixeldeck-loader-window {
+.fixflow-loader-window {
   position: relative;
   display: block;
   width: 90px;
@@ -671,31 +671,31 @@
   overflow: hidden;
 }
 
-.pixeldeck-loader-window::after {
+.fixflow-loader-window::after {
   position: absolute;
   z-index: 1;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    var(--pixeldeck-loader-bg) 0%,
+    var(--fixflow-loader-bg) 0%,
     transparent 28%,
     transparent 72%,
-    var(--pixeldeck-loader-bg) 100%
+    var(--fixflow-loader-bg) 100%
   );
   pointer-events: none;
   content: '';
 }
 
-.pixeldeck-loader-word-track {
+.fixflow-loader-word-track {
   display: flex;
   height: 168px;
   flex-direction: column;
   color: var(--pd-c-9b8fff);
-  animation: pixeldeck-loader-words 10s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  animation: fixflow-loader-words 10s cubic-bezier(0.65, 0, 0.35, 1) infinite;
   will-change: transform;
 }
 
-.pixeldeck-loader-word-track > span {
+.fixflow-loader-word-track > span {
   height: 24px;
   flex: 0 0 24px;
   padding-inline-start: 6px;
@@ -2027,6 +2027,88 @@
   color: var(--pd-c-c4b5fd);
 }
 
+/* ─── Property sections ───────────────────────────────────────────────────
+   Every group of controls says what it is and can be folded away. What this
+   replaces was a stack of identical unlabelled cards, where a blur slider and
+   a shadow toggle shared one anonymous box and nothing told you which control
+   belonged to which idea. */
+.pd-prop-section {
+  border: 1px solid var(--pd-line-subtle);
+  border-radius: 12px;
+  background: var(--pd-fill-subtle);
+  overflow: hidden;
+}
+
+.pd-prop-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 4px;
+}
+
+.pd-prop-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 6px;
+  color: var(--pd-c-b0b0c4);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: start;
+  transition: color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-prop-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-prop-title:hover { color: var(--pd-c-e8e8f0); }
+
+/* The caret points along the writing direction when collapsed, so it reads as
+   "opens this way" in Pashto and Persian too. */
+.pd-prop-caret { flex: 0 0 auto; }
+[dir='rtl'] .pd-prop-section[data-collapsed] .pd-prop-caret { transform: scaleX(-1); }
+
+.pd-prop-action { flex: 0 0 auto; }
+
+.pd-prop-body {
+  padding: 2px 12px 12px;
+}
+
+.pd-prop-hint {
+  margin: 0 0 8px;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-prop-pair {
+  display: flex;
+  gap: 10px;
+}
+
+.pd-prop-pair > * { flex: 1 1 0; min-width: 0; }
+
+/* Nothing selected: say so, rather than showing an empty sheet that looks
+   like the panel failed to load. */
+.pd-prop-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-prop-empty p { font-size: 12px; line-height: 1.6; max-width: 22em; }
+
 /* ─── Colour picker ───────────────────────────────────────────────────────
    Closed, it is one row: the colour, its name, a chevron. Open, it is the
    picker — a saturation field, a hue rail, the hex, and swatches behind three
@@ -2923,5 +3005,5 @@
     scroll-behavior: auto !important;
   }
 
-  .pixeldeck-loader-word-track { transform: translateY(0); }
+  .fixflow-loader-word-track { transform: translateY(0); }
 }

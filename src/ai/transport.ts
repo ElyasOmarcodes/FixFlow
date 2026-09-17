@@ -1,6 +1,6 @@
 import { chat, editImage } from '@/ai/client'
 import type { AiChatOptions, AiImageEditOptions } from '@/ai/client'
-import { getPixelDeckConfig } from '@/config'
+import { getFixFlowConfig } from '@/config'
 
 export interface AiTransport {
   chat(options: AiChatOptions): Promise<string>
@@ -10,7 +10,7 @@ export interface AiTransport {
 const directTransport: AiTransport = { chat, editImage }
 
 function resolveTransport(): AiTransport {
-  return getPixelDeckConfig().aiTransport ?? directTransport
+  return getFixFlowConfig().aiTransport ?? directTransport
 }
 
 export async function transportChat(options: AiChatOptions): Promise<string> {

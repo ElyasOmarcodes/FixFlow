@@ -152,7 +152,7 @@ export async function waitForStageSettled(
       name: node.name?.(),
       className: node.getClassName?.(),
     }))
-  console.warn('[PixelDeck] stage did not settle before capture timeout — capturing anyway', {
+  console.warn('[FixFlow] stage did not settle before capture timeout — capturing anyway', {
     totalImages: images.length,
     ...classification,
     unsettled,

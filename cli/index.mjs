@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * PixelDeck CLI
+ * FixFlow CLI
  * 
  * Usage:
- *   pixeldeck export --project=<path> --screenshots=<dir> --output=<dir>
- *   pixeldeck export --config=<batch.yaml>
- *   pixeldeck serve  # serve dist/ for development
+ *   fixflow export --project=<path> --screenshots=<dir> --output=<dir>
+ *   fixflow export --config=<batch.yaml>
+ *   fixflow serve  # serve dist/ for development
  */
 function parseArgs(rawArgs) {
   const opts = {}
@@ -56,7 +56,7 @@ async function main() {
 
 function printHelp() {
   console.log(`
-PixelDeck CLI
+FixFlow CLI
 
 Commands:
   export          Export a project to PNG files
@@ -96,6 +96,6 @@ try {
 } catch (error) {
   const verbose = process.argv.includes('--verbose') || Boolean(process.env.DEBUG)
   const message = error instanceof Error ? error.message : String(error)
-  console.error(`[PixelDeck CLI] ${verbose && error instanceof Error ? error.stack ?? message : message}`)
+  console.error(`[FixFlow CLI] ${verbose && error instanceof Error ? error.stack ?? message : message}`)
   process.exitCode = 1
 }

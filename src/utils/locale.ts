@@ -1,5 +1,5 @@
 /**
- * locale.ts — Localization utilities for PixelDeck
+ * locale.ts — Localization utilities for FixFlow
  *
  * The core resolver is applyLocaleToGroup(group, locale, defaultLocale).
  * It deep-walks one group's layers and merges localeContent[locale] into each

@@ -1,4 +1,4 @@
-// ─── Curated Google Fonts for PixelDeck ──────────────────────────────────────
+// ─── Curated Google Fonts for FixFlow ──────────────────────────────────────
 
 /** Writing system a face is designed for. Absent means Latin. */
 export type FontScript = 'latin' | 'arabic'
@@ -207,7 +207,7 @@ export async function ensureFontReady(family: string, weight: number = 400): Pro
  * Call once on app startup.
  */
 export function loadGoogleFonts(): void {
-  if (document.getElementById('gf-pixeldeck')) return
+  if (document.getElementById('gf-fixflow')) return
 
   // Build families param — include italic axis where available
   const italicFamilies = new Set([
@@ -234,7 +234,7 @@ export function loadGoogleFonts(): void {
   }).join('&')
 
   const link = document.createElement('link')
-  link.id = 'gf-pixeldeck'
+  link.id = 'gf-fixflow'
   link.rel = 'stylesheet'
   link.href = `https://fonts.googleapis.com/css2?${params}&display=swap`
   document.head.appendChild(link)

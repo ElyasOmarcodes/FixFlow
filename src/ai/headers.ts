@@ -1,7 +1,7 @@
 import type { AiProvider } from '@/ai/providers'
 
-const APP_TITLE = 'PixelDeck'
-const FALLBACK_ORIGIN = 'https://pixeldeck.local'
+const APP_TITLE = 'FixFlow'
+const FALLBACK_ORIGIN = 'https://fixflow.local'
 
 interface HeaderOptions {
   contentType?: boolean

@@ -13,11 +13,11 @@ import { ColorField, FillControl, SliderField } from '@/components/properties/Pr
 import {
   fieldCls,
   labelCls,
-  panelSectionCls,
   pauseTemporal,
   resumeTemporal,
   subtleButtonCls,
 } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
 import { FileUploadButton } from '@/components/ui/FileUploadButton'
@@ -75,7 +75,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Background type toggle */}
       <div>
         <label className={labelCls}>{t('background.type')}</label>
@@ -212,7 +212,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
       </div>
 
       {/* Decorative glow accents */}
-      <div className={panelSectionCls}>
+      <PropertySection id="bg-accents" title={t('props.secBackground')} icon="image">
         <label className={labelCls}>Accents</label>
         <div className="space-y-3">
           <div className="space-y-1.5">
@@ -345,7 +345,7 @@ export function BackgroundProperties({ layer }: { layer: BackgroundLayer }) {
             + Add Accent
           </button>
         </div>
-      </div>
+      </PropertySection>
 
       <FileUploadButton
         ref={bgImageInputRef}

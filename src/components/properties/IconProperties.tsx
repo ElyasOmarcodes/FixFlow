@@ -7,8 +7,9 @@ import { Icon } from '@/components/ui/Icon'
 import { getIconGlyph } from '@/assets/icons/library'
 import { parseViewBox } from '@/utils/materialSymbols'
 import {
-  labelCls, panelSectionCls, subtleButtonCls, pauseTemporal, resumeTemporal,
+  subtleButtonCls, pauseTemporal, resumeTemporal,
 } from '@/components/properties/panelConstants'
+import { PropertySection } from '@/components/properties/PropertySection'
 import { useT } from '@/i18n'
 
 /** The layer's own glyph at a fixed preview size, in whichever paint mode it uses. */
@@ -56,9 +57,8 @@ export function IconProperties({ layer }: { layer: IconLayer }) {
   const displayName = layer.icon.replace(/^material:/, '').replace(/[-_]/g, ' ')
 
   return (
-    <div className="space-y-4">
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('iconProps.glyph')}</label>
+    <div className="space-y-3">
+      <PropertySection id="icon-glyph" title={t('iconProps.glyph')} icon="sparkles">
         <button
           type="button"
           onClick={() => setPickerOpen(true)}
@@ -68,9 +68,9 @@ export function IconProperties({ layer }: { layer: IconLayer }) {
           <span className="flex-1 truncate text-start">{displayName}</span>
           <span className="text-[var(--pd-c-6b6b7a)]">{t('iconProps.change')}</span>
         </button>
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
+      <PropertySection id="icon-size" title={t('props.secSize')} icon="maximize">
         <SliderField
           label={t('iconProps.size')}
           value={layer.size}
@@ -92,21 +92,19 @@ export function IconProperties({ layer }: { layer: IconLayer }) {
           />
         )}
         {filled && <p className="mt-2 text-[11px] text-[var(--pd-c-6b6b7a)]">{t('iconProps.filledNote')}</p>}
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <label className={labelCls}>{t('iconProps.color')}</label>
+      <PropertySection id="icon-color" title={t('iconProps.color')} icon="palette">
         <ColorField
           value={layer.color}
           onChange={(value) => upd({ color: value })}
           onInteractionStart={pauseTemporal}
           onInteractionEnd={resumeTemporal}
         />
-      </div>
+      </PropertySection>
 
-      <div className={panelSectionCls}>
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <label className={`${labelCls} !mb-0`}>{t('iconProps.plate')}</label>
+      <PropertySection id="icon-plate" title={t('props.secPlate')} icon="shape">
+        <div className="mb-2 flex items-center justify-end gap-2">
           <button
             type="button"
             className={subtleButtonCls}
@@ -156,7 +154,7 @@ export function IconProperties({ layer }: { layer: IconLayer }) {
             />
           </>
         )}
-      </div>
+      </PropertySection>
 
       <IconPickerModal
         open={pickerOpen}

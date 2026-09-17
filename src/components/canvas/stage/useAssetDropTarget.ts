@@ -108,7 +108,7 @@ export function useAssetDropTarget({
   const handleAssetDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     const target = resolveDropTarget(e)
     if (!target) return
-    const internalName = e.dataTransfer.getData('application/x-pixeldeck-asset') || e.dataTransfer.getData('text/plain')
+    const internalName = e.dataTransfer.getData('application/x-fixflow-asset') || e.dataTransfer.getData('text/plain')
     const internalAsset = internalName ? assets[internalName] : undefined
     if (internalAsset) {
       e.preventDefault()
@@ -133,7 +133,7 @@ export function useAssetDropTarget({
   }
 
   const handleAssetDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    const isInternal = e.dataTransfer.types.includes('application/x-pixeldeck-asset')
+    const isInternal = e.dataTransfer.types.includes('application/x-fixflow-asset')
     const isFiles = e.dataTransfer.types.includes('Files')
     if (!isInternal && !isFiles) return
     e.preventDefault()

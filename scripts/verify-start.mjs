@@ -45,7 +45,7 @@ try {
     }, 60)
     await page.goto('http://127.0.0.1:4174')
 
-    const start = page.getByRole('dialog', { name: 'PixelDeck', exact: true })
+    const start = page.getByRole('dialog', { name: 'FixFlow', exact: true })
     await expect(start).toBeVisible({ timeout: 15000 })
 
     // Launch order is splash → projects page, with no editor in between. The
@@ -104,7 +104,7 @@ try {
   await page.goto('http://127.0.0.1:4174')
   await expect(page.locator('.pd-editor canvas').first()).toBeVisible({ timeout: 15000 })
   await page.waitForTimeout(1500)
-  await expect(page.getByRole('dialog', { name: 'PixelDeck', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('dialog', { name: 'FixFlow', exact: true })).toHaveCount(0)
   console.log('PASS preference off: launches straight into the editor')
   await context.close()
 } finally {

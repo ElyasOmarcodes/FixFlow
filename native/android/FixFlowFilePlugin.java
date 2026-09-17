@@ -1,4 +1,4 @@
-package com.pixeldeck.app;
+package com.fixflow.app;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,8 +17,8 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 /** Bounded bridge transfers; the document picker grants access to one chosen file. */
-@CapacitorPlugin(name = "PixelDeckFile")
-public class PixelDeckFilePlugin extends Plugin {
+@CapacitorPlugin(name = "FixFlowFile")
+public class FixFlowFilePlugin extends Plugin {
     private File pending;
     private String session;
     private boolean picking;
@@ -38,7 +38,7 @@ public class PixelDeckFilePlugin extends Plugin {
     public synchronized void begin(PluginCall call) {
         if (pending != null) { call.reject("Another save is in progress"); return; }
         try {
-            pending = File.createTempFile("pixeldeck-export-", ".tmp", getContext().getCacheDir());
+            pending = File.createTempFile("fixflow-export-", ".tmp", getContext().getCacheDir());
             session = UUID.randomUUID().toString();
             JSObject response = new JSObject();
             response.put("session", session);

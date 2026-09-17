@@ -1,6 +1,6 @@
 name: Apps · Desktop & Android
 
-# Builds installable PixelDeck apps from the same web bundle the site uses:
+# Builds installable FixFlow apps from the same web bundle the site uses:
 #
 #   Desktop → Tauri v2. The webview comes from the OS, so the installers are a
 #             few MB instead of the ~100 MB an Electron bundle would cost.
@@ -99,18 +99,18 @@ jobs:
             # AppImage is deliberately excluded: it bundles webkit2gtk and
             # weighs ~90 MB, against ~6 MB for the deb.
             bundles: deb,rpm
-            artifact: pixeldeck-linux-x64
+            artifact: fixflow-linux-x64
           - os: windows-latest
             label: Windows x64
             bundles: nsis
-            artifact: pixeldeck-windows-x64
+            artifact: fixflow-windows-x64
           - os: macos-latest
             label: macOS universal
             bundles: dmg
             # One dmg that runs on both Apple Silicon and Intel.
             target: universal-apple-darwin
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
-            artifact: pixeldeck-macos-universal
+            artifact: fixflow-macos-universal
 
     steps:
       - uses: actions/checkout@v7
@@ -189,7 +189,7 @@ jobs:
 
           # Deliberately broad: match on installer extension rather than on
           # Tauri's exact file naming, which has changed between releases
-          # (e.g. the NSIS output is PixelDeck_<ver>_x64-setup.exe today).
+          # (e.g. the NSIS output is FixFlow_<ver>_x64-setup.exe today).
           find "$base" -type f \
             \( -name '*.deb' -o -name '*.rpm' -o -name '*.dmg' \
                -o -name '*.exe' -o -name '*.msi' -o -name '*.AppImage' \) \
@@ -312,7 +312,7 @@ jobs:
             --ks-pass "pass:$KEYSTORE_PASSWORD" \
             --ks-key-alias "$KEY_ALIAS" \
             --key-pass "pass:$KEY_PASSWORD" \
-            --out android/app/build/outputs/apk/release/pixeldeck-release.apk \
+            --out android/app/build/outputs/apk/release/fixflow-release.apk \
             "$RUNNER_TEMP/aligned.apk"
           rm -f "$RUNNER_TEMP/release.jks" "$RUNNER_TEMP/aligned.apk"
 
@@ -332,7 +332,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: pixeldeck-android
+          name: fixflow-android
           path: out/*
           if-no-files-found: error
           retention-days: 30

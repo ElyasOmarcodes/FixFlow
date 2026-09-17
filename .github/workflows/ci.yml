@@ -105,8 +105,8 @@ jobs:
         run: |
           node cli/index.mjs export \
             --project=public/templates/ledger-dark.template.json \
-            --output=/tmp/pixeldeck-smoke
+            --output=/tmp/fixflow-smoke
       - name: Assert PNGs were produced
-        run: test "$(find /tmp/pixeldeck-smoke -name '*.png' | wc -l)" -gt 0
+        run: test "$(find /tmp/fixflow-smoke -name '*.png' | wc -l)" -gt 0
 
   # Secret scanning and SAST are handled by security.yml (Battlellama-actions).

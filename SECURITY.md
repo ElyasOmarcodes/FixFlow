@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-PixelDeck is pre-1.0. Security fixes are supported for the current `main` branch only.
+FixFlow is pre-1.0. Security fixes are supported for the current `main` branch only.
 
 ## Reporting a Vulnerability
 
@@ -28,7 +28,7 @@ Do **not** open a public issue for security bugs. Public disclosure before a fix
 
 - Vulnerabilities in Chromium itself. Please report those to Google.
 - Google Fonts CDN availability, privacy, or delivery issues.
-- `node_modules` vulnerabilities with no PixelDeck-specific impact or exploit path.
+- `node_modules` vulnerabilities with no FixFlow-specific impact or exploit path.
 
 ## Response Commitment
 

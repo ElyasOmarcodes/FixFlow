@@ -86,7 +86,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
     if (trimmed && trimmed !== project.name) {
       renameProject(project.id, trimmed).catch((err) => {
         if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
-        else console.error('[PixelDeck] Failed to rename project', err)
+        else console.error('[FixFlow] Failed to rename project', err)
       })
     }
     setEditingName(false)
@@ -151,7 +151,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         onRenameProject={(name) => {
           renameProject(project.id, name).catch((err) => {
             if (err instanceof ProjectConflictError) notifyProjectConflict(err.projectId)
-            else console.error('[PixelDeck] Failed to rename project', err)
+            else console.error('[FixFlow] Failed to rename project', err)
           })
         }}
         groups={[

@@ -61,6 +61,9 @@ export const useApiKeysStore = create<ApiKeysState>()(
       },
     }),
     {
+      // Still `pixeldeck`: the app was renamed, the data on people's machines was
+      // not. Renaming a storage key does not migrate it — it reads a different,
+      // empty one. See src/store/idb-storage.ts.
       name: 'pixeldeck-api-keys',
       version: 2,
       migrate: (persisted) => {

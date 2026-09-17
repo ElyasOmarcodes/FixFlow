@@ -4,6 +4,11 @@
  * Falls back silently to a no-op if IndexedDB is unavailable (e.g., SSR, private mode).
  */
 
+// Still `pixeldeck`, and it stays that way. The app was renamed; the
+// database on a person's machine was not. Renaming this constant does not
+// migrate anything — it opens a different, empty database, and every project
+// they have made disappears. The same reasoning keeps the `pixeldeck.*` and
+// `pixeldeck-*` localStorage keys under their old names.
 const DB_NAME = 'pixeldeck'
 const STORE_NAME = 'kv'
 

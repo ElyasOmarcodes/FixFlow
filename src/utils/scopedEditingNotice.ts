@@ -13,6 +13,9 @@ import { useSyncExternalStore } from 'react'
 
 export type ScopedNoticeKind = 'format' | 'locale'
 
+// Still `pixeldeck`: the app was renamed, the data on people's machines was
+// not. Renaming a storage key does not migrate it — it reads a different,
+// empty one. See src/store/idb-storage.ts.
 const KEY = 'pixeldeck:scoped-notice-seen'
 
 /** Kinds already shown. Read once; storage can throw in a private window. */

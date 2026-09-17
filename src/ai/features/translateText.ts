@@ -165,7 +165,7 @@ async function parseSingleTranslationWithRetry(
       return parseSingleTranslationResponse(repaired, args.targetLocale)
     } catch {
       // Log full raw responses to the browser console for diagnosis.
-      console.error('[PixelDeck] Translation JSON parse failed.\nFirst response:', raw, '\nRetry response:', repaired)
+      console.error('[FixFlow] Translation JSON parse failed.\nFirst response:', raw, '\nRetry response:', repaired)
       const preview = (s: string) => s.slice(0, 200).replace(/\n/g, '↵')
       throw new Error(
         `AI returned invalid translation JSON after retry. ${String(firstError)}\n` +

@@ -322,7 +322,7 @@ describe('async project save chain', () => {
     const events = new EventTarget()
     Object.assign(globalThis, {
       window: {
-        __PIXELDECK_CONFIG__: { projectStorage: adapter },
+        __FIXFLOW_CONFIG__: { projectStorage: adapter },
         setTimeout: globalThis.setTimeout.bind(globalThis),
         addEventListener: events.addEventListener.bind(events),
         removeEventListener: events.removeEventListener.bind(events),

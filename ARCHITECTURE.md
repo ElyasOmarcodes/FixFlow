@@ -1,8 +1,8 @@
-# PixelDeck Architecture
+# FixFlow Architecture
 
 ## Overview
 
-PixelDeck is a single-page React application that serves two runtime modes:
+FixFlow is a single-page React application that serves two runtime modes:
 
 1. **Editor mode**: interactive GUI for designing App Store screenshot layouts
 2. **Headless export mode**: triggered by the CLI; renders slides and captures PNGs without user interaction
@@ -327,7 +327,7 @@ dist/  ──┬─→ GitHub Pages (web)
          └─→ capacitor.config.json → Capacitor → .apk / .aab
 ```
 
-Both shells are pure webview hosts. PixelDeck is already local-first — projects
+Both shells are pure webview hosts. FixFlow is already local-first — projects
 in `localStorage`, assets in IndexedDB, PNG export through the webview's own
 download path — so `src-tauri` declares no Tauri commands and no plugins, and
 its capability set is `core:default` only. That keeps the desktop installers in

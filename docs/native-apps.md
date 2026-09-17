@@ -1,6 +1,6 @@
 # Desktop & Android apps
 
-PixelDeck ships as three things built from **one** web bundle:
+FixFlow ships as three things built from **one** web bundle:
 
 | Target | Shell | Typical download |
 |---|---|---|
@@ -19,7 +19,7 @@ There is no second codebase. `dist/` is the app; the shells only host a webview.
 **Tauri, not Electron.** Tauri uses the webview the OS already has (WebView2 on
 Windows, WKWebView on macOS, WebKitGTK on Linux) instead of bundling a whole
 Chromium. That is the difference between a ~5 MB installer and a ~120 MB one.
-PixelDeck is local-first: projects and assets live in localStorage/IndexedDB.
+FixFlow is local-first: projects and assets live in localStorage/IndexedDB.
 Exports use the native Save dialog and the filesystem plugin on desktop. The
 main window receives only `dialog:allow-save` and `fs:allow-write-file`; there is
 no blanket filesystem scope. The dialog grants access to the selected file.
@@ -167,7 +167,7 @@ empty, so forks without secrets are unaffected.
   build. `style-src` keeps `'unsafe-inline'` because the editor styles most
   nodes with React `style` attributes; this was verified by running the built
   Linux binary under Xvfb and confirming the UI paints.
-- **`identifier`** is `com.pixeldeck.app` in both shells. Change it in
+- **`identifier`** is `com.fixflow.app` in both shells. Change it in
   `tauri.conf.json` and `capacitor.config.json` together if you fork and
   publish your own builds.
 - **iOS** is not wired into CI (it needs a paid Apple account and a macOS
@@ -176,7 +176,7 @@ empty, so forks without secrets are unaffected.
 
 ## Native export and mobile behavior
 
-Android's committed `native/android/PixelDeckFilePlugin.java` is copied into the
+Android's committed `native/android/FixFlowFilePlugin.java` is copied into the
 generated project by `scripts/configure-android.mjs`. It uses
 `ACTION_CREATE_DOCUMENT`, so users choose a destination for PNG, ZIP or JSON.
 No storage, media-library, camera or all-files runtime permission is requested.
