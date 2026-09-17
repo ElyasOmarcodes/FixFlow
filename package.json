@@ -50,7 +50,9 @@
     "test:watch": "vitest",
     "test:responsive": "node scripts/verify-responsive.mjs",
     "test:editor": "node scripts/verify-editor.mjs",
-    "test:start": "node scripts/verify-start.mjs"
+    "test:start": "node scripts/verify-start.mjs",
+    "test:templates": "node scripts/verify-templates.mjs",
+    "build:templates": "node scripts/build-editorial-templates.mjs && node scripts/build-template-manifest.mjs"
   },
   "engines": {
     "node": ">=20.19.0"

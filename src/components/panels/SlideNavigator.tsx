@@ -156,7 +156,14 @@ function SortableGroupItem({
                   style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}
                   className="relative shrink-0 group"
                 >
-                  <div
+                  {/* A real button: this is the primary way to move between
+                      slides, and as a bare div it was invisible to the
+                      keyboard and to a screen reader alike. */}
+                  <button
+                    type="button"
+                    aria-label={`Slide ${num}`}
+                    aria-current={isActive ? 'true' : undefined}
+                    data-slide-group={group.id}
                     style={{
                       width: thumbW,
                       height: THUMB_H,
@@ -167,6 +174,7 @@ function SortableGroupItem({
                       position: 'relative',
                       overflow: 'hidden',
                       flexShrink: 0,
+                      padding: 0,
                     }}
                     onClick={() => {
                       setActiveSlideGroup(group.id)
@@ -193,7 +201,7 @@ function SortableGroupItem({
                         <Icon name="phone" size={13} />
                       </div>
                     )}
-                  </div>
+                  </button>
 
                   <span style={{ fontSize: 9, color: isActive ? '#7c6ef6' : '#6b6b7a', lineHeight: 1 }}>
                     {num}

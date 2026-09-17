@@ -44,32 +44,32 @@
     {
       "slug": "noor-editorial",
       "name": "Noor · Editorial",
-      "description": "Seven original coordinated layouts with editable typography, feature cards and replaceable device screens.",
-      "category": "Editorial",
+      "description": "Warm paper-and-ink reading set: serif hero, a library panorama across two slides, feature cards, a two-device showcase and a gold close. Swap in your own screenshots.",
+      "category": "Books & Reference",
       "file": "/templates/noor-editorial.template.json",
       "slides": 7,
       "previewSize": "1320×2868",
-      "preview": "#f4efe4"
+      "preview": "radial-gradient(62% 25% at 86% 10%, rgba(201,138,46,0.18), transparent 70%), radial-gradient(67% 26% at 6% 88%, rgba(17,97,73,0.10), transparent 70%), linear-gradient(258deg, #FDFAF3 0%, #F7EFE0 55%, #F0E4CE 100%)"
     },
     {
       "slug": "orbit-studio",
       "name": "Orbit · Studio",
-      "description": "Seven original coordinated layouts with editable typography, feature cards and replaceable device screens.",
-      "category": "Editorial",
+      "description": "Midnight studio set: neon-gradient hero, a two-slide canvas panorama, feature cards, a tilted two-device showcase and a violet close. Brand Kit wired.",
+      "category": "Graphics & Design",
       "file": "/templates/orbit-studio.template.json",
       "slides": 7,
       "previewSize": "1320×2868",
-      "preview": "#111127"
+      "preview": "radial-gradient(65% 26% at 84% 8%, rgba(139,123,255,0.34), transparent 70%), radial-gradient(68% 27% at 8% 86%, rgba(34,211,238,0.18), transparent 70%), linear-gradient(252deg, #0A0C1B 0%, #131735 55%, #1B1140 100%)"
     },
     {
       "slug": "serein-wellness",
       "name": "Serein · Wellness",
-      "description": "Seven original coordinated layouts with editable typography, feature cards and replaceable device screens.",
-      "category": "Editorial",
+      "description": "Soft sage-and-sand wellness set: calm hero, a breathing panorama across two slides, habit cards, a progress showcase and a deep-green close.",
+      "category": "Health & Fitness",
       "file": "/templates/serein-wellness.template.json",
       "slides": 7,
       "previewSize": "1320×2868",
-      "preview": "#f9e8d7"
+      "preview": "radial-gradient(64% 26% at 84% 10%, rgba(47,122,104,0.16), transparent 70%), radial-gradient(67% 26% at 8% 86%, rgba(224,141,110,0.14), transparent 70%), linear-gradient(260deg, #F7FBF7 0%, #EAF4EE 55%, #DDEDE3 100%)"
     }
   ]
 }
