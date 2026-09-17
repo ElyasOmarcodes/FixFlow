@@ -113,7 +113,10 @@ export function IconProperties({ layer }: { layer: IconLayer }) {
             onClick={() => upd(layer.background
               ? { background: undefined }
               : {
-                  background: 'rgba(255,255,255,0.12)',
+                  // Visible on any background. A 12%-white wash was invisible
+                  // on a light design and barely there on a dark one, so
+                  // "add a plate" looked like it had done nothing.
+                  background: '#ffffff',
                   // A plate with no padding is a square the size of the glyph,
                   // which reads as a crop rather than as a backing shape.
                   backgroundPadding: layer.backgroundPadding || Math.round(layer.size * 0.35),
@@ -143,7 +146,9 @@ export function IconProperties({ layer }: { layer: IconLayer }) {
             <SliderField
               label={t('iconProps.plateRadius')}
               value={layer.backgroundRadius}
-              min={0} max={300} unit="px"
+              // Half the plate is a full circle; beyond that there is nothing
+              // left to round and the shape distorts.
+              min={0} max={Math.round((layer.size + layer.backgroundPadding * 2) / 2)} unit="px"
               onChange={(value) => upd({ backgroundRadius: value })}
               onInteractionStart={pauseTemporal}
               onInteractionEnd={resumeTemporal}

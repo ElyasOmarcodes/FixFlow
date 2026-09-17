@@ -224,7 +224,9 @@ function featureSlide(brand) {
   let n = 3
   for (const item of copy.items) {
     layers.push(shape(`l${n++}`, `Card ${item.title}`, M, y, COL, cardH, p.card, 44))
-    layers.push(icon(`l${n++}`, `Icon ${item.icon}`, M + 44, y + 52, item.icon, {
+    // The plate grows outward from the glyph, so the glyph's own position is
+    // what is placed here — the padding no longer shifts it.
+    layers.push(icon(`l${n++}`, `Icon ${item.icon}`, M + 70, y + 78, item.icon, {
       size: 60, color: p.accent, plate: p.iconPlate, platePadding: 26, plateRadius: 30,
     }))
     layers.push(text(`l${n++}`, item.title, M + 216, y + 62, item.title, {

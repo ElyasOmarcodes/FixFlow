@@ -94,19 +94,26 @@ export function IconNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
     >
       {layer.background && (
         <Rect
-          x={0}
-          y={0}
+          // The plate grows *outward* from the glyph rather than the glyph
+          // sitting inset within it. The layer's x,y is where the glyph is, so
+          // adding a plate — or changing its padding or corner radius — cannot
+          // move the icon, which is what made those controls look like they
+          // were resizing and repositioning the layer.
+          x={-layer.backgroundPadding}
+          y={-layer.backgroundPadding}
           width={plate}
           height={plate}
-          cornerRadius={layer.backgroundRadius}
+          // A radius beyond half the plate has no more circle to give and
+          // makes Konva draw a distorted shape.
+          cornerRadius={Math.min(layer.backgroundRadius, plate / 2)}
           {...layerFillToKonvaProps(layer.background, brandColors, { width: plate, height: plate })}
           {...shadowProps}
         />
       )}
       {pathData && (
         <Path
-          x={layer.backgroundPadding - boxX * scale}
-          y={layer.backgroundPadding - boxY * scale}
+          x={-boxX * scale}
+          y={-boxY * scale}
           data={pathData}
           scaleX={scale}
           scaleY={scale}
@@ -125,8 +132,16 @@ export function IconNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
         />
       )}
       {/* A glyph is thin strokes; without a transparent hit area, clicking
-          anywhere but exactly on a line would miss the layer entirely. */}
-      <Rect x={0} y={0} width={plate} height={plate} fill="transparent" />
+          anywhere but exactly on a line would miss the layer entirely. The
+          area covers the plate when there is one, so the whole badge is
+          grabbable, not just the glyph in its middle. */}
+      <Rect
+        x={layer.background ? -layer.backgroundPadding : 0}
+        y={layer.background ? -layer.backgroundPadding : 0}
+        width={layer.background ? plate : layer.size}
+        height={layer.background ? plate : layer.size}
+        fill="transparent"
+      />
     </Group>
   )
 }

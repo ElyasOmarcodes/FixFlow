@@ -86,6 +86,7 @@ export const fa: Record<TranslationKey, string> = {
   'common.edit': 'ویرایش',
   'common.export': 'خروجی',
   'common.import': 'ورود',
+  'app.pressBackAgain': 'برای خروج دوباره بازگشت را بزنید',
   'common.loading': 'در حال بارگذاری…',
   'common.next': 'بعدی',
   'common.previous': 'قبلی',

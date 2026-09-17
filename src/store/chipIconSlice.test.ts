@@ -113,3 +113,63 @@ describe('chip icon side', () => {
     expect(chip.iconPosition).toBe('right')
   })
 })
+
+describe('icon backing plate', () => {
+  it('leaves the glyph where it is when a plate is added', () => {
+    // The plate grows outward from the glyph. It used to be the other way
+    // round — the layer origin was the plate's corner and the glyph was inset
+    // by the padding — so switching a plate on appeared to move and resize
+    // the icon.
+    useEditorStore.getState().addIcon()
+    const before = lastLayer() as IconLayer
+    useEditorStore.getState().updateLayer(before.id, {
+      background: '#ffffff',
+      backgroundPadding: 40,
+    } as Partial<IconLayer>)
+    const after = lastLayer() as IconLayer
+    expect({ x: after.x, y: after.y, size: after.size, rotation: after.rotation })
+      .toEqual({ x: before.x, y: before.y, size: before.size, rotation: before.rotation })
+  })
+
+  it('leaves everything alone when only the corner radius changes', () => {
+    useEditorStore.getState().addIcon()
+    const id = lastLayer().id
+    useEditorStore.getState().updateLayer(id, { background: '#ffffff', backgroundPadding: 30 } as Partial<IconLayer>)
+    const before = lastLayer() as IconLayer
+    useEditorStore.getState().updateLayer(id, { backgroundRadius: 120 } as Partial<IconLayer>)
+    const after = lastLayer() as IconLayer
+    expect({ x: after.x, y: after.y, size: after.size, rotation: after.rotation, pad: after.backgroundPadding })
+      .toEqual({ x: before.x, y: before.y, size: before.size, rotation: before.rotation, pad: before.backgroundPadding })
+  })
+
+  it('migrates a plated icon so it lands where it was drawn', () => {
+    useEditorStore.getState().addIcon()
+    const { project } = useEditorStore.getState()
+    const legacy = {
+      ...project,
+      settings: { ...project.settings, schemaVersion: 4 },
+      slideGroups: project.slideGroups.map((group) => ({
+        ...group,
+        layers: group.layers.map((layer) => layer.type !== 'icon'
+          ? layer
+          : ({ ...layer, x: 100, y: 200, background: '#fff', backgroundPadding: 30 } as typeof layer)),
+      })),
+    } as Project
+
+    const migrated = migrateProject(JSON.parse(JSON.stringify(legacy)) as Project)
+    const icon = migrated.slideGroups.flatMap((g) => g.layers).find((l) => l.type === 'icon') as IconLayer
+    // Old origin was the plate corner, so the glyph was at 130,230 — which is
+    // where the new origin has to be for the design to look unchanged.
+    expect({ x: icon.x, y: icon.y }).toEqual({ x: 130, y: 230 })
+  })
+
+  it('leaves an unplated icon\u2019s position alone', () => {
+    useEditorStore.getState().addIcon()
+    const { project } = useEditorStore.getState()
+    const legacy = { ...project, settings: { ...project.settings, schemaVersion: 4 } } as Project
+    const before = legacy.slideGroups.flatMap((g) => g.layers).find((l) => l.type === 'icon') as IconLayer
+    const migrated = migrateProject(JSON.parse(JSON.stringify(legacy)) as Project)
+    const icon = migrated.slideGroups.flatMap((g) => g.layers).find((l) => l.type === 'icon') as IconLayer
+    expect({ x: icon.x, y: icon.y }).toEqual({ x: before.x, y: before.y })
+  })
+})

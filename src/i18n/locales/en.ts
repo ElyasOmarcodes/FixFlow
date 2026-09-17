@@ -91,6 +91,7 @@ export const en = {
   'common.edit': 'Edit',
   'common.export': 'Export',
   'common.import': 'Import',
+  'app.pressBackAgain': 'Press back again to leave',
   'common.loading': 'Loading…',
   'common.next': 'Next',
   'common.previous': 'Previous',

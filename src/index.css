@@ -1467,6 +1467,29 @@
 
 .pd-slide-options-popover header button:active { background: var(--pd-hover); }
 
+/* The "press back again" hint. A transient line above the chrome, not a
+   dialog: it must not take focus or a press, only tell you what a second
+   Back would do. */
+.pd-exit-hint {
+  position: fixed;
+  inset-inline: 0;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: var(--pd-z-confirm);
+  margin-inline: auto;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--pd-c-1e1e28);
+  border: 1px solid var(--pd-line);
+  box-shadow: var(--pd-shadow-popover);
+  color: var(--pd-c-e8e8f0);
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+  animation: pd-fade-in var(--pd-dur-fast) var(--pd-ease-decel) both;
+}
+
 /* ── Switch ────────────────────────────────────────────────────────────────
    One switch, sized by a data attribute. The off state needs a track the
    knob can be seen against in *both* themes, which is why the knob is a

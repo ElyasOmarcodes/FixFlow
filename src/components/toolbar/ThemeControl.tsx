@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useT } from '@/i18n'
 import { applySystemBars } from '@/native/systemUi'
-import { haptic } from '@/native/haptics'
 
 type Theme = 'light' | 'dark' | 'system'
 export function ThemeControl() {
@@ -29,7 +28,7 @@ export function ThemeControl() {
     media.addEventListener('change', apply)
     return () => media.removeEventListener('change', apply)
   }, [theme])
-  return <select className="pd-theme-control" aria-label={t('workspace.theme')} value={theme} onChange={(event) => { haptic('select'); setTheme(event.target.value as Theme) }}>
+  return <select className="pd-theme-control" aria-label={t('workspace.theme')} value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>
     <option value="system">{t('workspace.system')}</option>
     <option value="light">{t('phone.themeLight')}</option>
     <option value="dark">{t('phone.themeDark')}</option>

@@ -7,6 +7,16 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.12.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.12.0) - 2026-09-17
+
+### Fixed
+
+- **The app no longer vibrates on every tap.** A delegated listener answered every press in the app with a haptic. That is not what native apps do and it is exhausting on a phone. The buzz is now reserved for a long press — the one gesture with no visual start, where it is the only signal the hold registered.
+- **Android Back no longer leaves the app from anywhere in the editor.** It unwinds what you are holding first — an open text editor, then group edit, then a multi-selection, then a single selection — and only an empty stack reaches the shell, which asks once ("press back again to leave") instead of exiting on the first press.
+- **The slide long-press menu works on mobile again.** It relied on the browser's `contextmenu`, which a touch hold does not reliably fire on a `<button>` — and the slide thumbnails became buttons in 0.11.0. The hold is now measured from pointer events, so it works on every element and can be felt before the menu appears. The menu also gained the `role` it never had, which made it invisible to a screen reader.
+- **Layers no longer jump after a pinch-zoom.** A two-finger zoom usually starts with one finger already down, and if that finger landed on a layer Konva had begun dragging it. The pinch then swallowed the touch events Konva needs for its own bookkeeping, leaving a stale pointer position for the next gesture to measure against, and a `dragend` reporting wherever the finger happened to be when the second one arrived. A drag interrupted by a pinch is now abandoned rather than committed, the lift reaches Konva so it can clean up, and the tap that ends the gesture is ignored.
+- **An icon's backing plate no longer moves or resizes the icon.** The layer's origin was the plate's corner with the glyph inset by the padding, so switching a plate on — or changing its padding or corner radius — appeared to reposition and resize the layer. The origin is the glyph now and the plate grows outward around it; existing projects are migrated so nothing shifts. The plate also had a 12%-white default fill that was invisible on most designs, and its corner radius could exceed half the plate and distort the shape.
+
 ## [0.11.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.11.0) - 2026-09-17
 
 ### Added

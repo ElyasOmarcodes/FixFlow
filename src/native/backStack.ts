@@ -72,6 +72,8 @@ export function clearBackStack(): void {
 
 /** Priorities, named so call sites do not invent numbers. */
 export const BACK_PRIORITY = {
+  /** Editor state — a selection or an editing mode, under every surface. */
+  canvas: 5,
   panel: 10,
   sheet: 20,
   popover: 25,

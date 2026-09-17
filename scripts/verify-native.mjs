@@ -61,7 +61,30 @@ try {
   await expect(page.locator('#mobile-layers')).toBeHidden()
   console.log('PASS back: then closes the panel')
 
-  // Nothing left — the shell is told so, rather than a surface being invented.
+  // Editor state unwinds before the app does. One press used to drop straight
+  // out of the app from anywhere in the editor, discarding nothing but
+  // certainly surprising: a selection, a group you are inside, or an open
+  // text editor each answer Back first.
+  // The earlier presses closed the panel, so open it again to reach Insert.
+  await page.locator('.pd-mobile-nav button').first().click()
+  await expect(page.locator('#mobile-layers')).toBeVisible()
+  await page.getByRole('button', { name: 'New layer', exact: true }).click()
+  await page.getByRole('menuitem', { name: 'Shape', exact: true }).click()
+  await page.waitForTimeout(600)
+  // Close the panel so the stack holds only the selection.
+  expect(await back()).toBe(true)
+  await expect(page.locator('#mobile-layers')).toBeHidden()
+  const selected = () => page.evaluate(async () => {
+    const { useEditorStore } = await import('/src/store/index.ts')
+    return useEditorStore.getState().selection !== null
+  })
+  expect(await selected()).toBe(true)
+  expect(await back()).toBe(true)
+  expect(await selected()).toBe(false)
+  console.log('PASS back: clears the selection instead of leaving the app')
+
+  // Only a truly empty stack reaches the shell, which then asks once before
+  // leaving rather than exiting on the first press.
   expect(await back()).toBe(false)
   console.log('PASS back: reports an empty stack at the root')
 
@@ -89,6 +112,26 @@ try {
   })
   expect(fontSize).toBeGreaterThanOrEqual(16)
   console.log(`PASS keyboard: touch inputs are ${fontSize}px, so focusing one cannot zoom the viewport`)
+
+  // No vibration on an ordinary press. A phone that buzzes every time you
+  // touch a button is not more native, it is exhausting — the buzz is only
+  // for a long press, where there is no other signal the hold registered.
+  const hapticCalls = await page.evaluate(async () => {
+    const calls = []
+    const module = await import('/src/native/haptics.ts')
+    void module
+    // Every call site, counted from source rather than mocked: the module is
+    // lazily imported inside the app, so a runtime spy would miss it.
+    const sources = await Promise.all(
+      ['/src/App.tsx', '/src/native/useLongPress.ts'].map(async (path) => (await fetch(path)).text()),
+    )
+    for (const [index, text] of sources.entries()) {
+      for (const match of text.matchAll(/\bhaptic\(/g)) calls.push(`${index}:${match.index}`)
+    }
+    return calls.length
+  })
+  expect(hapticCalls).toBe(1)
+  console.log('PASS haptics: one call site, the long press')
 
   await page.screenshot({ path: 'test-results/native/editor.png' })
   expect(errors).toEqual([])

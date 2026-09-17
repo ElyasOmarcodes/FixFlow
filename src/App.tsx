@@ -7,7 +7,6 @@ import { useBackDismiss } from '@/native/useBackDismiss'
 import { isAndroid } from '@/native/platform'
 import { configureKeyboard, trackKeyboardInset } from '@/native/systemUi'
 import { suppressWebGestures } from '@/native/gestures'
-import { usePressFeedback } from '@/native/usePressFeedback'
 import { useT } from '@/i18n'
 import { Icon } from '@/components/ui/Icon'
 import { useRef, useEffect, useState, lazy, Suspense } from 'react'
@@ -45,12 +44,19 @@ const StartScreen = lazy(loadStartScreen)
 
 const INITIAL_SPLASH_MIN_MS = 450
 
+/** How long a first Back press counts as "I might be leaving". */
+const EXIT_CONFIRM_MS = 2200
+
 export default function App() {
   const t = useT()
   const [mobilePanel, setMobilePanel] = useState<'layers' | 'properties' | null>(null)
   // Read once, at mount: flipping the preference from inside the screen must
   // not close the screen the user is still looking at.
   const [startOpen, setStartOpen] = useState(shouldShowStartScreenOnLaunch)
+  // Back at the root asks once before leaving; the ref is what the native
+  // listener reads, since it is registered once and never re-created.
+  const confirmExitRef = useRef(false)
+  const [exitHintVisible, setExitHintVisible] = useState(false)
   const stageRef = useRef<Konva.Stage>(null)
   const conflictNotice = useProjectsStore((s) => s.conflictNotice)
 
@@ -61,9 +67,21 @@ export default function App() {
     if (!isAndroid()) return
     const listener = NativeApp.addListener('backButton', () => {
       if (handleBack()) return
-      // Nothing left to dismiss. Leaving the editor keeps its state, the way
-      // Back out of any Android app does — it does not discard the project.
-      void NativeApp.minimizeApp()
+      // Nothing left to unwind. Leaving is a real decision — the editor is
+      // full of work — so it takes a second press, which is what every
+      // Android app that holds unsaved state does. One press used to drop
+      // straight out of the app from anywhere in the editor.
+      if (confirmExitRef.current) {
+        confirmExitRef.current = false
+        void NativeApp.minimizeApp()
+        return
+      }
+      confirmExitRef.current = true
+      setExitHintVisible(true)
+      window.setTimeout(() => {
+        confirmExitRef.current = false
+        setExitHintVisible(false)
+      }, EXIT_CONFIRM_MS)
     })
     return () => { void listener.then((handle) => handle.remove()) }
   }, [])
@@ -72,10 +90,20 @@ export default function App() {
   useBackDismiss(mobilePanel !== null, () => setMobilePanel(null), BACK_PRIORITY.panel)
   useBackDismiss(startOpen, () => setStartOpen(false), BACK_PRIORITY.sheet)
 
+  // Editor state unwinds before the app does: an open text editor, then group
+  // edit, then a multi-selection, then a single selection. Back out of the
+  // editor should put down what you are holding before it leaves the room.
+  const editingTextId = useEditorStore((s) => s.editingTextId)
+  const selectedCount = useEditorStore((s) => s.selectedLayerIds.length)
+  const hasSelection = useEditorStore((s) => s.selection !== null)
+  useBackDismiss(editingTextId !== null, () => useEditorStore.getState().stopTextEdit(), BACK_PRIORITY.popover)
+  const inGroupEdit = useEditorStore((s) => s.editingGroupId !== null)
+  useBackDismiss(inGroupEdit, () => useEditorStore.getState().exitGroupEdit(), BACK_PRIORITY.canvas)
+  useBackDismiss(selectedCount > 0, () => useEditorStore.getState().clearMultiSelection(), BACK_PRIORITY.canvas)
+  useBackDismiss(selectedCount === 0 && hasSelection, () => useEditorStore.getState().deselect(), BACK_PRIORITY.canvas)
+
   // Native chrome: stop the WebView panning the whole app under the keyboard,
   // and publish its height so a bottom sheet can sit above it.
-  usePressFeedback()
-
   useEffect(() => {
     configureKeyboard()
     const releaseKeyboard = trackKeyboardInset()
@@ -428,6 +456,9 @@ export default function App() {
         <Suspense>
           <StartScreen onClose={() => setStartOpen(false)} />
         </Suspense>
+      )}
+      {exitHintVisible && (
+        <div className="pd-exit-hint" role="status">{t('app.pressBackAgain')}</div>
       )}
       <AppLoadingScreen visible={!hasCompletedInitialLoad} />
       {offscreenThumbnailElement}

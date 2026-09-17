@@ -13,6 +13,7 @@ import { SlideOptionsCard, SlideOptionsControls } from '@/components/panels/slid
 import type { BackgroundLayer, SlideGroup } from '@/types'
 import type { ThumbnailMap } from '@/hooks/useThumbnails'
 import { Icon } from '@/components/ui/Icon'
+import { useLongPress } from '@/native/useLongPress'
 import { useT } from '@/i18n'
 
 interface ContextMenu {
@@ -47,7 +48,7 @@ interface SortableGroupItemProps {
   staleGroupIds: Set<string>
   captureThumbnail: (groupId: string) => void
   THUMB_H: number
-  handleContextMenu: (e: React.MouseEvent, groupId: string) => void
+  handleContextMenu: (point: { clientX: number; clientY: number }, groupId: string) => void
   startRename: (groupId: string, currentName: string) => void
   setActiveSlideGroup: (id: string) => void
   commitRename: () => void
@@ -75,6 +76,10 @@ function SortableGroupItem({
   setRenameValue,
 }: SortableGroupItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: group.id })
+  // A held press opens the group's menu. Measured from pointer events rather
+  // than taken from `contextmenu`, which a touch hold does not reliably fire
+  // on a <button> — which is why the first slide's menu stopped appearing.
+  const longPress = useLongPress((point) => handleContextMenu(point, group.id))
   const thumbW = Math.min(50, Math.round((group.slideWidth / group.slideHeight) * THUMB_H))
   const slideGap = 6
   const stripWidth = (thumbW * groupSlides.length) + (slideGap * Math.max(0, groupSlides.length - 1))
@@ -108,7 +113,7 @@ function SortableGroupItem({
           previews. Pano/strip slides keep their tighter inner gap as one visual unit. */}
       <div
         style={{ display: 'flex', flexDirection: 'column', gap: 2, width: stripWidth, flexShrink: 0 }}
-        onContextMenu={(e) => handleContextMenu(e, group.id)}
+        {...longPress}
         onDoubleClick={() => startRename(group.id, group.name)}
       >
         {renamingId === group.id ? (
@@ -296,12 +301,10 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
     setRenameValue('')
   }
 
-  const handleContextMenu = (e: React.MouseEvent, groupId: string) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleContextMenu = (point: { clientX: number; clientY: number }, groupId: string) => {
     const MENU_HEIGHT = 100 // 3 items × ~32px
-    const y = e.clientY + MENU_HEIGHT > window.innerHeight ? e.clientY - MENU_HEIGHT : e.clientY
-    setContextMenu({ groupId, x: e.clientX, y })
+    const y = point.clientY + MENU_HEIGHT > window.innerHeight ? point.clientY - MENU_HEIGHT : point.clientY
+    setContextMenu({ groupId, x: point.clientX, y })
   }
 
   const selectSlideGroup = (id: string) => {
@@ -438,14 +441,13 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
       {/* Context menu */}
       {contextMenu && (
         <div
-          className="fixed z-[var(--pd-z-popover)] py-1 rounded shadow-2xl border"
-          style={{
-            left: contextMenu.x,
-            top: contextMenu.y,
-            background: 'var(--pd-c-18181f)',
-            borderColor: 'rgba(255,255,255,0.08)',
-            minWidth: 140,
-          }}
+          // A real menu: it is reached by a long press or a right-click and
+          // has no other affordance, so without the role it is invisible to a
+          // screen reader — and to anything looking for it by role.
+          role="menu"
+          aria-label={t('slides.options')}
+          className="pd-slide-menu fixed z-[var(--pd-z-popover)] py-1 rounded shadow-2xl border border-[var(--pd-line-soft)] bg-[var(--pd-panel)]"
+          style={{ left: contextMenu.x, top: contextMenu.y, minWidth: 140 }}
           onClick={(e) => e.stopPropagation()}
         >
           {[
@@ -454,15 +456,15 @@ export function SlideNavigator({ thumbnails, staleGroupIds, onCaptureThumbnail }
           ].map(({ action, label }) => (
             <button
               key={action}
-              className="w-full text-start px-3 py-2 text-xs hover:bg-[var(--pd-fill)] transition-colors"
-              style={{ color: 'var(--pd-c-e8e8f0)' }}
+              role="menuitem"
+              className="w-full text-start px-3 py-2 text-xs text-[var(--pd-c-e8e8f0)] hover:bg-[var(--pd-fill)] transition-colors"
               onClick={() => handleMenuAction(action, contextMenu.groupId)}
             >
               {label}
             </button>
           ))}
           <div className="my-1 border-t border-[var(--pd-line-soft)]" />
-          <button className="w-full text-start px-3 py-2 text-xs text-[var(--pd-danger)] hover:bg-[var(--pd-fill)] transition-colors" onClick={() => handleMenuAction('delete', contextMenu.groupId)}>Delete</button>
+          <button role="menuitem" className="w-full text-start px-3 py-2 text-xs text-[var(--pd-danger)] hover:bg-[var(--pd-fill)] transition-colors" onClick={() => handleMenuAction('delete', contextMenu.groupId)}>Delete</button>
         </div>
       )}
     </footer>

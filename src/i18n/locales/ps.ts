@@ -86,6 +86,7 @@ export const ps: Record<TranslationKey, string> = {
   'common.edit': 'سمون',
   'common.export': 'صادرول',
   'common.import': 'واردول',
+  'app.pressBackAgain': 'د وتلو لپاره بیا بک ووهه',
   'common.loading': 'په بارولو کې…',
   'common.next': 'بل',
   'common.previous': 'پخوانی',

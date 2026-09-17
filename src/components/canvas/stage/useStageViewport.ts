@@ -1,6 +1,7 @@
 import { getStage } from '@/utils/stageRegistry'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useEditorStore } from '@/store'
+import { cancelDragForPinch, startPinchTapGrace } from './pinchGuard'
 import { getPanoTotalWidth } from '@/utils/panoGeometry'
 import type { CanvasFormatId, SlideGroup } from '@/types'
 
@@ -140,8 +141,22 @@ export function useStageViewport({
     let gesture: { distance: number; zoom: number; x: number; y: number } | null = null
     const touch = (event: TouchEvent) => {
       if (event.touches.length < 2) {
-        if (gesture) { event.stopImmediatePropagation(); event.preventDefault() }
-        if (event.touches.length === 0) gesture = null
+        if (gesture) {
+          event.preventDefault()
+          // touchend is deliberately *not* stopped: Konva keeps its own
+          // pointer bookkeeping from these events, and swallowing the lift
+          // left it holding a stale position for the next gesture to measure
+          // a delta against — which is why tapping a layer straight after a
+          // zoom moved it. The tap that ends the gesture is suppressed by the
+          // grace window instead, which is a narrower instrument.
+          if (event.type !== 'touchend' && event.type !== 'touchcancel') {
+            event.stopImmediatePropagation()
+          }
+        }
+        if (event.touches.length === 0 && gesture) {
+          gesture = null
+          startPinchTapGrace()
+        }
         return
       }
       event.preventDefault()
@@ -153,7 +168,11 @@ export function useStageViewport({
       const distance = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
       const state = useEditorStore.getState()
       if (!gesture) {
-        getStage()?.find((node: { isDragging: () => boolean }) => node.isDragging()).forEach((node) => node.stopDrag())
+        // A second finger turns a drag into a camera move. The drag is
+        // abandoned rather than committed wherever the finger had reached.
+        const dragging = getStage()?.find((node: { isDragging: () => boolean }) => node.isDragging()) ?? []
+        if (dragging.length > 0) cancelDragForPinch()
+        dragging.forEach((node) => node.stopDrag())
         gesture = { distance: Math.max(1, distance), zoom: state.zoom, x: (x - state.viewportX) / state.zoom, y: (y - state.viewportY) / state.zoom }
         return
       }

@@ -2,19 +2,17 @@ import { ImpactStyle } from '@capacitor/haptics'
 import { isNativeMobile } from './platform'
 
 /**
- * Touch feedback.
+ * Touch feedback, for a long press and nothing else.
  *
- * The single clearest tell that something is a web page is that pressing a
- * control does nothing you can feel. A native app answers a press in the
- * hand, before the screen has finished changing.
+ * It used to fire on every press in the app, which is wrong: a phone that
+ * buzzes each time you touch a button is not more native, it is exhausting,
+ * and none of the platforms do it. A long press is different — it is a
+ * gesture with no visual start, so the buzz is the only signal that the
+ * press was recognised before the menu appears. That is the one case.
  *
- * Deliberately three levels and no more, so the whole app speaks one
- * vocabulary: a selection tick for choosing among things, a light tap for
- * ordinary buttons, a firmer one for something committed or destructive.
- *
- * Every call is fire-and-forget. Haptics are a courtesy, and a device with
- * the motor disabled, or a browser with no plugin, must never surface an
- * error or block the action it was decorating.
+ * Fire-and-forget: haptics are a courtesy, and a device with the motor
+ * disabled, or a browser with no plugin, must never surface an error or
+ * block the gesture it was confirming.
  */
 
 type Feel = 'select' | 'tap' | 'commit'

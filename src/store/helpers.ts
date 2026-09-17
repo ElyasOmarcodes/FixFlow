@@ -41,11 +41,18 @@ export const SLIDE_KEY_SCHEMA_VERSION = 3
 export const CHIP_ICON_SIDE_SCHEMA_VERSION = 4
 
 /**
+ * An icon layer's x,y used to be its backing plate's top-left, with the glyph
+ * inset by the padding; it is now the glyph itself, with the plate growing
+ * outward. See migrateIconPlateOrigin().
+ */
+export const ICON_PLATE_ORIGIN_SCHEMA_VERSION = 5
+
+/**
  * What migrateProject() brings a project up to. Named separately so adding a
  * migration means bumping one constant rather than hunting for every place
  * that happened to reference the previously-latest one.
  */
-export const CURRENT_SCHEMA_VERSION = CHIP_ICON_SIDE_SCHEMA_VERSION
+export const CURRENT_SCHEMA_VERSION = ICON_PLATE_ORIGIN_SCHEMA_VERSION
 
 export { findLayerInTree, mapLayerTree, updateLayerInTree } from '@/utils/layerTree'
 
@@ -577,6 +584,23 @@ export function migrateChipIconSide(project: Project): Project {
   }
 }
 
+/** Keep a plated icon exactly where it was drawn under the old origin. */
+export function migrateIconPlateOrigin(project: Project): Project {
+  return {
+    ...project,
+    slideGroups: project.slideGroups.map((group) => ({
+      ...group,
+      layers: mapLayerTree(group.layers, (layer) => {
+        if (layer.type !== 'icon' || !layer.background) return layer
+        const padding = layer.backgroundPadding ?? 0
+        if (padding === 0) return layer
+        // The glyph used to sit at (x + padding); that is the new x.
+        return { ...layer, x: layer.x + padding, y: layer.y + padding } as Layer
+      }),
+    })),
+  }
+}
+
 export function migrateProject(raw: Project): Project {
   const project = normalizeGroupFamilies(normalizeProjectFormats(raw))
   for (const sg of project.slideGroups) {
@@ -607,6 +631,10 @@ export function migrateProject(raw: Project): Project {
   if ((project.settings.schemaVersion ?? 0) < CHIP_ICON_SIDE_SCHEMA_VERSION) {
     project.slideGroups = migrateChipIconSide(project).slideGroups
     project.settings = { ...project.settings, schemaVersion: CHIP_ICON_SIDE_SCHEMA_VERSION }
+  }
+  if ((project.settings.schemaVersion ?? 0) < ICON_PLATE_ORIGIN_SCHEMA_VERSION) {
+    project.slideGroups = migrateIconPlateOrigin(project).slideGroups
+    project.settings = { ...project.settings, schemaVersion: ICON_PLATE_ORIGIN_SCHEMA_VERSION }
   }
   return project
 }
