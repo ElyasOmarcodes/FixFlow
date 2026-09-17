@@ -41,7 +41,7 @@ function matchesFontSearch(entry: { label: string; nativeLabel?: string }, needl
   return entry.label.toLowerCase().includes(q) || (entry.nativeLabel?.includes(needle) ?? false)
 }
 
-function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
+export function FontPicker({ value, customFonts, onChange }: FontPickerProps) {
   const t = useT()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')

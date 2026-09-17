@@ -182,7 +182,13 @@ export interface EditorStore {
   addToGroup: (groupId: string, layer: Layer) => void
   removeFromGroup: (groupId: string, layerId: string) => void
   updateChildLayer: (groupId: string, childId: string, patch: Partial<Layer>) => void
-  addChipGroup: () => void
+  addChip: () => void
+  /**
+   * Insert a glyph. With no argument it drops a placeholder from the bundled
+   * library; a fetched symbol passes its own geometry so it never needs the
+   * network again.
+   */
+  addIcon: (pick?: { name: string; path?: string; viewBox?: string; filled?: boolean }) => void
   /** Reorder children within a group */
   reorderGroupChildren: (groupId: string, childIds: string[]) => void
   /** Move a top-level layer into a group; insertBeforeChildId=null appends */

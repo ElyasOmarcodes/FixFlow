@@ -1,4 +1,4 @@
-import type { Layer, BackgroundLayer, PhoneLayer, TextLayer, ImageLayer, ShapeLayer, EmojiLayer, BrandLayer, GroupLayer } from '@/types'
+import type { Layer, BackgroundLayer, PhoneLayer, TextLayer, ImageLayer, ShapeLayer, EmojiLayer, BrandLayer, GroupLayer, ChipLayer, IconLayer } from '@/types'
 import { BackgroundNode } from './BackgroundNode'
 import { PhoneNode } from './PhoneNode'
 import { TextNode } from './TextNode'
@@ -7,6 +7,8 @@ import { ShapeNode } from './ShapeNode'
 import { EmojiNode } from './EmojiNode'
 import { BrandNode } from './BrandNode'
 import { GroupNode } from './GroupNode'
+import { ChipNode } from './ChipNode'
+import { IconNode } from './IconNode'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -150,6 +152,28 @@ export function LayerNode({
           onSelectChild={onSelectChild}
           onChildDragEnd={onChildDragEnd}
           onChildTransformEnd={onChildTransformEnd}
+        />
+      )
+    case 'chip':
+      return (
+        <ChipNode
+          layer={layer as ChipLayer}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onDragEnd={onDragEnd}
+          onTransformEnd={(attrs) => onTransformEnd(attrs as Partial<Layer>)}
+          forceNotDraggable={forceNotDraggable}
+        />
+      )
+    case 'icon':
+      return (
+        <IconNode
+          layer={layer as IconLayer}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onDragEnd={onDragEnd}
+          onTransformEnd={(attrs) => onTransformEnd(attrs as Partial<Layer>)}
+          forceNotDraggable={forceNotDraggable}
         />
       )
     default:

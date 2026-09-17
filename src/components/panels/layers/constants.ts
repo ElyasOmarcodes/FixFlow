@@ -13,6 +13,8 @@ export const LAYER_ICON: Record<LayerTypeKey, IconName> = {
   emoji: 'emoji',
   brand: 'brand',
   group: 'group',
+  chip: 'chip',
+  icon: 'sparkles',
 }
 
 export interface ContextMenu { layerId: string; x: number; y: number }

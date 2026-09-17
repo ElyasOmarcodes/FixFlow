@@ -1,7 +1,4 @@
-import type {
-  Layer, GroupLayer,
-  PhoneLayer, TextLayer, ImageLayer, ShapeLayer, EmojiLayer, BrandLayer,
-} from '@/types'
+import type { Layer, GroupLayer, PhoneLayer, TextLayer, ImageLayer, ShapeLayer, EmojiLayer, BrandLayer, ChipLayer, IconLayer } from '@/types'
 import {
   BASE_CANVAS_FORMAT,
   getFamilyDefaultPhoneModel,
@@ -49,7 +46,8 @@ export const createLayerSlice = (
   | 'addShape'
   | 'addEmoji'
   | 'addBrand'
-  | 'addChipGroup'
+  | 'addChip'
+  | 'addIcon'
 > => ({
   // ─ Layer actions
   addLayer: (layer) => {
@@ -464,31 +462,66 @@ export const createLayerSlice = (
     get().addLayer(layer)
   },
 
-  addChipGroup: () => {
+  /**
+   * A chip is one layer, not a shape with a text layer parked on top.
+   *
+   * The old two-layer group could drift apart when either half was moved, had
+   * to be hunted through the layer tree to edit, and — worst — its background
+   * never followed the label, so renaming a chip left the text hanging outside
+   * its own pill. The box is now derived from the contents on every render.
+   */
+  addChip: () => {
     const group = getActiveGroup(get)
     if (!group) return
     const { settings } = get().project
     const factor = getLayerDefaultsScaleFactor(group, settings)
 
-    const bg: ShapeLayer = {
-      id: newId(), name: 'Chip BG', type: 'shape',
-      x: 0, y: 0, rotation: 0, opacity: 1, visible: true, locked: false,
-      shapeType: 'rect',
-      width: 280 * factor, height: 72 * factor,
+    const chip: ChipLayer = {
+      id: newId(), name: 'Chip', type: 'chip',
+      x: 100 * factor, y: 600 * factor, rotation: 0, opacity: 1, visible: true, locked: false,
+      text: 'Feature',
+      fontFamily: 'Inter',
+      fontSize: 31 * factor,
+      fontWeight: 700,
+      textColor: '#ffffff',
       fill: { type: 'linear', angle: 120, stops: [{ offset: 0, color: '#FF6F61' }, { offset: 1, color: '#EC4899' }] },
       cornerRadius: 36 * factor,
+      paddingX: 32 * factor,
+      paddingY: 18 * factor,
+      iconSize: 30 * factor,
+      iconGap: 12 * factor,
+      iconPosition: 'start',
     }
-    const label: TextLayer = {
-      id: newId(), name: 'Chip Label', type: 'text',
-      x: 32 * factor, y: 20 * factor, rotation: 0, opacity: 1, visible: true, locked: false,
-      text: 'Feature', fontFamily: 'Inter', fontSize: 31 * factor, fontWeight: 700,
-      fill: '#ffffff', letterSpacing: -0.4 * factor, lineHeight: 1, align: 'left',
+    get().addLayer(seedLocaleContent(chip, settings.defaultLocale))
+    // A new chip is an empty pill until it has a label, so open the panel on
+    // the tab that holds one.
+    set({ pendingContentFocusLayerId: chip.id })
+  },
+
+  addIcon: (pick) => {
+    const group = getActiveGroup(get)
+    if (!group) return
+    const { settings } = get().project
+    const factor = getLayerDefaultsScaleFactor(group, settings)
+    const name = pick?.name ?? 'star'
+
+    const icon: IconLayer = {
+      id: newId(), name: name.replace(/^material:/, '').replace(/[-_]/g, ' '), type: 'icon',
+      x: 120 * factor, y: 500 * factor, rotation: 0, opacity: 1, visible: true, locked: false,
+      icon: name,
+      size: 96 * factor,
+      color: '#ffffff',
+      // Scaled with the icon so the weight looks the same on every canvas size.
+      strokeWidth: 2 * factor * (96 / 24) / 4,
+      backgroundPadding: 0,
+      backgroundRadius: 24 * factor,
+      // A fetched glyph carries its geometry with it, so the project renders
+      // the same on a machine that has never reached Google's servers.
+      ...(pick?.path
+        ? { customPath: pick.path, customViewBox: pick.viewBox, customFilled: pick.filled }
+        : {}),
     }
-    const chipGroup: GroupLayer = {
-      id: newId(), name: 'Chip', type: 'group',
-      x: 100 * factor, y: 600 * factor, rotation: 0, opacity: 1, visible: true, locked: false,
-      children: [bg, seedLocaleContent(label, settings.defaultLocale)],
-    }
-    get().addLayer(chipGroup)
+    get().addLayer(icon)
+    set({ pendingContentFocusLayerId: icon.id })
   },
 })

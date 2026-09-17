@@ -11,6 +11,8 @@ import type {
   EmojiLayer,
   BrandLayer,
   GroupLayer,
+  ChipLayer,
+  IconLayer,
   PhoneLayer,
   SlideGroup,
   FillValue,
@@ -37,6 +39,8 @@ import { EmojiProperties } from '@/components/properties/EmojiProperties'
 import { BrandProperties } from '@/components/properties/BrandProperties'
 import { ShapeProperties } from '@/components/properties/ShapeProperties'
 import { GroupProperties } from '@/components/properties/GroupProperties'
+import { ChipProperties } from '@/components/properties/ChipProperties'
+import { IconProperties } from '@/components/properties/IconProperties'
 import { getCanvasFormat, getFormatCanvasDims, getFormatLabel, getProjectActiveFormats, getProjectBaseFormat, resolveGroupView } from '@/utils/canvasFormats'
 import type { CanvasFormatId } from '@/types'
 import { getLayerBBox, getUnionBBox, computeAlignPatch, type AlignAxis } from '@/utils/alignLayers'
@@ -417,6 +421,8 @@ function ContentTab({ layer }: { layer: Layer }) {
   if (layer.type === 'emoji') return <EmojiProperties layer={layer as EmojiLayer} />
   if (layer.type === 'brand') return <BrandProperties layer={layer as BrandLayer} />
   if (layer.type === 'shape') return <ShapeProperties layer={layer as ShapeLayer} />
+  if (layer.type === 'chip') return <ChipProperties layer={layer as ChipLayer} />
+  if (layer.type === 'icon') return <IconProperties layer={layer as IconLayer} />
   if (layer.type === 'group') return <GroupProperties layer={layer as GroupLayer} />
   return <div className={panelSectionCls}><p className="text-xs text-[var(--pd-c-6b6b7a)]">Unknown layer type</p></div>
 }

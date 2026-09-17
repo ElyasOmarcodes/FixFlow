@@ -264,7 +264,7 @@ export interface LegacyLocaleLayoutFields {
   localeBaseDelta?: Partial<Record<string, LayoutDelta>>;
 }
 
-export type LayerType = 'background' | 'phone' | 'text' | 'image' | 'shape' | 'emoji' | 'brand' | 'group';
+export type LayerType = 'background' | 'phone' | 'text' | 'image' | 'shape' | 'emoji' | 'brand' | 'group' | 'chip' | 'icon';
 
 // ─── Background ──────────────────────────────────────────────────────────────
 
@@ -446,6 +446,68 @@ export interface BrandLayer extends BaseLayer {
   gap: number;
 }
 
+/**
+ * A pill of label text on a rounded background, optionally with an icon.
+ *
+ * Previously this was a two-layer group — a shape with a text layer parked on
+ * top — which meant every edit was a hunt through the layer tree, the two
+ * halves could drift apart when either was moved, and the background never
+ * resized to fit the label. As one layer the box is *derived* from the text,
+ * the icon and the padding, so it is always the right size and there is one
+ * thing to select.
+ */
+export interface ChipLayer extends BaseLayer {
+  type: 'chip';
+  text: string;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: number;
+  /** Label colour. Background is `fill`, which may be a gradient. */
+  textColor: string;
+  fill: FillValue;
+  cornerRadius: number;
+  /** Space between the label and the box, per axis. */
+  paddingX: number;
+  paddingY: number;
+  /** Icon name from the canvas icon library. Omitted means label only. */
+  icon?: string;
+  iconSize: number;
+  /** Space between icon and label. */
+  iconGap: number;
+  /** Which side of the label the icon sits on, in reading order. */
+  iconPosition: 'start' | 'end';
+  iconColor?: string;
+  stroke?: string;
+  strokeWidth?: number;
+}
+
+/**
+ * A single glyph from the canvas icon library, drawn as strokes so it stays
+ * crisp at any export size, with an optional backing plate behind it.
+ */
+export interface IconLayer extends BaseLayer {
+  type: 'icon';
+  /** Name in the bundled library, or `custom:<assetKey>` for a fetched SVG. */
+  icon: string;
+  size: number;
+  color: string;
+  strokeWidth: number;
+  /** Backing plate. Omitted means the glyph sits directly on the design. */
+  background?: FillValue;
+  backgroundPadding: number;
+  backgroundRadius: number;
+  /** Raw SVG path data for a fetched icon, so it survives export and sharing. */
+  customPath?: string;
+  /**
+   * The fetched glyph's own coordinate box. Material Symbols are drawn on
+   * `0 -960 960 960`, not the library's 24-grid, so the path has to be mapped
+   * rather than assumed.
+   */
+  customViewBox?: string;
+  /** Material Symbols are solid shapes; the bundled library is stroked. */
+  customFilled?: boolean;
+}
+
 export interface GroupLayer extends BaseLayer {
   type: 'group'
   children: Layer[]
@@ -453,7 +515,7 @@ export interface GroupLayer extends BaseLayer {
   scale?: number
 }
 
-export type Layer = BackgroundLayer | PhoneLayer | TextLayer | ImageLayer | ShapeLayer | EmojiLayer | BrandLayer | GroupLayer;
+export type Layer = BackgroundLayer | PhoneLayer | TextLayer | ImageLayer | ShapeLayer | EmojiLayer | BrandLayer | GroupLayer | ChipLayer | IconLayer;
 
 // ─── CanvasBackground (legacy — kept for backwards-compat with old project files) ──
 

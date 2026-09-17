@@ -54,10 +54,10 @@ export interface LocalizableLayerRef {
   slideGroupName: string
   layerId: string
   layerName: string
-  layerType: 'text' | 'phone' | 'image'
+  layerType: 'text' | 'chip' | 'phone' | 'image'
   /** Human-readable CLI reference: "{slideGroupName}/{layerName}" */
   ref: string
-  /** Default (base-locale) text content — TextLayer only */
+  /** Default (base-locale) text content — text and chip layers only */
   defaultText?: string
   /** Default (base-locale) image reference — PhoneLayer.screenshotPath or ImageLayer.src */
   defaultImageRef?: string
@@ -88,7 +88,7 @@ export function effectiveLocalizationMode(layer: Layer): LocalizationMode {
 /** Whether locale content has the meaningful value required by its layer type. */
 export function isLocaleContentComplete(layer: Layer, content: LocaleContent | undefined): boolean {
   if (!content) return false
-  if (layer.type === 'text') return typeof content.text === 'string' && content.text.trim().length > 0
+  if (layer.type === 'text' || layer.type === 'chip') return typeof content.text === 'string' && content.text.trim().length > 0
   if (layer.type === 'phone') return Boolean(content.screenshotPath?.trim() || content.screenshotDataUrl)
   if (layer.type === 'image') return Boolean(content.src?.trim())
   return false
@@ -104,7 +104,7 @@ function collectFromLayers(
   for (const layer of layers) {
     if (layer.type === 'group') {
       collectFromLayers((layer as GroupLayer).children, groupId, groupName, defaultLocale, result)
-    } else if (layer.type === 'text' || layer.type === 'phone' || layer.type === 'image') {
+    } else if (layer.type === 'text' || layer.type === 'chip' || layer.type === 'phone' || layer.type === 'image') {
       result.push({
         slideGroupId: groupId,
         slideGroupName: groupName,
@@ -112,7 +112,7 @@ function collectFromLayers(
         layerName: layer.name,
         layerType: layer.type,
         ref: `${groupName}/${layer.name}`,
-        defaultText: layer.type === 'text' ? layer.localeContent?.[defaultLocale]?.text : undefined,
+        defaultText: layer.type === 'text' || layer.type === 'chip' ? layer.localeContent?.[defaultLocale]?.text : undefined,
         defaultImageRef: layer.type === 'phone'
           ? layer.localeContent?.[defaultLocale]?.screenshotPath
           : layer.type === 'image'
@@ -136,7 +136,7 @@ export interface LocaleManifestEntry {
   /** Layer nanoid — used for precise round-trip matching */
   id: string
   name: string
-  type: 'text' | 'phone' | 'image'
+  type: 'text' | 'chip' | 'phone' | 'image'
   /** Effective localization mode — CLI must NOT translate 'skip' layers. */
   mode: LocalizationMode
   /** Default (base-locale) values */
@@ -184,11 +184,11 @@ function collectManifestEntries(
       collectManifestEntries((layer as GroupLayer).children, groupName, locales, defaultLocale, result)
       continue
     }
-    if (layer.type !== 'text' && layer.type !== 'phone' && layer.type !== 'image') continue
+    if (layer.type !== 'text' && layer.type !== 'chip' && layer.type !== 'phone' && layer.type !== 'image') continue
 
     const defaultContent = layer.localeContent?.[defaultLocale]
     const defaultPatch: LocaleLayerPatch =
-      layer.type === 'text'
+      layer.type === 'text' || layer.type === 'chip'
         ? {
             text: defaultContent?.text,
             ...(defaultContent?.marks ? { marks: defaultContent.marks } : {}),

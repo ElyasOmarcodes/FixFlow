@@ -1386,6 +1386,166 @@
 
 .pd-slide-options-popover header button:active { background: var(--pd-hover); }
 
+/* ── Icon picker ───────────────────────────────────────────────────────────
+   A dense grid: the point is to scan a few hundred glyphs quickly, so the
+   cells are square, the label sits under the glyph, and the grid itself is
+   the only thing that scrolls — the search box and the category row stay
+   put while you hunt. */
+.pd-icon-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 14px 18px 18px;
+}
+
+.pd-icon-picker-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pd-icon-source {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 10px;
+  background: var(--pd-c-0f0f13);
+  border: 1px solid var(--pd-field-border);
+}
+
+.pd-icon-source button {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pd-c-8a86a0);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-icon-source button[aria-selected='true'] {
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+
+.pd-icon-search {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-field-border);
+  background: var(--pd-c-0f0f13);
+  color: var(--pd-c-e8e8f0);
+  font-size: 13px;
+}
+
+.pd-icon-categories {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.pd-icon-categories::-webkit-scrollbar { display: none; }
+
+.pd-icon-categories button {
+  flex: 0 0 auto;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--pd-field-border);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--pd-c-8a86a0);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-icon-categories button[aria-pressed='true'] {
+  border-color: var(--pd-accent);
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+
+.pd-icon-count,
+.pd-icon-note,
+.pd-icon-empty {
+  font-size: 11px;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-icon-empty { padding: 24px 0; text-align: center; }
+
+.pd-icon-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--pd-c-fca5a5, #fca5a5);
+}
+
+.pd-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 6px;
+  overflow-y: auto;
+  min-height: 0;
+  max-height: min(52dvh, 420px);
+  padding-inline-end: 4px;
+}
+
+.pd-icon-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 4px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: var(--pd-c-b0b0c4);
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    color var(--pd-dur-fast) var(--pd-ease-standard),
+    transform var(--pd-dur-instant) var(--pd-ease-spring);
+}
+
+.pd-icon-cell span {
+  width: 100%;
+  font-size: 9px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--pd-c-6b6b7a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-icon-cell:hover:not(:disabled) {
+  background: var(--pd-hover);
+  color: var(--pd-c-e8e8f0);
+}
+
+.pd-icon-cell:active:not(:disabled) { transform: scale(0.94); }
+
+.pd-icon-cell:disabled { opacity: 0.45; }
+
+.pd-icon-cell-active {
+  border-color: var(--pd-accent);
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+
+@keyframes pd-spin { to { transform: rotate(360deg); } }
+
+.pd-spin-slow { animation: pd-spin 900ms linear infinite; }
+
 /* ─── 7. Writing direction ─────────────────────────────────────────────────
    Everything above uses logical properties, so this section only has to
    handle what CSS cannot express logically: transforms, physical gradients

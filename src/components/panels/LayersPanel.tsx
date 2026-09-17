@@ -16,6 +16,7 @@ import { LAYER_ICON, type ContextMenu } from './layers/constants'
 import { SortableLayer, SortableGroup, DragPreview } from './layers/SortableLayerRow'
 import { AssetsSection } from './layers/AssetsSection'
 import { LayerContextMenu } from './layers/LayerContextMenu'
+import { IconPickerModal } from './IconPickerModal'
 import { useT } from '@/i18n'
 
 // ─── LayersPanel ──────────────────────────────────────────────────────────────
@@ -24,7 +25,7 @@ export function LayersPanel() {
   const t = useT()
   const {
     project, activeSlideGroupId, selection, select,
-    addPhone, addText, addShape, addEmoji, addChipGroup, addBrand, addImage,
+    addPhone, addText, addShape, addEmoji, addChip, addIcon, addBrand, addImage,
     removeLayer, duplicateLayer, moveLayerUp, moveLayerDown, updateLayer,
     setLayerVisibility, setLayerLocked, reorderLayers, dissolveGroup,
     selectedLayerIds, toggleLayerSelection, setMultiSelection, clearMultiSelection,
@@ -40,7 +41,8 @@ export function LayersPanel() {
     addText: s.addText,
     addShape: s.addShape,
     addEmoji: s.addEmoji,
-    addChipGroup: s.addChipGroup,
+    addChip: s.addChip,
+    addIcon: s.addIcon,
     addBrand: s.addBrand,
     addImage: s.addImage,
     removeLayer: s.removeLayer,
@@ -72,6 +74,7 @@ export function LayersPanel() {
   const layers = activeGroup?.layers ?? []
 
   const [insertOpen, setInsertOpen] = useState(false)
+  const [iconPickerOpen, setIconPickerOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'layers' | 'assets'>('layers')
   const [selecting, setSelecting] = useState(false)
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null)
@@ -282,7 +285,8 @@ export function LayersPanel() {
     }
     else if (key === 'shape') addShape()
     else if (key === 'emoji') addEmoji()
-    else if (key === 'chip') addChipGroup()
+    else if (key === 'chip') addChip()
+    else if (key === 'icon') setIconPickerOpen(true)
     else if (key === 'brand') addBrand()
     else if (key === 'image') imageInputRef.current?.click()
   }
@@ -292,6 +296,7 @@ export function LayersPanel() {
     { key: 'shape', icon: 'shape', label: t('layers.insertShape') },
     { key: 'emoji', icon: 'emoji', label: t('layers.insertEmoji') },
     { key: 'chip', icon: 'chip', label: t('layers.insertChip') },
+    { key: 'icon', icon: 'sparkles', label: t('layers.insertIcon') },
     { key: 'brand', icon: 'brand', label: t('layers.insertBrand') },
     { key: 'image', icon: 'image', label: t('layers.insertImage') },
   ]
@@ -415,6 +420,12 @@ export function LayersPanel() {
         <button aria-label={t('workspace.duplicate')} title={t('workspace.duplicate')} disabled={!selectedLayerIds.length && (!selectedLayer || selectedLayer.type === 'background')} onClick={() => { for (const id of selectedLayerIds.length ? selectedLayerIds : [selectedLayer!.id]) duplicateLayer(id) }}><Icon name="copy" size={20} /><span>{t('workspace.duplicate')}</span></button>
         <button aria-label={t('workspace.delete')} title={t('workspace.delete')} disabled={!selectedLayer && !selectedLayerIds.length || selectedLayer?.type === 'background'} onClick={() => { for (const id of selectedLayerIds.length ? selectedLayerIds : [selectedLayer!.id]) removeLayer(id); clearMultiSelection() }}><Icon name="trash" size={20} /><span>{t('workspace.delete')}</span></button>
       </footer>
+
+      <IconPickerModal
+        open={iconPickerOpen}
+        onClose={() => setIconPickerOpen(false)}
+        onPick={(icon) => addIcon(icon)}
+      />
 
       {/* Context menu */}
       {contextMenu && (
