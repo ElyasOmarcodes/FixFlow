@@ -1944,14 +1944,44 @@
   color: var(--pd-c-fca5a5, #fca5a5);
 }
 
-.pd-icon-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
-  gap: 6px;
+/* The virtualised catalogue scroller.
+
+   The viewport is the only thing that scrolls. Inside it a spacer carries the
+   full height of every row — so the scrollbar tells the truth about a 4,403
+   icon catalogue — while the grid on top of it holds just the rows on screen.
+   No row gap: the pitch has to match the row height the virtualiser measures
+   in, so the breathing room lives inside the cell instead. */
+.pd-vgrid {
   overflow-y: auto;
+  overscroll-behavior: contain;
   min-height: 0;
+  flex: 1 1 auto;
   max-height: min(52dvh, 420px);
   padding-inline-end: 4px;
+}
+
+.pd-vgrid-spacer {
+  position: relative;
+  width: 100%;
+}
+
+.pd-vgrid-rows {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  display: grid;
+  gap: 0;
+  will-change: transform;
+}
+
+.pd-vgrid-cell {
+  min-width: 0;
+  padding: 3px;
+}
+
+.pd-vgrid-cell > button {
+  width: 100%;
+  height: 100%;
 }
 
 .pd-icon-cell {
@@ -1996,6 +2026,106 @@
   background: var(--pd-accent-wash);
   color: var(--pd-c-c4b5fd);
 }
+
+/* ─── Translate-the-whole-design dialog ───────────────────────────────────
+   A short form, not a workspace: pick a scope, pick a language, watch it run.
+   Everything about it is sized so the whole thing fits above the fold on a
+   phone, because the person is here to press one button. */
+.pd-translate-all {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px 18px;
+}
+
+.pd-translate-all-lede {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-translate-all-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-translate-all-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-translate-all-select {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-field-border);
+  background-color: var(--pd-c-0f0f13);
+  color: var(--pd-c-e8e8f0);
+  font-size: 13px;
+}
+
+.pd-translate-all-count,
+.pd-translate-all-progress,
+.pd-translate-all-ok,
+.pd-translate-all-warn,
+.pd-translate-all-error {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-translate-all-ok { color: var(--pd-ok, #6ee7b7); }
+.pd-translate-all-warn { color: var(--pd-warn, #fbbf24); }
+.pd-translate-all-error { color: var(--pd-danger, #fca5a5); }
+
+.pd-translate-all-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.pd-translate-all-cancel,
+.pd-translate-all-run {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    opacity var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-translate-all-cancel {
+  border: 1px solid var(--pd-line);
+  color: var(--pd-c-b0b0c4);
+}
+
+.pd-translate-all-cancel:hover:not(:disabled) {
+  border-color: var(--pd-line-loud);
+  color: var(--pd-c-e8e8f0);
+}
+
+.pd-translate-all-run {
+  border: 1px solid var(--pd-accent-soft);
+  background: var(--pd-accent);
+  color: #fff;
+}
+
+.pd-translate-all-run:hover:not(:disabled) { filter: brightness(1.08); }
+
+.pd-translate-all-cancel:disabled,
+.pd-translate-all-run:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* Google-symbol variant controls: style, fill and weight. */
 .pd-icon-variants {
@@ -2069,10 +2199,34 @@
   font-size: 11.5px;
 }
 
-/* Google serves its symbols as black artwork, which disappears on a dark
-   panel. Recoloured to the current text colour with a filter, since an <img>
-   cannot inherit `fill` — and the grid has to stay <img> so hundreds of
-   previews cost one cached request each rather than a parse. */
+/* A catalogue preview drawn from the Material Symbols font.
+
+   The element's text is the icon's own name; the font maps it to the artwork
+   as a ligature, so one 320 KB file draws all 4,403 icons in the current text
+   colour with no per-icon request. `liga` is stated explicitly because a
+   browser that has disabled discretionary ligatures would otherwise print the
+   name instead of the icon. */
+.pd-icon-cell span.pd-symbol-glyph {
+  font-family: 'Material Symbols Outlined', sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  width: auto;
+  color: inherit;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fallback preview, used only when the font could not load. Google serves its
+   symbols as black artwork, which disappears on a dark panel, and an <img>
+   cannot inherit `fill` — so it is recoloured with a filter. */
 .pd-symbol-img {
   filter: invert(var(--pd-symbol-invert, 1));
   opacity: 0.86;
@@ -2460,12 +2614,31 @@
    viewport: a 1200px tablet still needs 40px targets. */
 
 @media (pointer: coarse) {
-  .pd-toolbar button,
-  .pd-slides button,
-  .pd-sidebar button,
-  .pd-modal-panel button { min-height: 40px; }
+  /* A blanket min-height grows the *drawn* control, not just its hit area.
+     That turned the 44×20 switch into a 44×40 pill — a circle with a knob
+     rattling around inside it. Controls whose size is their design opt out
+     here and get their reach from `.pd-hit` below instead. */
+  .pd-toolbar button:not(.pd-hit),
+  .pd-slides button:not(.pd-hit),
+  .pd-sidebar button:not(.pd-hit),
+  .pd-modal-panel button:not(.pd-hit) { min-height: 40px; }
 
-  .pd-toolbar button { min-width: 40px; }
+  .pd-toolbar button:not(.pd-hit) { min-width: 40px; }
+
+  /* Reach without resizing: an invisible 44px square centred on the control,
+     which is the accessibility minimum, while the control stays the size the
+     design says it is. */
+  .pd-hit { position: relative; }
+
+  .pd-hit::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(44px, 100%);
+    height: max(44px, 100%);
+    transform: translate(-50%, -50%);
+  }
 
   /* 16px is the threshold below which mobile browsers zoom the page on focus. */
   input, select, textarea { font-size: 16px; }

@@ -3,6 +3,7 @@ import { Group, Path, Rect, Text } from 'react-konva'
 import type Konva from 'konva'
 import type { ChipLayer } from '@/types'
 import { getIconGlyph } from '@/assets/icons/library'
+import { parseViewBox } from '@/utils/materialSymbols'
 import { layoutChip, measureChipText } from '@/utils/chipLayout'
 import { resolveBrandColor } from '@/utils/brandColors'
 import { layerFillToKonvaProps } from '@/utils/konvaFill'
@@ -42,12 +43,17 @@ export function ChipNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
     iconGap: layer.iconGap,
     iconPosition: layer.iconPosition,
   })
-  const glyph = layer.icon ? getIconGlyph(layer.icon) : undefined
+  // A fetched symbol carries its own path and grid; a library one is looked
+  // up by name and lives on the 24-grid the layout assumes.
+  const iconPath = layer.iconPath ?? (layer.icon ? getIconGlyph(layer.icon)?.d : undefined)
+  const iconFilled = layer.iconPath ? layer.iconFilled === true : false
+  const [iconBoxX, iconBoxY, iconBoxW, iconBoxH] = parseViewBox(layer.iconPath ? layer.iconViewBox : undefined)
+  const iconScale = layer.iconSize / Math.max(iconBoxW, iconBoxH, 1)
 
   const shadowProps = useLayerEffects(
     groupRef,
     layer,
-    `chip:${layer.text}:${layer.icon ?? ''}:${layer.fontSize}:${box.width}x${box.height}`,
+    `chip:${layer.text}:${layer.icon ?? ''}:${layer.fontSize}:${box.width}x${box.height}:${iconFilled}`,
   )
 
   // Held in a ref because a live transform mutates the node without a re-render;
@@ -121,19 +127,25 @@ export function ChipNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
         {...layerFillToKonvaProps(layer.fill, brandColors, { width: box.width, height: box.height })}
         {...shadowProps}
       />
-      {glyph && box.iconX !== null && (
+      {iconPath && box.iconX !== null && (
         <Path
-          x={box.iconX}
-          y={box.iconY}
-          data={glyph.d}
-          scaleX={box.iconScale}
-          scaleY={box.iconScale}
-          stroke={iconColor}
-          // Divided by the scale so the stroke reads the same weight whatever
-          // size the icon is drawn at.
-          strokeWidth={2 / box.iconScale}
-          lineCap="round"
-          lineJoin="round"
+          // The glyph's own box origin is subtracted so both grids land in the
+          // same iconSize square the layout reserved for them.
+          x={box.iconX - iconBoxX * iconScale}
+          y={box.iconY - iconBoxY * iconScale}
+          data={iconPath}
+          scaleX={iconScale}
+          scaleY={iconScale}
+          {...(iconFilled
+            ? { fill: iconColor }
+            : {
+                stroke: iconColor,
+                // Divided by the scale so the stroke reads the same weight
+                // whatever size the icon is drawn at.
+                strokeWidth: 2 / iconScale,
+                lineCap: 'round' as const,
+                lineJoin: 'round' as const,
+              })}
           listening={false}
         />
       )}

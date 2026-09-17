@@ -375,4 +375,18 @@ export const ps: Record<TranslationKey, string> = {
   'loc.translateRetry': 'بیا وژباړه',
   'loc.translating': 'ژباړل کیږي…',
   'loc.translationFailed': 'ژباړه ناکامه شوه',
+  // ─ د ټول کانواس ژباړه
+  'translateAll.action': 'هرڅه وژباړه',
+  'translateAll.title': 'د ډیزاین ژباړه',
+  'translateAll.lede': 'په کانواس کې هر سرلیک، متن او چیپ په یوه ژبه بدلوي، په خپل ځای کې. یو ځل undo هرڅه بیرته راولي.',
+  'translateAll.scope': 'څه وژباړل شي',
+  'translateAll.scopeSlide': 'همدا سلایډ',
+  'translateAll.scopeProject': 'ټول {count} سلایډونه',
+  'translateAll.target': 'ژبه',
+  'translateAll.found': '{count} متنونه وموندل شول',
+  'translateAll.run': 'وژباړه',
+  'translateAll.again': 'بیا وژباړه',
+  'translateAll.progress': 'د {total} څخه {done} ژباړل کیږي…',
+  'translateAll.complete': '{count} وژباړل شول.',
+  'translateAll.partial': '{count} وژباړل شول، {failed} ونه ژباړل شول — بیا یې هڅه وکړئ.',
 }

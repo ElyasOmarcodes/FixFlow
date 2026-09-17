@@ -1,34 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useT } from '@/i18n'
-import { applySystemBars } from '@/native/systemUi'
+import { applyTheme, readThemePreference, saveThemePreference, type ThemePreference } from '@/utils/theme'
 
-type Theme = 'light' | 'dark' | 'system'
+/**
+ * Picks the theme. It does not *own* it — see src/utils/theme.ts. This
+ * component is only rendered in the desktop toolbar and the mobile sheet, so
+ * anything it owned would not exist until one of those was on screen.
+ */
 export function ThemeControl() {
   const t = useT()
-  const [theme, setTheme] = useState<Theme>(() => {
-    try {
-      const saved = localStorage.getItem('pixeldeck.theme')
-      return saved === 'dark' || saved === 'light' ? saved : 'system'
-    } catch { return 'system' }
-  })
+  const [theme, setTheme] = useState<ThemePreference>(readThemePreference)
+
   useEffect(() => {
-    const media = matchMedia('(prefers-color-scheme: dark)')
-    const apply = () => {
-      const resolved = theme === 'system' ? (media.matches ? 'dark' : 'light') : theme
-      document.documentElement.dataset.theme = resolved
-      document.documentElement.style.colorScheme = resolved
-      // Repaint the phone's own status bar to match. Read from the computed
-      // token rather than a second copy of the hex, so the bar can never
-      // drift from the panel it sits above.
-      const panel = getComputedStyle(document.documentElement).getPropertyValue('--pd-panel').trim()
-      applySystemBars(resolved, panel || (resolved === 'dark' ? '#18181f' : '#ffffff'))
-    }
-    apply()
-    try { localStorage.setItem('pixeldeck.theme', theme) } catch { /* Session-only preference. */ }
-    media.addEventListener('change', apply)
-    return () => media.removeEventListener('change', apply)
+    saveThemePreference(theme)
+    applyTheme(theme)
   }, [theme])
-  return <select className="pd-theme-control" aria-label={t('workspace.theme')} value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>
+
+  return <select className="pd-theme-control" aria-label={t('workspace.theme')} value={theme} onChange={(event) => setTheme(event.target.value as ThemePreference)}>
     <option value="system">{t('workspace.system')}</option>
     <option value="light">{t('phone.themeLight')}</option>
     <option value="dark">{t('phone.themeDark')}</option>

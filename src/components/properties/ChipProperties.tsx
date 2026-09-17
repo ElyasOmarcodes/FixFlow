@@ -31,7 +31,14 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
   const upd = (patch: Partial<ChipLayer>) => updateLayer(layer.id, patch as Partial<Layer>)
   const [pickerOpen, setPickerOpen] = useState(false)
 
-  const glyph = layer.icon ? getIconGlyph(layer.icon) : undefined
+  // Same two sources as the canvas: a fetched symbol brings its own geometry,
+  // a library one is looked up by name.
+  const iconPath = layer.iconPath ?? (layer.icon ? getIconGlyph(layer.icon)?.d : undefined)
+  const iconViewBox = layer.iconPath ? layer.iconViewBox ?? '0 -960 960 960' : '0 0 24 24'
+  const iconFilled = layer.iconPath ? layer.iconFilled === true : false
+  const iconLabel = layer.icon?.startsWith('material:')
+    ? layer.icon.slice('material:'.length).replace(/_/g, ' ')
+    : layer.icon?.replace(/-/g, ' ')
 
   return (
     <div className="space-y-4">
@@ -138,19 +145,21 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
             onClick={() => setPickerOpen(true)}
             className={`${subtleButtonCls} flex flex-1 items-center gap-2`}
           >
-            {glyph
-              ? <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            {iconPath
+              ? <svg width={16} height={16} viewBox={iconViewBox}
+                  fill={iconFilled ? 'currentColor' : 'none'}
+                  stroke={iconFilled ? 'none' : 'currentColor'}
                   strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d={glyph.d} />
+                  <path d={iconPath} />
                 </svg>
               : <Icon name="sparkles" size={14} />}
-            <span className="truncate">{layer.icon ? layer.icon.replace(/-/g, ' ') : t('chip.iconNone')}</span>
+            <span className="truncate">{iconLabel ?? t('chip.iconNone')}</span>
           </button>
           {layer.icon && (
             <button
               type="button"
               className={subtleButtonCls}
-              onClick={() => upd({ icon: undefined })}
+              onClick={() => upd({ icon: undefined, iconPath: undefined, iconViewBox: undefined, iconFilled: undefined })}
               title={t('chip.iconRemove')}
               aria-label={t('chip.iconRemove')}
             >
@@ -221,11 +230,12 @@ export function ChipProperties({ layer }: { layer: ChipLayer }) {
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
         selected={layer.icon}
-        // A chip draws its glyph from the bundled library only: it is inline
-        // with text at text weight, where a filled Material shape reads as a
-        // blob rather than as part of the label.
-        libraryOnly
-        onPick={(icon) => upd({ icon: icon.name })}
+        onPick={(icon) => upd({
+          icon: icon.name,
+          iconPath: icon.path,
+          iconViewBox: icon.viewBox,
+          iconFilled: icon.filled,
+        })}
       />
     </div>
   )

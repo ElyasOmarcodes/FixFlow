@@ -161,6 +161,19 @@ export const STYLE_KEYS: Partial<Record<LayerType, string[]>> = {
   image: ['cornerRadius', 'blur', 'shadow', 'opacity'],
   phone: ['scale', 'screenshotFit', 'screenshotOffsetX', 'screenshotOffsetY', 'showStatusBar', 'statusBarTheme', 'statusBarBg', 'statusBarColor', 'border', 'blur', 'shadow', 'opacity'],
   group: ['blur', 'shadow', 'opacity'],
+  // Everything about how a chip looks, but not its label or which glyph it
+  // carries — those are content, and copying a style must not overwrite them.
+  chip: [
+    'fontFamily', 'fontSize', 'fontWeight', 'textColor', 'fill', 'cornerRadius',
+    'paddingX', 'paddingY', 'iconSize', 'iconGap', 'iconPosition', 'iconColor',
+    'stroke', 'strokeWidth', 'blur', 'shadow', 'opacity',
+  ],
+  // Likewise: the size, colour, weight and backing plate travel; the glyph
+  // itself does not.
+  icon: [
+    'size', 'color', 'strokeWidth', 'background', 'backgroundPadding',
+    'backgroundRadius', 'blur', 'shadow', 'opacity',
+  ],
 }
 
 export function createBackgroundLayer(overrides?: Partial<BackgroundLayer>): BackgroundLayer {

@@ -375,4 +375,18 @@ export const fa: Record<TranslationKey, string> = {
   'loc.translateRetry': 'ترجمه مجدد',
   'loc.translating': 'در حال ترجمه…',
   'loc.translationFailed': 'ترجمه ناموفق بود',
+  // ─ ترجمهٔ کل بوم
+  'translateAll.action': 'ترجمهٔ همه',
+  'translateAll.title': 'ترجمهٔ طرح',
+  'translateAll.lede': 'هر عنوان، متن و چیپ روی بوم را در جای خود به یک زبان بازنویسی می‌کند. یک بار undo همه را برمی‌گرداند.',
+  'translateAll.scope': 'چه چیزی ترجمه شود',
+  'translateAll.scopeSlide': 'همین اسلاید',
+  'translateAll.scopeProject': 'هر {count} اسلاید',
+  'translateAll.target': 'به زبان',
+  'translateAll.found': '{count} متن پیدا شد',
+  'translateAll.run': 'ترجمه کن',
+  'translateAll.again': 'دوباره ترجمه کن',
+  'translateAll.progress': 'ترجمهٔ {done} از {total}…',
+  'translateAll.complete': '{count} ترجمه شد.',
+  'translateAll.partial': '{count} ترجمه شد، {failed} ترجمه نشد — دوباره تلاش کنید.',
 }

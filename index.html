@@ -12,6 +12,28 @@
     <meta name="description" content="Design polished App Store screenshot layouts with PixelDeck — a visual editor for iOS and Android screenshots." />
     <meta name="theme-color" content="#0f0f13" />
 
+    <!--
+      Paint the theme before the first frame.
+
+      The app applies the theme itself once React is up, but that is one frame
+      too late: a light phone would flash the dark surface first. Six lines of
+      blocking script is the standard price for not flashing, and it degrades
+      to the dark default if storage is unreadable.
+    -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('pixeldeck.theme');
+          var pref = saved === 'light' || saved === 'dark' ? saved : 'system';
+          var resolved = pref === 'system'
+            ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : pref;
+          document.documentElement.dataset.theme = resolved;
+          document.documentElement.style.colorScheme = resolved;
+        } catch (error) { /* Private window: the default stands. */ }
+      })();
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="PixelDeck — App Store Screenshot Designer" />

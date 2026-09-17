@@ -469,8 +469,17 @@ export interface ChipLayer extends BaseLayer {
   /** Space between the label and the box, per axis. */
   paddingX: number;
   paddingY: number;
-  /** Icon name from the canvas icon library. Omitted means label only. */
+  /**
+   * The glyph, as a library name or `material:<name>` for a fetched symbol.
+   * Omitted means label only.
+   */
   icon?: string;
+  /** Raw path data for a fetched glyph, so the chip survives export and sharing. */
+  iconPath?: string;
+  /** The fetched glyph's own coordinate box — Material's is `0 -960 960 960`. */
+  iconViewBox?: string;
+  /** Material Symbols are solid shapes; the bundled library is stroked. */
+  iconFilled?: boolean;
   iconSize: number;
   /** Space between icon and label. */
   iconGap: number;

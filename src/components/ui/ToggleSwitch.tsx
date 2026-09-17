@@ -58,7 +58,9 @@ export function ToggleSwitch({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="pd-switch"
+      // `pd-hit` keeps the 44px touch target off the drawn size — see the
+      // coarse-pointer block in index.css.
+      className="pd-switch pd-hit"
       data-size={size}
     >
       <span className="pd-switch-knob" />

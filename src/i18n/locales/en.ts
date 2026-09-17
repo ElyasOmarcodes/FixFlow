@@ -380,6 +380,20 @@ export const en = {
   'loc.translateRetry': 'Re-translate',
   'loc.translating': 'Translating…',
   'loc.translationFailed': 'Translation failed',
+  // ─ Translate the whole canvas
+  'translateAll.action': 'Translate everything',
+  'translateAll.title': 'Translate the design',
+  'translateAll.lede': 'Rewrites every headline, caption and chip on the canvas into one language, in place. One undo puts it all back.',
+  'translateAll.scope': 'What to translate',
+  'translateAll.scopeSlide': 'This slide',
+  'translateAll.scopeProject': 'All {count} slides',
+  'translateAll.target': 'Into',
+  'translateAll.found': '{count} pieces of text found',
+  'translateAll.run': 'Translate',
+  'translateAll.again': 'Translate again',
+  'translateAll.progress': 'Translating {done} of {total}…',
+  'translateAll.complete': '{count} translated.',
+  'translateAll.partial': '{count} translated, {failed} could not be — try those again.',
 } as const
 
 export type TranslationKey = keyof typeof en

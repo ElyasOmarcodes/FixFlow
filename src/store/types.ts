@@ -10,6 +10,7 @@ import type {
   PanoSettings,
 } from '@/types'
 import type { ContentSyncPlan } from '@/utils/contentSync'
+import type { CanvasTranslationPatch } from './slices/translateSlice'
 
 // ─── EditorStore interface ────────────────────────────────────────────────────
 
@@ -159,6 +160,11 @@ export interface EditorStore {
   sendLayerToBack: (layerId: string) => void
   reorderLayers: (layerIds: string[]) => void
   setLayerVisibility: (layerId: string, visible: boolean) => void
+  /**
+   * Rewrite many layers' text in one undo step, across every slide group.
+   * Used by the AI "translate the whole design" pass.
+   */
+  applyCanvasTranslations: (patches: CanvasTranslationPatch[]) => void
   setLayerLocked: (layerId: string, locked: boolean) => void
 
   // ─ Selection

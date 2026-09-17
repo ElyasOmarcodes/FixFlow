@@ -5,8 +5,10 @@ import {
   searchMaterialSymbols, symbolUrl,
   type SymbolStyle, type SymbolVariant, type SymbolWeight,
 } from '@/utils/materialSymbols'
+import { loadSymbolFont, symbolFontFamily } from '@/utils/symbolFont'
 import { ModalShell } from '@/components/ui/ModalShell'
 import { Icon } from '@/components/ui/Icon'
+import { VirtualIconGrid } from './icons/VirtualIconGrid'
 import { useT } from '@/i18n'
 
 interface IconPickerModalProps {
@@ -16,18 +18,16 @@ interface IconPickerModalProps {
   onPick: (icon: { name: string; path?: string; viewBox?: string; filled?: boolean }) => void
   /** Highlighted as current, when replacing an existing icon. */
   selected?: string
-  /**
-   * Hide the online tab. Callers that draw the glyph as strokes on a 24-grid
-   * (the chip's inline icon) can only use the bundled library, so offering the
-   * fetched set would hand them something they cannot render.
-   */
+  /** Hide the online tab, for a caller that can only draw bundled geometry. */
   libraryOnly?: boolean
 }
 
 type Source = 'library' | 'online'
 
-/** How many symbols the grid draws before asking the person to narrow down. */
-const ONLINE_PAGE = 120
+/** One grid row, in px: the cell's own height plus the grid gap. */
+const ROW_HEIGHT = 78
+/** Narrowest a cell may get before the grid drops a column. */
+const CELL_WIDTH = 78
 
 /** Draws a bundled glyph from raw path data at a fixed preview size. */
 function GlyphPreview({ d, size = 22 }: { d: string; size?: number }) {
@@ -40,19 +40,14 @@ function GlyphPreview({ d, size = 22 }: { d: string; size?: number }) {
 }
 
 /**
- * A Google symbol, drawn by the browser straight from the endpoint.
+ * Fallback preview: one <img> straight from Google's per-icon endpoint.
  *
- * An <img> rather than a fetch-and-parse: the grid shows hundreds at a time
- * and only the one that gets picked needs its geometry in hand. The browser
- * caches them, so picking is usually instant afterwards.
- *
- * A failed load falls back to a placeholder rather than an empty cell: behind
- * a corporate proxy, or offline, a grid of bare labels looks like the app is
- * broken instead of like the network is.
+ * Only used when the font could not be loaded. Because the grid is virtualised
+ * this is about thirty requests rather than four thousand, so a blocked font
+ * degrades to a slower grid instead of an unusable one.
  */
-function SymbolPreview({ name, variant, size = 24 }: { name: string; variant: SymbolVariant; size?: number }) {
+function SymbolImage({ name, variant, size = 24 }: { name: string; variant: SymbolVariant; size?: number }) {
   const [failed, setFailed] = useState(false)
-  // A new name or variant is a new request, so give the image another chance.
   const key = `${name}:${variant.style}:${variant.filled}:${variant.weight}`
   const [lastKey, setLastKey] = useState(key)
   if (lastKey !== key) { setLastKey(key); setFailed(false) }
@@ -67,8 +62,6 @@ function SymbolPreview({ name, variant, size = 24 }: { name: string; variant: Sy
       loading="lazy"
       decoding="async"
       onError={() => setFailed(true)}
-      // Painted with the current text colour rather than Google's black, so a
-      // grid of them reads in both themes.
       className="pd-symbol-img"
     />
   )
@@ -82,6 +75,13 @@ function SymbolPreview({ name, variant, size = 24 }: { name: string; variant: Sy
  * the headless CLI exporter. Google's catalogue is the second tab and carries
  * everything on fonts.google.com/icons: every name, all three styles, the fill
  * axis and the seven weights.
+ *
+ * The online tab draws its previews with the Material Symbols *font*, one
+ * ~320 KB file covering all 4,403 glyphs, and virtualises the grid. That is
+ * what lets the whole catalogue be scrolled — previously it was capped at 120
+ * because each visible cell was its own request, so a person could not see
+ * what they were choosing from. What gets committed to the canvas is still the
+ * picked icon's path geometry, so the font is a browsing aid only.
  */
 export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }: IconPickerModalProps) {
   const t = useT()
@@ -95,6 +95,10 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
   const [weight, setWeight] = useState<SymbolWeight>(DEFAULT_VARIANT.weight)
   const [names, setNames] = useState<readonly string[] | null>(null)
   const [namesFailed, setNamesFailed] = useState(false)
+  // Which style/weight/fill combination the font is installed for. Held as
+  // the key itself rather than a boolean so switching variant falls back to
+  // the images for exactly as long as the new font is in flight.
+  const [readyFontKey, setReadyFontKey] = useState<string | null>(null)
 
   // Reset on the open→closed edge, in render rather than in an effect: the
   // modal unmounts its body while exiting, so an effect would land a frame
@@ -115,15 +119,33 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
     return () => { cancelled = true }
   }, [source, names, namesFailed])
 
+  // One font per style/weight/fill combination, fetched the first time that
+  // combination is shown. `fonts.check` is what decides whether the grid can
+  // draw glyphs: a blocked CDN resolves the load but leaves nothing installed.
+  const fontKey = `${style}:${weight}:${filled ? 1 : 0}`
+  const fontReady = readyFontKey === fontKey
+  useEffect(() => {
+    if (source !== 'online') return
+    let cancelled = false
+    loadSymbolFont(style, weight, filled).then(() => {
+      if (cancelled) return
+      let available = false
+      try {
+        available = document.fonts.check(`24px "${symbolFontFamily(style)}"`, 'home')
+      } catch { /* No font API, or a blocked CDN: the images carry the grid. */ }
+      if (available) setReadyFontKey(fontKey)
+    })
+    return () => { cancelled = true }
+  }, [source, style, weight, filled, fontKey])
+
   const variant: SymbolVariant = useMemo(() => ({ style, filled, weight }), [style, filled, weight])
   const libraryResults = useMemo(() => searchIcons(query, category), [query, category])
-  // Capped: every rendered cell is a request to Google, so the grid shows a
-  // page at a time and the search narrows it rather than the scrollbar.
-  const onlineMatches = useMemo(
-    () => (names ? searchMaterialSymbols(query, names, 5000) : []),
+  // Uncapped: the grid only mounts the rows on screen, so the whole catalogue
+  // costs the same as one screenful of it.
+  const onlineResults = useMemo(
+    () => (names ? searchMaterialSymbols(query, names, names.length) : []),
     [query, names],
   )
-  const onlineResults = useMemo(() => onlineMatches.slice(0, ONLINE_PAGE), [onlineMatches])
 
   const handleLibraryPick = (glyph: IconGlyph) => {
     onPick({ name: glyph.name })
@@ -186,10 +208,14 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
             ))}
           </div>
           <p className="pd-icon-count">{t('icons.count', { count: libraryResults.length })}</p>
-          <div className="pd-icon-grid">
-            {libraryResults.map((glyph) => (
+          <VirtualIconGrid
+            items={libraryResults}
+            rowHeight={ROW_HEIGHT}
+            minCellWidth={CELL_WIDTH}
+            keyOf={(glyph) => glyph.name}
+            emptyState={<p className="pd-icon-empty">{t('icons.noResults')}</p>}
+            renderCell={(glyph) => (
               <button
-                key={glyph.name}
                 type="button"
                 title={glyph.name}
                 aria-label={glyph.name}
@@ -200,9 +226,8 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
                 <GlyphPreview d={glyph.d} />
                 <span>{glyph.name.replace(/-/g, ' ')}</span>
               </button>
-            ))}
-          </div>
-          {libraryResults.length === 0 && <p className="pd-icon-empty">{t('icons.noResults')}</p>}
+            )}
+          />
         </>
       ) : (
         <>
@@ -237,16 +262,16 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
             <p className="pd-icon-empty">{t('common.loading')}</p>
           ) : (
             <>
-              <p className="pd-icon-count">
-                {onlineMatches.length > onlineResults.length
-                  ? t('icons.showingOf', { count: onlineResults.length, total: onlineMatches.length })
-                  : t('icons.count', { count: onlineMatches.length })}
-              </p>
+              <p className="pd-icon-count">{t('icons.count', { count: onlineResults.length })}</p>
               {error && <p className="pd-icon-error"><Icon name="alert-triangle" size={13} />{error}</p>}
-              <div className="pd-icon-grid">
-                {onlineResults.map((name) => (
+              <VirtualIconGrid
+                items={onlineResults}
+                rowHeight={ROW_HEIGHT}
+                minCellWidth={CELL_WIDTH}
+                keyOf={(name) => name}
+                emptyState={<p className="pd-icon-empty">{t('icons.noResults')}</p>}
+                renderCell={(name) => (
                   <button
-                    key={name}
                     type="button"
                     title={name}
                     aria-label={name}
@@ -255,14 +280,21 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
                     className={selected === `material:${name}` ? 'pd-icon-cell pd-icon-cell-active' : 'pd-icon-cell'}
                     onClick={() => void handleOnlinePick(name)}
                   >
-                    {pendingName === name
-                      ? <Icon name="spinner" size={22} className="pd-spin-slow" />
-                      : <SymbolPreview name={name} variant={variant} />}
+                    {pendingName === name ? (
+                      <Icon name="spinner" size={22} className="pd-spin-slow" />
+                    ) : fontReady ? (
+                      // The glyph *is* the name: Material Symbols map each
+                      // icon's name to its artwork as a ligature.
+                      <span className="pd-symbol-glyph" style={{ fontFamily: symbolFontFamily(style) }} aria-hidden="true">
+                        {name}
+                      </span>
+                    ) : (
+                      <SymbolImage name={name} variant={variant} />
+                    )}
                     <span>{name.replace(/_/g, ' ')}</span>
                   </button>
-                ))}
-              </div>
-              {onlineResults.length === 0 && <p className="pd-icon-empty">{t('icons.noResults')}</p>}
+                )}
+              />
             </>
           )}
         </>
@@ -270,4 +302,3 @@ export function IconPickerModal({ open, onClose, onPick, selected, libraryOnly }
     </ModalShell>
   )
 }
-

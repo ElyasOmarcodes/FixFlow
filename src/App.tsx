@@ -7,6 +7,8 @@ import { useBackDismiss } from '@/native/useBackDismiss'
 import { isAndroid } from '@/native/platform'
 import { configureKeyboard, trackKeyboardInset } from '@/native/systemUi'
 import { suppressWebGestures } from '@/native/gestures'
+import { readThemePreference, watchTheme } from '@/utils/theme'
+import { applySystemBars } from '@/native/systemUi'
 import { useT } from '@/i18n'
 import { Icon } from '@/components/ui/Icon'
 import { useRef, useEffect, useState, lazy, Suspense } from 'react'
@@ -104,6 +106,14 @@ export default function App() {
 
   // Native chrome: stop the WebView panning the whole app under the keyboard,
   // and publish its height so a bottom sheet can sit above it.
+  // The theme is applied here, at the root, so a phone is never left on the
+  // wrong one until some component that happens to set it is first rendered.
+  // While the preference is 'system' this also follows the OS switching.
+  useEffect(() => watchTheme(readThemePreference, (resolved) => {
+    const panel = getComputedStyle(document.documentElement).getPropertyValue('--pd-panel').trim()
+    applySystemBars(resolved, panel || (resolved === 'dark' ? '#18181f' : '#ffffff'))
+  }), [])
+
   useEffect(() => {
     configureKeyboard()
     const releaseKeyboard = trackKeyboardInset()

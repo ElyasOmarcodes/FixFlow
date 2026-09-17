@@ -24,6 +24,12 @@ const SettingsModal = lazy(() =>
 const HelpModal = lazy(() =>
   import('@/components/panels/HelpModal').then((m) => ({ default: m.HelpModal })),
 )
+const TranslateCanvasModal = lazy(() =>
+  import('@/components/panels/TranslateCanvasModal').then((m) => ({ default: m.TranslateCanvasModal })),
+)
+const ApiKeysModal = lazy(() =>
+  import('@/components/panels/ApiKeysModal').then((m) => ({ default: m.ApiKeysModal })),
+)
 
 interface ToolbarProps {
   onExport: () => void
@@ -98,6 +104,8 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
+  const [translateOpen, setTranslateOpen] = useState(false)
+  const [apiKeysOpen, setApiKeysOpen] = useState(false)
 
   // Saved indicator — flashes "Saving…" then "Saved" briefly
   const [saveLabel, setSaveLabel] = useState<'saved' | 'saving' | null>(null)
@@ -127,6 +135,12 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
       <TemplatesModal open={templatesOpen} onClose={() => setTemplatesOpen(false)} />
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <TranslateCanvasModal
+        open={translateOpen}
+        onClose={() => setTranslateOpen(false)}
+        onNeedsApiKey={() => { setTranslateOpen(false); setApiKeysOpen(true) }}
+      />
+      <ApiKeysModal open={apiKeysOpen} onClose={() => setApiKeysOpen(false)} />
     </Suspense>
 
     {compact && (
@@ -165,6 +179,19 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
                 label: `${t('toolbar.group')} (${selectedLayerIds.length})`,
                 onClick: runAndClose(() => createGroup(selectedLayerIds)),
               }] : []),
+            ],
+          },
+          {
+            key: 'ai',
+            title: t('translateAll.title'),
+            actions: [
+              {
+                key: 'translate-all',
+                icon: 'sparkles',
+                label: t('translateAll.action'),
+                onClick: runAndClose(() => setTranslateOpen(true)),
+                primary: true,
+              },
             ],
           },
           {
@@ -406,6 +433,15 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         </button>
 
         <button
+          onClick={() => setTranslateOpen(true)}
+          title={t('translateAll.lede')}
+          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-3 py-1.5 rounded border border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)] transition-colors"
+        >
+          <Icon name="sparkles" size={13} />
+          <span className="max-[1099px]:hidden">{t('translateAll.action')}</span>
+        </button>
+
+        <button
           onClick={() => onSetMode(mode === 'localization' ? 'editor' : 'localization')}
           title={t('toolbar.localizationTitle')}
           className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border transition-colors ${
@@ -429,7 +465,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
 
         {/* GitHub link */}
         <a
-          href="https://github.com/ElyasOmarhs/PixelDeck"
+          href="https://github.com/ElyasOmarcodes/FixFlow"
           target="_blank"
           rel="noopener noreferrer"
           title="View on GitHub"
