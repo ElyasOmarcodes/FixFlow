@@ -1,7 +1,30 @@
 import { spawn } from 'node:child_process'
 import { setTimeout as delay } from 'node:timers/promises'
 import { chromium, expect } from '@playwright/test'
-import { mkdir } from 'node:fs/promises'
+import { mkdir, readFile } from 'node:fs/promises'
+
+/**
+ * A chapter's title, read from the file that defines it.
+ *
+ * Copying the title into this script is how the run broke: the Pashto AI
+ * chapter was retitled and the assertion still waited for the old heading,
+ * five minutes into a cross-platform build. A test may assert that the help
+ * is translated; it may not hold its own stale copy of the translation.
+ */
+async function helpChapterTitle(language, file) {
+  const raw = await readFile(`docs/help/${language}/${file}`, 'utf8')
+  const match = /^title:\s*(.+)$/m.exec(raw)
+  if (!match) throw new Error(`No title in docs/help/${language}/${file}`)
+  return match[1].trim()
+}
+
+/** A UI string, read from the dictionary that defines it, for the same reason. */
+async function uiString(language, key) {
+  const raw = await readFile(`src/i18n/locales/${language}.ts`, 'utf8')
+  const match = new RegExp(`'${key}':\\s*(?:'([^']+)'|"([^"]+)")`).exec(raw)
+  if (!match) throw new Error(`No ${key} in src/i18n/locales/${language}.ts`)
+  return match[1] ?? match[2]
+}
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5173'], { stdio: 'ignore' })
 for (let i = 0; i < 50; i++) {
   // Loopback-only readiness probe for our local test server; no credentials or user data.
@@ -144,17 +167,19 @@ try {
     await page.getByRole('dialog', { name: 'PixelDeck user guide' })
       .getByRole('button', { name: 'Close', exact: true }).click()
     for (const [lang, title, aiTitle] of [
-      ['ps', 'د PixelDeck لارښود', 'Gemini او د AI کارول'],
-      ['fa', 'راهنمای PixelDeck', 'Gemini و استفاده از AI'],
+      ['ps', await uiString('ps', 'help.title'), await helpChapterTitle('ps', '14-ai-features.md')],
+      ['fa', await uiString('fa', 'help.title'), await helpChapterTitle('fa', '14-ai-features.md')],
     ]) {
       await page.evaluate((language) => localStorage.setItem('pixeldeck.ui-language', language), lang)
       await page.reload()
       await page.waitForTimeout(1800)
       if (width < 1024) {
-        await page.locator('.pd-mobile-header').getByRole('button', { name: 'تنظیمات', exact: true }).click()
-        await page.locator('.pd-settings-tabs').getByRole('button', { name: 'پانو', exact: true }).click()
+        await page.locator('.pd-mobile-header')
+          .getByRole('button', { name: await uiString(lang, 'toolbar.settings'), exact: true }).click()
+        await page.locator('.pd-settings-tabs')
+          .getByRole('button', { name: await uiString(lang, 'settings.pano'), exact: true }).click()
         const content = page.locator('.pd-settings-content')
-        await expect(content.getByRole('heading')).toHaveText(lang === 'ps' ? 'د پانوراما تنظیمات' : 'تنظیمات پانوراما')
+        await expect(content.getByRole('heading')).toHaveText(await uiString(lang, 'settings.panoTitle'))
         expect(await content.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(2)
         await page.screenshot({ path: `test-results/editor/settings-${lang}-${width}.png` })
         await page.keyboard.press('Escape')
@@ -163,15 +188,15 @@ try {
         // Help lives in the "more" sheet on compact widths; the desktop toolbar
         // is not rendered there at all.
         await page.locator('.pd-mobile-header button').last().click()
-        await page.getByRole('dialog').getByRole('button', { name: lang === 'ps' ? 'مرسته' : 'راهنما', exact: true }).click()
+        await page.getByRole('dialog').getByRole('button', { name: await uiString(lang, 'toolbar.help'), exact: true }).click()
       } else {
-        await page.locator('.pd-toolbar').getByTitle(lang === 'ps' ? 'مرسته او د کیبورډ لنډ لارې' : 'راهنما و کلیدهای میان‌بر').click()
+        await page.locator('.pd-toolbar').getByTitle(await uiString(lang, 'toolbar.helpTitle')).click()
       }
       await expect(page.getByRole('dialog', { name: title })).toBeVisible()
       // Help switches navigation at md (768px), independently of the editor shell.
       const chapterSelect = page.getByRole('dialog').locator('select')
       if (await chapterSelect.isVisible()) await chapterSelect.selectOption('ai-features')
-      else await page.getByRole('dialog').getByRole('button', { name: new RegExp(aiTitle) }).click()
+      else await page.getByRole('dialog').getByRole('button', { name: aiTitle, exact: false }).click()
       await expect(page.getByRole('heading', { name: aiTitle })).toBeVisible()
       await page.screenshot({ path: `test-results/editor/guide-${lang}-${width}.png` })
       await page.keyboard.press('Escape')
