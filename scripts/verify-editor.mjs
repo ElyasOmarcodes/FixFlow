@@ -466,31 +466,10 @@ try {
       await page.waitForTimeout(400)
       await expect(handles).toHaveCount(0)
 
-      // Snapping was already restored before the handle checks; just reset the
-      // project for the template sweep below.
-      await page.evaluate(async () => {
-        const { useEditorStore } = await import('/src/store/index.ts')
-        useEditorStore.getState().resetProject()
-      })
-      await page.waitForTimeout(600)
-
-      for (const slug of ['noor-editorial', 'orbit-studio', 'serein-wellness']) {
-        await page.evaluate(async (name) => {
-          const { useEditorStore } = await import('/src/store/index.ts')
-          const template = await (await fetch(`/templates/${name}.template.json`)).json()
-          useEditorStore.getState().importTemplateAsNewProject(template)
-        }, slug)
-        await page.waitForTimeout(1200)
-        for (let index = 0; index < 7; index++) {
-          await page.evaluate(async (i) => {
-            const { useEditorStore } = await import('/src/store/index.ts')
-            const state = useEditorStore.getState()
-            state.setActiveSlideGroup(state.project.slideGroups[i].id)
-          }, index)
-          await page.waitForTimeout(350)
-          await page.screenshot({ path: `test-results/editor/${slug}-${index + 1}.png` })
-        }
-      }
+      // Templates used to be swept from here by poking the store, with the
+      // slide-group count hard-coded. verify-templates.mjs now renders every
+      // slide of every bundled template through the UI a user actually uses,
+      // and reads the group count off the project instead of assuming it.
     }
     expect(errors).toEqual([])
     console.log(`PASS ${width}: type RTL text, duplicate/delete/undo, themes, guide`)
