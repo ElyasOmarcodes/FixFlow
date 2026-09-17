@@ -1,8 +1,13 @@
 import { ExportModal } from '@/components/panels/ExportModal'
 import { SelectionActions } from '@/components/canvas/SelectionActions'
 import { SelectionHandleActions } from '@/components/canvas/SelectionHandleActions'
-import { Capacitor } from '@capacitor/core'
 import { App as NativeApp } from '@capacitor/app'
+import { BACK_PRIORITY, handleBack } from '@/native/backStack'
+import { useBackDismiss } from '@/native/useBackDismiss'
+import { isAndroid } from '@/native/platform'
+import { configureKeyboard, trackKeyboardInset } from '@/native/systemUi'
+import { suppressWebGestures } from '@/native/gestures'
+import { usePressFeedback } from '@/native/usePressFeedback'
 import { useT } from '@/i18n'
 import { Icon } from '@/components/ui/Icon'
 import { useRef, useEffect, useState, lazy, Suspense } from 'react'
@@ -49,22 +54,34 @@ export default function App() {
   const stageRef = useRef<Konva.Stage>(null)
   const conflictNotice = useProjectsStore((s) => s.conflictNotice)
 
+  // Android Back unwinds the surface stack — see src/native/backStack.ts. It
+  // used to guess from the DOM ("is a [role=dialog] present?"), which closed
+  // the panel behind a dialog and could not see a popover at all.
   useEffect(() => {
-    if (Capacitor.getPlatform() !== 'android') return
+    if (!isAndroid()) return
     const listener = NativeApp.addListener('backButton', () => {
-      if (document.querySelector('[role="dialog"]')) {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
-      } else if (startOpen) {
-        setStartOpen(false)
-      } else if (mobilePanel) {
-        setMobilePanel(null)
-      } else {
-        // Keep the editor's local state alive when leaving with Android Back.
-        void NativeApp.minimizeApp()
-      }
+      if (handleBack()) return
+      // Nothing left to dismiss. Leaving the editor keeps its state, the way
+      // Back out of any Android app does — it does not discard the project.
+      void NativeApp.minimizeApp()
     })
     return () => { void listener.then((handle) => handle.remove()) }
-  }, [mobilePanel, startOpen])
+  }, [])
+
+  // The mobile panels and the start screen are surfaces like any other.
+  useBackDismiss(mobilePanel !== null, () => setMobilePanel(null), BACK_PRIORITY.panel)
+  useBackDismiss(startOpen, () => setStartOpen(false), BACK_PRIORITY.sheet)
+
+  // Native chrome: stop the WebView panning the whole app under the keyboard,
+  // and publish its height so a bottom sheet can sit above it.
+  usePressFeedback()
+
+  useEffect(() => {
+    configureKeyboard()
+    const releaseKeyboard = trackKeyboardInset()
+    const releaseGestures = suppressWebGestures()
+    return () => { releaseKeyboard(); releaseGestures() }
+  }, [])
 
   // Register the stage in the singleton registry so PropertiesPanel and other
   // non-canvas components can access it for bounding-box queries (alignment).

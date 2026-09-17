@@ -1,4 +1,6 @@
 import { createPortal } from 'react-dom'
+import { BACK_PRIORITY } from '@/native/backStack'
+import { useBackDismiss } from '@/native/useBackDismiss'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '@/components/ui/Icon'
 
@@ -97,6 +99,10 @@ export function ModalShell({
   closeOnBackdrop = true,
 }: ModalShellProps) {
   const { mounted, exiting } = useExitTransition(open)
+
+  // Android Back dismisses a dialog the same way Escape does. Registered here
+  // rather than per-dialog so every one of them behaves the same.
+  useBackDismiss(open, onEscape ?? onClose, BACK_PRIORITY.modal)
 
   useEffect(() => {
     if (!open || !closeOnEscape) return

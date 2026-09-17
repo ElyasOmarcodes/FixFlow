@@ -241,9 +241,27 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    /* The long-press "copy image / open link" callout is the WebView telling
+       the user they are looking at a web page. */
+    -webkit-touch-callout: none;
+    /* Double-tap must not zoom the *page*: the canvas runs its own pinch and
+       zoom, and a page that scales underneath it fights the design surface. */
+    touch-action: manipulation;
   }
 
   :root[data-theme="light"] body { color-scheme: light; }
+
+  /* The on-screen keyboard's height, published by the native shell. Zero in a
+     browser and on desktop, so the same rules hold everywhere. */
+  :root { --pd-keyboard-h: 0px; }
+
+  /* iOS and some Android WebViews zoom the viewport when a field smaller than
+     16px takes focus, and never zoom back. The app's inputs are 11–13px by
+     design, so they are scaled up on touch instead of being left to trigger
+     that. */
+  @media (pointer: coarse) {
+    input, textarea, select { font-size: max(16px, 1em); }
+  }
 
   /* Pashto and Persian need a face that carries the script. Vazirmatn leads
      the stack for those UI languages (it also has Latin glyphs, so mixed
@@ -908,7 +926,7 @@
 }
 
 .pd-modal-panel {
-  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: calc(100dvh - 24px - var(--pd-keyboard-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   min-width: 0;
   animation: pd-pop-in var(--pd-dur-base) var(--pd-ease-decel) both;
 }
@@ -1172,6 +1190,7 @@
 .pd-more-backdrop {
   position: fixed;
   inset: 0;
+  padding-bottom: var(--pd-keyboard-h);
   z-index: var(--pd-z-more-sheet);
   display: flex;
   align-items: flex-end;
@@ -2169,6 +2188,8 @@
     width: 100%;
     height: 100%;
     max-height: 100%;
+    /* Above the on-screen keyboard, not behind it. */
+    padding-bottom: var(--pd-keyboard-h);
     z-index: var(--pd-z-sheet);
     border-radius: var(--pd-radius-sheet) var(--pd-radius-sheet) 0 0;
     background: var(--pd-panel);
