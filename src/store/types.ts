@@ -11,6 +11,7 @@ import type {
 } from '@/types'
 import type { ContentSyncPlan } from '@/utils/contentSync'
 import type { CanvasTranslationPatch } from './slices/translateSlice'
+import type { GeneratedSlide } from './slices/generateSlice'
 
 // ─── EditorStore interface ────────────────────────────────────────────────────
 
@@ -165,6 +166,11 @@ export interface EditorStore {
    * Used by the AI "translate the whole design" pass.
    */
   applyCanvasTranslations: (patches: CanvasTranslationPatch[]) => void
+  /**
+   * Place an AI-generated slide on the active slide group, as one undo step.
+   * Replaces the existing layers unless `replace` is false.
+   */
+  applyGeneratedSlide: (slide: GeneratedSlide, options?: { replace?: boolean }) => void
   setLayerLocked: (layerId: string, locked: boolean) => void
 
   // ─ Selection

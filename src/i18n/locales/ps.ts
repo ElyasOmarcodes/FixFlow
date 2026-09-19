@@ -502,4 +502,17 @@ export const ps: Record<TranslationKey, string> = {
   'align.slideBottom': 'د سلایډ ښکته اړخ ته',
   'align.multiHint': 'ټاکل شوي لایرونه یو له بل سره برابروي.',
   'align.multi': 'برابرول ({count})',
+  // ─ د AI په مرسته سلایډ جوړول
+  'generate.action': 'سلایډ ډیزاین کړه',
+  'generate.title': 'د AI په مرسته سلایډ ډیزاین',
+  'generate.lede': 'سلایډ بیان کړه، له ریښتینو لایرونو جوړیږي — سرلیک، چیپ، ایکن، ډیوایس — نو وروسته هر یو بدلولی شې.',
+  'generate.brief': 'دا سلایډ باید څه ووايي؟',
+  'generate.placeholder': 'د عادتونو څارونکی — هغه سلایډ چې ستاسو تسلسل په یوه کتنه ښیي',
+  'generate.replace': 'له خالي سلایډ پیل وکړه',
+  'generate.replaceOn': 'د دې سلایډ لایرونه بدلیږي. یو ځل undo یې بیرته راولي.',
+  'generate.replaceOff': 'نوي لایرونه به د موجوده پر سر زیات شي.',
+  'generate.working': 'ډیزاین کیږي…',
+  'generate.done': 'ترسره شو — سلایډ په کانواس کې دی.',
+  'generate.run': 'ډیزاین یې کړه',
+  'generate.again': 'بل یو ډیزاین کړه',
 }

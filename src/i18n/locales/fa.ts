@@ -502,4 +502,17 @@ export const fa: Record<TranslationKey, string> = {
   'align.slideBottom': 'به پایین اسلاید',
   'align.multiHint': 'لایه‌های انتخاب‌شده را با هم هم‌تراز می‌کند.',
   'align.multi': 'هم‌ترازی ({count})',
+  // ─ ساخت اسلاید با هوش مصنوعی
+  'generate.action': 'طراحی اسلاید',
+  'generate.title': 'طراحی اسلاید با هوش مصنوعی',
+  'generate.lede': 'اسلاید را توصیف کنید تا از لایه‌های واقعی ساخته شود — عنوان، چیپ، آیکون، دستگاه — و بعد هر بخشش قابل ویرایش بماند.',
+  'generate.brief': 'این اسلاید چه بگوید؟',
+  'generate.placeholder': 'یک ردیاب عادت — اسلایدی که زنجیرهٔ روزها را یک‌جا نشان می‌دهد',
+  'generate.replace': 'از اسلاید خالی شروع کن',
+  'generate.replaceOn': 'لایه‌های این اسلاید جایگزین می‌شوند. یک undo برشان می‌گرداند.',
+  'generate.replaceOff': 'لایه‌های تازه روی آنچه هست افزوده می‌شوند.',
+  'generate.working': 'در حال طراحی…',
+  'generate.done': 'انجام شد — اسلاید روی بوم است.',
+  'generate.run': 'طراحی کن',
+  'generate.again': 'یکی دیگر بساز',
 }

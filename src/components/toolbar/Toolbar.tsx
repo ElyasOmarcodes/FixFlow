@@ -27,6 +27,9 @@ const HelpModal = lazy(() =>
 const TranslateCanvasModal = lazy(() =>
   import('@/components/panels/TranslateCanvasModal').then((m) => ({ default: m.TranslateCanvasModal })),
 )
+const GenerateSlideModal = lazy(() =>
+  import('@/components/panels/GenerateSlideModal').then((m) => ({ default: m.GenerateSlideModal })),
+)
 const ApiKeysModal = lazy(() =>
   import('@/components/panels/ApiKeysModal').then((m) => ({ default: m.ApiKeysModal })),
 )
@@ -105,6 +108,7 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
   const [helpOpen, setHelpOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const [translateOpen, setTranslateOpen] = useState(false)
+  const [generateOpen, setGenerateOpen] = useState(false)
   const [apiKeysOpen, setApiKeysOpen] = useState(false)
 
   // Saved indicator — flashes "Saving…" then "Saved" briefly
@@ -139,6 +143,11 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
         open={translateOpen}
         onClose={() => setTranslateOpen(false)}
         onNeedsApiKey={() => { setTranslateOpen(false); setApiKeysOpen(true) }}
+      />
+      <GenerateSlideModal
+        open={generateOpen}
+        onClose={() => setGenerateOpen(false)}
+        onNeedsApiKey={() => { setGenerateOpen(false); setApiKeysOpen(true) }}
       />
       <ApiKeysModal open={apiKeysOpen} onClose={() => setApiKeysOpen(false)} />
     </Suspense>
@@ -186,11 +195,17 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
             title: t('translateAll.title'),
             actions: [
               {
+                key: 'generate-slide',
+                icon: 'ai',
+                label: t('generate.action'),
+                onClick: runAndClose(() => setGenerateOpen(true)),
+                primary: true,
+              },
+              {
                 key: 'translate-all',
                 icon: 'sparkles',
                 label: t('translateAll.action'),
                 onClick: runAndClose(() => setTranslateOpen(true)),
-                primary: true,
               },
             ],
           },
@@ -430,6 +445,15 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
           className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-3 py-1.5 rounded border border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)] transition-colors"
         >
           <Icon name="settings" size={13} /><span className="max-[1099px]:hidden">{t('toolbar.settings')}</span>
+        </button>
+
+        <button
+          onClick={() => setGenerateOpen(true)}
+          title={t('generate.lede')}
+          className="flex items-center gap-1.5 text-xs text-[var(--pd-c-e8e8f0)] px-3 py-1.5 rounded border border-[var(--pd-line)] hover:border-[var(--pd-line-loud)] hover:bg-[var(--pd-fill-soft)] transition-colors"
+        >
+          <Icon name="ai" size={13} />
+          <span className="max-[1099px]:hidden">{t('generate.action')}</span>
         </button>
 
         <button

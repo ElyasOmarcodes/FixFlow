@@ -2364,6 +2364,133 @@
   color: var(--pd-c-6b6b7a);
 }
 
+/* ─── Design-a-slide dialog ───────────────────────────────────────────────
+   A brief, one switch, one button. The interesting part happens on the
+   canvas, so the dialog stays out of the way of it. */
+.pd-generate {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px 18px;
+}
+
+.pd-generate-lede {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-generate-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-generate-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-generate-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-field-border);
+  background: var(--pd-c-0f0f13);
+  color: var(--pd-c-e8e8f0);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.pd-generate-input:focus {
+  outline: none;
+  border-color: var(--pd-accent-soft);
+}
+
+.pd-generate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-line-subtle);
+  background: var(--pd-fill-subtle);
+}
+
+.pd-generate-switch-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--pd-c-e8e8f0);
+}
+
+.pd-generate-hint {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-generate-progress,
+.pd-generate-ok,
+.pd-generate-error {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-generate-ok { color: var(--pd-ok, #6ee7b7); }
+.pd-generate-error { color: var(--pd-danger, #fca5a5); }
+
+.pd-generate-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.pd-generate-cancel,
+.pd-generate-run {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background-color var(--pd-dur-fast) var(--pd-ease-standard),
+    border-color var(--pd-dur-fast) var(--pd-ease-standard),
+    opacity var(--pd-dur-fast) var(--pd-ease-standard);
+}
+
+.pd-generate-cancel {
+  border: 1px solid var(--pd-line);
+  color: var(--pd-c-b0b0c4);
+}
+
+.pd-generate-cancel:hover:not(:disabled) {
+  border-color: var(--pd-line-loud);
+  color: var(--pd-c-e8e8f0);
+}
+
+.pd-generate-run {
+  border: 1px solid var(--pd-accent-soft);
+  background: var(--pd-accent);
+  color: #fff;
+}
+
+.pd-generate-run:hover:not(:disabled) { filter: brightness(1.08); }
+
+.pd-generate-cancel:disabled,
+.pd-generate-run:disabled { opacity: 0.45; cursor: not-allowed; }
+
 /* ─── Translate-the-whole-design dialog ───────────────────────────────────
    A short form, not a workspace: pick a scope, pick a language, watch it run.
    Everything about it is sized so the whole thing fits above the fold on a

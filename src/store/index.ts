@@ -22,6 +22,7 @@ import { createSlideGroupSlice } from './slices/slideGroupSlice'
 import { createLayerSlice } from './slices/layerSlice'
 import { createGroupSlice } from './slices/groupSlice'
 import { createTranslateSlice } from './slices/translateSlice'
+import { createGenerateSlice } from './slices/generateSlice'
 import { createClipboardSlice } from './slices/clipboardSlice'
 import { createProjectSlice } from './slices/projectSlice'
 
@@ -79,6 +80,7 @@ export const useEditorStore = create<EditorStore>()(
       ...createLayerSlice(set, get),
       ...createGroupSlice(set, get),
       ...createTranslateSlice(set, get),
+      ...createGenerateSlice(set, get),
       ...createClipboardSlice(set, get),
       ...createProjectSlice(set, get, () => useEditorStore.temporal.getState().clear()),
     })) as StateCreator<EditorStore>,

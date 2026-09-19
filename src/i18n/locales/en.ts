@@ -507,6 +507,19 @@ export const en = {
   'align.slideBottom': 'Align to the slide’s bottom',
   'align.multiHint': 'Aligns the selected layers to each other.',
   'align.multi': 'Align ({count})',
+  // ─ Generate a slide with AI
+  'generate.action': 'Design a slide',
+  'generate.title': 'Design a slide with AI',
+  'generate.lede': 'Describe the slide and it is built from real layers — headline, chip, icon, device — so every piece stays editable afterwards.',
+  'generate.brief': 'What should this slide say?',
+  'generate.placeholder': 'A habit tracker — the slide about seeing your streak at a glance',
+  'generate.replace': 'Start from a blank slide',
+  'generate.replaceOn': 'The layers on this slide are replaced. One undo brings them back.',
+  'generate.replaceOff': 'The new layers are added on top of what is already here.',
+  'generate.working': 'Designing…',
+  'generate.done': 'Done — the slide is on the canvas.',
+  'generate.run': 'Design it',
+  'generate.again': 'Design another',
 } as const
 
 export type TranslationKey = keyof typeof en
