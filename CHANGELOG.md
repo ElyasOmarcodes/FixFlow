@@ -7,6 +7,17 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.15.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.15.0) - 2026-09-19
+
+### Added
+
+- **The AI can design editorial slides, not just single-message ones.** A prompt can now produce the layout people actually wanted: a small label, a two-tone headline, two or three feature cards, and a device cropped by the bottom edge. Each card is assembled as a **group** — plate, tinted tile, glyph, bold line, description — because that is the object a person thinks they are moving; five loose layers would look identical and fill the layers panel with twenty rows for three cards. The card's height comes from how many lines its description wraps to, its columns are centred against each other, and its ink is picked from the luminance of its own plate, so a white card on a white-text slide can never come back blank.
+- **Generated copy is set in a face that has its letters.** A Pashto or Persian headline was being set in a Latin display face with no Arabic glyphs at all, falling back to whatever the system happened to have. Script now decides the face before role does, Arabic script is never tracked out (spacing the letters apart breaks their joins), and a feature card is mirrored — tile on the right, copy flush right — instead of reading as a Latin layout with Pashto poured into it.
+
+### Fixed
+
+- **Generated cards no longer come out too short for their own text.** Card heights are measured from the copy, and measuring against a font the browser has not fetched yet returns the fallback's metrics. The faces a plan needs are now loaded before anything is measured.
+
 ## [0.14.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.14.0) - 2026-09-19
 
 ### Added
