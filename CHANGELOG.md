@@ -7,6 +7,17 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.16.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.16.0) - 2026-09-19
+
+### Added
+
+- **An assistant that edits the canvas, not a chatbot beside it.** Write a sentence and layers are added, moved, grouped, aligned and repainted on the slide you are looking at — through the same store actions the toolbar uses, so what lands is real layers with nothing AI-specific left in the document afterwards. A message is not one request to a model: "make the headline fit" means read the slide, find it, measure it against the canvas, change it, look again, so a turn runs rounds until the assistant says it is finished or a cap stops it. The cap matters — a model that cannot do what was asked would otherwise try variations until the person's credit ran out, and every round is a paid request against their own key.
+- **Everything one message does is one undo.** Adding three layers and grouping them is one thing a person did. A turn that fails is rolled back whole instead of leaving half a change, and the panel's "undo this change" stops offering itself once the person has edited something themselves, because undo would then take away *their* work.
+- **The assistant reaches the whole program.** Not only the layers on the current slide: other slide groups (add, copy, rename, resize, panorama width, delete), the language and store-format axes, the brand palette, laying out a whole editorial slide from a plan, and rewriting every string on a slide into another language. Deleting a slide group asks twice — the first call reports what it would destroy and refuses, so the question reaches the person before the work does.
+- **On a phone it is a sheet that leaves the canvas visible.** The assistant edits the thing behind it, so unlike the other sheets it does not take the whole screen: the change appears while you are still reading the reply. The composer sits above the keyboard. On a desktop it is a fourth dock with a width you set and it remembers.
+- **The canvas says what changed.** Layers a turn touched are outlined for a moment — a turn asked for one thing can touch four, and reading ids out of a transcript is not how anyone finds them. The selection bar gained "ask the assistant about this", and whatever is selected travels with the message, because "this" means what is selected.
+- **A propose-only mode**, which leaves the reading tools working and refuses every write, for people who want the suggestion without the edit.
+
 ## [0.15.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.15.0) - 2026-09-19
 
 ### Added
