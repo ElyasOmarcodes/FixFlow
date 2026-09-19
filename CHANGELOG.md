@@ -7,6 +7,14 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.17.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.17.0) - 2026-09-19
+
+### Added
+
+- **The assistant's reply appears while it is being written.** A turn is one JSON object, so until now nothing could be shown until the whole thing had arrived — several seconds of a spinner on a slow connection with no sign anything was happening. The sentence is now read out of the half-arrived answer and shown as it is typed. Where a provider cannot stream — Google's native endpoint, or a gateway that rejects it — the answer simply arrives in one piece, exactly as before.
+- **Each project keeps its own conversation.** Come back to a project and the assistant still has what you asked it. Threads are stored beside the project's assets, never inside the project file, because a conversation is not design data and has no business travelling inside an exported `.json`. A restored turn no longer offers to undo itself — the undo history it belonged to did not survive the reload, so pressing it would undo something else.
+- **The assistant can look at the slide.** It can take a picture of the canvas and judge its own work — whether something overlaps, whether a line fell off the edge — rather than reasoning only from the layer list. The picture is downscaled hard, and only the most recent one is ever carried forward, because each one is paid for out of the same key.
+
 ## [0.16.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.16.0) - 2026-09-19
 
 ### Added
