@@ -515,4 +515,16 @@ export const ps: Record<TranslationKey, string> = {
   'generate.done': 'ترسره شو — سلایډ په کانواس کې دی.',
   'generate.run': 'ډیزاین یې کړه',
   'generate.again': 'بل یو ډیزاین کړه',
+  // ─ د منو بار
+  'menu.file': 'فایل',
+  'menu.edit': 'سمون',
+  'menu.insert': 'ننوتل',
+  'menu.view': 'کتنه',
+  'menu.ai': 'مصنوعي ځیرکتیا',
+  'menu.help': 'مرسته',
+  'menu.grid': 'ګرډ',
+  'menu.seamGuides': 'د درز کرښې',
+  'menu.themeLight': 'روښانه',
+  'menu.themeDark': 'تیاره',
+  'menu.apiKeys': 'د AI کلیدونه',
 }

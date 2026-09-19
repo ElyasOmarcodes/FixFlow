@@ -520,6 +520,18 @@ export const en = {
   'generate.done': 'Done — the slide is on the canvas.',
   'generate.run': 'Design it',
   'generate.again': 'Design another',
+  // ─ Menu bar
+  'menu.file': 'File',
+  'menu.edit': 'Edit',
+  'menu.insert': 'Insert',
+  'menu.view': 'View',
+  'menu.ai': 'AI',
+  'menu.help': 'Help',
+  'menu.grid': 'Grid',
+  'menu.seamGuides': 'Seam guides',
+  'menu.themeLight': 'Light',
+  'menu.themeDark': 'Dark',
+  'menu.apiKeys': 'AI keys',
 } as const
 
 export type TranslationKey = keyof typeof en

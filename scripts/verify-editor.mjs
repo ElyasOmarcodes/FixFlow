@@ -25,6 +25,23 @@ async function uiString(language, key) {
   if (!match) throw new Error(`No ${key} in src/i18n/locales/${language}.ts`)
   return match[1] ?? match[2]
 }
+/**
+ * Pick a command from the desktop menu bar.
+ *
+ * The chrome is a menu bar now, so a command that used to be its own button is
+ * a menu away. The trigger lookup is scoped to `.pd-menubar` because the bar's
+ * triggers and the items inside a menu share `role="menuitem"` — "Help" names
+ * both the menu and a command in it.
+ */
+async function pickFromMenu(page, menu, item) {
+  await page.locator('.pd-menubar').getByRole('menuitem', { name: menu, exact: true }).click()
+  const open = page.getByRole('menu', { name: menu })
+  // A checkable row is a `menuitemcheckbox`, which `menuitem` does not match.
+  await open.getByRole('menuitem', { name: item, exact: true })
+    .or(open.getByRole('menuitemcheckbox', { name: item, exact: true }))
+    .first().click()
+}
+
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5173'], { stdio: 'ignore' })
 for (let i = 0; i < 50; i++) {
   // Loopback-only readiness probe for our local test server; no credentials or user data.
@@ -126,7 +143,8 @@ try {
       }
       await page.screenshot({ path: `test-results/editor/more-sheet-${width}.png` })
     }
-    await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light')
+    if (width < 1024) await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('light')
+    else await pickFromMenu(page, 'View', 'Light')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
     if (width < 1024) {
       await page.keyboard.press('Escape')
@@ -138,15 +156,16 @@ try {
     await page.screenshot({ path: `test-results/editor/workspace-${width}-light.png` })
     if (width < 1024) await page.locator('#mobile-properties .pd-panel-close').click()
     await openMoreIfCompact()
-    await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('dark')
+    if (width < 1024) await page.getByRole('combobox', { name: 'Appearance', exact: true }).selectOption('dark')
+    else await pickFromMenu(page, 'View', 'Dark')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     if (width < 1024) {
       await page.keyboard.press('Escape')
       await expect(page.getByRole('dialog', { name: 'More tools' })).toHaveCount(0)
     }
     await page.screenshot({ path: `test-results/editor/workspace-${width}-dark.png` })
-    const settingsButton = width < 1024 ? page.locator('.pd-mobile-header').getByRole('button', { name: 'Settings', exact: true }) : page.getByTitle('Open settings', { exact: true })
-    await settingsButton.click()
+    if (width < 1024) await page.locator('.pd-mobile-header').getByRole('button', { name: 'Settings', exact: true }).click()
+    else await pickFromMenu(page, 'Help', 'Settings…')
     await expect(page.locator('.pd-settings')).toBeVisible()
     for (const tab of ['AI', 'Language', 'Brand', 'Pano']) {
       await page.locator('.pd-settings-tabs').getByRole('button', { name: tab, exact: true }).click()
@@ -160,7 +179,7 @@ try {
       await openMoreIfCompact()
       await page.getByRole('dialog', { name: 'More tools' }).getByRole('button', { name: 'Help', exact: true }).click()
     } else {
-      await page.getByTitle('Help & keyboard shortcuts').click()
+      await pickFromMenu(page, 'Help', 'Help')
     }
     await expect(page.getByRole('dialog', { name: 'FixFlow user guide' })).toBeVisible()
     await page.screenshot({ path: `test-results/editor/guide-${width}.png` })
@@ -190,7 +209,7 @@ try {
         await page.locator('.pd-mobile-header button').last().click()
         await page.getByRole('dialog').getByRole('button', { name: await uiString(lang, 'toolbar.help'), exact: true }).click()
       } else {
-        await page.locator('.pd-toolbar').getByTitle(await uiString(lang, 'toolbar.helpTitle')).click()
+        await pickFromMenu(page, await uiString(lang, 'menu.help'), await uiString(lang, 'toolbar.help'))
       }
       await expect(page.getByRole('dialog', { name: title })).toBeVisible()
       // Help switches navigation at md (768px), independently of the editor shell.
@@ -268,7 +287,7 @@ try {
       // Leave a selection behind, so a surviving one would be visible.
       await page.locator('.pd-layer-list button').first().click()
       const before = await groupCount()
-      await page.locator('.pd-toolbar').getByRole('button', { name: 'Templates', exact: true }).click()
+      await pickFromMenu(page, 'File', 'Templates…')
       const gallery = page.getByRole('dialog')
       await expect(gallery.getByRole('button', { name: 'A new project', exact: true })).toHaveAttribute('aria-pressed', 'true')
       await gallery.getByRole('button', { name: 'Use this template', exact: true }).first().click()
@@ -283,7 +302,7 @@ try {
 
       // Apply the same template again in append mode. Only then should the
       // groups accumulate — which is what proves the default did not append.
-      await page.locator('.pd-toolbar').getByRole('button', { name: 'Templates', exact: true }).click()
+      await pickFromMenu(page, 'File', 'Templates…')
       const appendGallery = page.getByRole('dialog')
       await appendGallery.getByRole('button', { name: 'Add to current project', exact: true }).click()
       await appendGallery.getByRole('button', { name: 'Add slides to project', exact: true }).first().click()

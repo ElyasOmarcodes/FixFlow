@@ -290,6 +290,18 @@ export function LayersPanel() {
     else if (key === 'brand') addBrand()
     else if (key === 'image') imageInputRef.current?.click()
   }
+  // The menu bar has an Insert menu of its own, and image insertion owns a
+  // file input while icon insertion owns the picker — both of which live here.
+  // Rather than a second copy of either, the menu asks this panel to do it.
+  useEffect(() => {
+    const onInsert = (event: Event) => {
+      const kind = (event as CustomEvent<string>).detail
+      if (typeof kind === 'string') handleInsertToolClick(kind)
+    }
+    window.addEventListener('fixflow:insert', onInsert)
+    return () => window.removeEventListener('fixflow:insert', onInsert)
+  })
+
   const insertTools: { key: string; icon: IconName; label: string }[] = [
     { key: 'phone', icon: 'phone', label: t('layers.insertDevices') },
     { key: 'text', icon: 'text', label: t('layers.insertText') },

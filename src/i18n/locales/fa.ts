@@ -515,4 +515,16 @@ export const fa: Record<TranslationKey, string> = {
   'generate.done': 'انجام شد — اسلاید روی بوم است.',
   'generate.run': 'طراحی کن',
   'generate.again': 'یکی دیگر بساز',
+  // ─ نوار منو
+  'menu.file': 'فایل',
+  'menu.edit': 'ویرایش',
+  'menu.insert': 'درج',
+  'menu.view': 'نمایش',
+  'menu.ai': 'هوش مصنوعی',
+  'menu.help': 'راهنما',
+  'menu.grid': 'شبکه',
+  'menu.seamGuides': 'خطوط درز',
+  'menu.themeLight': 'روشن',
+  'menu.themeDark': 'تیره',
+  'menu.apiKeys': 'کلیدهای هوش مصنوعی',
 }

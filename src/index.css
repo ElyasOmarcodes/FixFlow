@@ -2364,6 +2364,252 @@
   color: var(--pd-c-6b6b7a);
 }
 
+/* ─── Desktop chrome: menu bar + options bar ──────────────────────────────
+
+   Two rows, the arrangement desktop editors settled on: the top one names
+   kinds of work and never changes width, the second holds what you reach for
+   while working and changes with the selection. What it replaces was a single
+   row of eighteen buttons that ran out of room at 1440px and started
+   truncating its own labels — a row cannot grow, so every feature added had
+   to displace something. */
+.pd-toolbar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--pd-line);
+}
+
+.pd-menubar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding-inline: 8px;
+}
+
+.pd-menubar {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.pd-menubar-item { position: relative; }
+
+.pd-menubar-trigger {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--pd-c-b0b0c4);
+  white-space: nowrap;
+}
+
+.pd-menubar-trigger:hover { background: var(--pd-fill); color: var(--pd-c-e8e8f0); }
+
+.pd-menubar-trigger[aria-expanded='true'] {
+  background: var(--pd-accent-wash);
+  color: var(--pd-c-c4b5fd);
+}
+
+/* Opens under its own label and along the writing direction, so the menus
+   hang from the right-hand edge in Pashto and Persian. */
+.pd-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  inset-inline-start: 0;
+  z-index: var(--pd-z-popover);
+  min-width: 210px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-line-loud);
+  background: var(--pd-c-18181f);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+.pd-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  color: var(--pd-c-b0b0c4);
+  text-align: start;
+}
+
+.pd-menu-row:hover:not(:disabled),
+.pd-menu-row:focus-visible {
+  background: var(--pd-fill);
+  color: var(--pd-c-e8e8f0);
+  outline: none;
+}
+
+.pd-menu-row:disabled { opacity: 0.38; cursor: default; }
+
+/* A fixed gutter, so labels line up whether or not an item has an icon or a
+   tick — a ragged left edge is what makes a menu look homemade. */
+.pd-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  flex: 0 0 auto;
+  color: var(--pd-c-8a86a0);
+}
+
+.pd-menu-label { flex: 1 1 auto; white-space: nowrap; }
+
+.pd-menu-shortcut {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--pd-c-6b6b7a);
+  font-variant-numeric: tabular-nums;
+  /* A shortcut is written the same way in every language. */
+  direction: ltr;
+}
+
+.pd-menu-caption {
+  padding: 5px 9px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pd-c-6b6b7a);
+}
+
+.pd-menu-separator {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--pd-line-subtle);
+}
+
+.pd-doc-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+  min-width: 0;
+}
+
+.pd-doc-title button {
+  max-width: clamp(120px, 20vw, 280px);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--pd-c-a0a0b0);
+  cursor: text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-doc-title button:hover { background: var(--pd-fill); color: var(--pd-c-e8e8f0); }
+
+.pd-doc-title input {
+  width: 200px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--pd-accent-soft);
+  background: var(--pd-fill);
+  color: var(--pd-c-e8e8f0);
+  font-size: 12px;
+  outline: none;
+}
+
+.pd-save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--pd-ok, #6ee7b7);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.pd-optionsbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 10px 6px;
+}
+
+.pd-options-group { display: flex; align-items: center; gap: 2px; }
+
+.pd-options-group button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  color: var(--pd-c-b0b0c4);
+}
+
+.pd-options-group button:hover:not(:disabled) { background: var(--pd-fill); color: var(--pd-c-e8e8f0); }
+.pd-options-group button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.pd-options-divider {
+  width: 1px;
+  height: 20px;
+  flex: 0 0 auto;
+  background: var(--pd-fill-strong);
+}
+
+.pd-options-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--pd-line);
+  font-size: 12px;
+  color: var(--pd-c-b0b0c4);
+  white-space: nowrap;
+}
+
+.pd-options-toggle:hover { border-color: var(--pd-line-loud); color: var(--pd-c-e8e8f0); }
+
+.pd-options-toggle[aria-pressed='true'] {
+  border-color: var(--pd-accent-soft);
+  background: var(--pd-accent-wash-strong);
+  color: var(--pd-c-c4b5fd);
+}
+
+.pd-options-context {
+  font-size: 11.5px;
+  color: var(--pd-c-6b6b7a);
+  white-space: nowrap;
+}
+
+.pd-options-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--pd-accent-soft);
+  background: var(--pd-accent-wash);
+  font-size: 12px;
+  color: var(--pd-c-c4b5fd);
+  white-space: nowrap;
+}
+
+.pd-options-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 9px;
+  background: var(--pd-accent);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pd-options-export:hover { filter: brightness(1.08); }
+
 /* ─── Design-a-slide dialog ───────────────────────────────────────────────
    A brief, one switch, one button. The interesting part happens on the
    canvas, so the dialog stays out of the way of it. */

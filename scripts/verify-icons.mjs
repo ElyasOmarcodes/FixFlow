@@ -110,8 +110,10 @@ try {
   await page.screenshot({ path: `${OUT}/chip-picker.png` })
   await page.keyboard.press('Escape')
 
-  // The translate-everything action is reachable from the toolbar.
-  await page.getByRole('button', { name: /Translate everything/i }).first().click()
+  // The translate-everything action is reachable from the menu bar.
+  await page.locator('.pd-menubar').getByRole('menuitem', { name: 'AI', exact: true }).click()
+  await page.getByRole('menu', { name: 'AI' })
+    .getByRole('menuitem', { name: 'Translate everything…', exact: true }).click()
   await expect(page.getByRole('dialog', { name: 'Translate the design' })).toBeVisible()
   await page.screenshot({ path: `${OUT}/translate-all.png` })
 
