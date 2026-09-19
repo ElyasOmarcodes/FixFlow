@@ -14,8 +14,12 @@ import type { AiAuth } from './translateText'
  * repair by hand.
  */
 
-const BLOCK_TYPES: readonly SlideBlockType[] = ['chip', 'headline', 'subhead', 'body', 'icon', 'phone']
-const LAYOUTS = ['text-above-device', 'text-below-device', 'text-only'] as const
+const BLOCK_TYPES: readonly SlideBlockType[] = [
+  'eyebrow', 'chip', 'headline', 'subhead', 'body', 'icon', 'feature', 'phone',
+]
+const LAYOUTS = ['text-above-device', 'text-below-device', 'text-only', 'feature-cards'] as const
+/** A block whose words live in `title`, with `text` as its description. */
+const TITLED: readonly SlideBlockType[] = ['feature']
 
 /** The bundled glyph names, which are the only ones guaranteed to render. */
 function iconNames(): string[] {
@@ -26,6 +30,7 @@ export const SLIDE_SYSTEM_PROMPT = [
   'You design App Store and Google Play screenshot slides.',
   'A slide sells ONE idea: a short headline, an optional supporting line, and at most one device.',
   'Write marketing copy, not documentation. Headlines are 2–6 words. Never use a full stop in a headline.',
+  'A feature slide instead lists two or three concrete capabilities as cards, each with a bold four-word line and one sentence under it.',
   'Answer with JSON only. No prose, no markdown fence.',
 ].join('\n')
 
@@ -57,17 +62,29 @@ export function buildSlidePrompt(args: {
     '  "backgroundTo": "#RRGGBB",',
     '  "textColor": "#RRGGBB",',
     '  "accentColor": "#RRGGBB",',
+    '  "headlineAccent": "the tail of the headline, verbatim",',
+    '  "cardColor": "#RRGGBB",',
+    '  "displayFont": "sans" | "serif",',
     `  "layout": ${LAYOUTS.map((l) => `"${l}"`).join(' | ')},`,
-    '  "blocks": [ { "type": …, "text": …, "icon": …, "iconPosition": "left" | "right" } ]',
+    '  "blocks": [ { "type": …, "title": …, "text": …, "icon": …, "iconPosition": "left" | "right" } ]',
     '}',
     '',
     'Rules:',
     `- "type" is one of: ${BLOCK_TYPES.join(', ')}.`,
-    '- Use at most one headline, one subhead, one body and one phone.',
-    '- "text" is required for chip, headline, subhead and body; omit it for icon and phone.',
-    '- "icon" is required for icon, optional for chip, and MUST be one of the names listed below.',
+    '- Use at most one eyebrow, one headline, one subhead, one body and one phone.',
+    '- "text" is required for eyebrow, chip, headline, subhead and body; omit it for icon and phone.',
+    '- A "feature" card needs BOTH "title" (a bold line of 2–5 words) and "text" (one short sentence), plus an "icon".',
+    '- "icon" is required for icon and feature, optional for chip, and MUST be one of the names listed below.',
     '- Include a "phone" block unless the idea is better told without a device; then use layout "text-only".',
     '- backgroundFrom/backgroundTo must have enough contrast against textColor to be readable.',
+    '- "cardColor" is the plate behind a feature card; it must contrast with the background, not match it.',
+    '- "headlineAccent" must appear in the headline word for word, or leave it out.',
+    '',
+    'Choosing a layout:',
+    '- "feature-cards" for an editorial slide that lists 2–3 capabilities: an eyebrow, a headline, then "feature" blocks, and a device cropped by the bottom edge. Prefer "serif" and a light, warm background for this one.',
+    '- "text-above-device" for a single-message slide: a chip, a headline, a supporting line, then the device.',
+    '- "text-below-device" when the device should lead.',
+    '- "text-only" when there is no device to show.',
     '',
     'Allowed icon names:',
     iconNames().join(', '),
@@ -103,14 +120,19 @@ export function parseSlidePlan(raw: string): SlidePlan {
       const type = String(item.type ?? '') as SlideBlockType
       if (!BLOCK_TYPES.includes(type)) continue
       const text = typeof item.text === 'string' ? item.text.trim() : undefined
+      const title = typeof item.title === 'string' ? item.title.trim() : undefined
+      // A titled block needs its bold line; a model that sends only a
+      // description gets it promoted rather than dropped.
+      if (TITLED.includes(type) && !title && !text) continue
       // A text block with nothing in it would render as an empty box the user
       // then has to find and delete.
-      if (type !== 'icon' && type !== 'phone' && !text) continue
+      if (!TITLED.includes(type) && type !== 'icon' && type !== 'phone' && !text) continue
       const icon = typeof item.icon === 'string' && known.has(item.icon) ? item.icon : undefined
       if (type === 'icon' && !icon) continue
       blocks.push({
         type,
         text,
+        title,
         icon,
         iconPosition: item.iconPosition === 'right' ? 'right' : 'left',
       })
@@ -125,6 +147,9 @@ export function parseSlidePlan(raw: string): SlidePlan {
       backgroundTo: String(record.backgroundTo ?? ''),
       textColor: String(record.textColor ?? ''),
       accentColor: String(record.accentColor ?? ''),
+      headlineAccent: typeof record.headlineAccent === 'string' ? record.headlineAccent : undefined,
+      cardColor: typeof record.cardColor === 'string' ? record.cardColor : undefined,
+      displayFont: record.displayFont === 'serif' ? 'serif' : 'sans',
       layout,
       blocks,
     }

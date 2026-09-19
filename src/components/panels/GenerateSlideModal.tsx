@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useEditorStore } from '@/store'
+import { ensureFontReady } from '@/utils/fonts'
 import { useApiKeysStore } from '@/store/apiKeys'
 import { generateSlidePlan } from '@/ai/features/generateSlide'
 import type { AiAuth } from '@/ai/features/translateText'
-import { backgroundFillFor, buildSlideLayers, canvasFor } from '@/utils/slidePlan'
+import { backgroundFillFor, buildSlideLayers, canvasFor, fontsUsedBy } from '@/utils/slidePlan'
 import { ModalShell } from '@/components/ui/ModalShell'
 import { Icon } from '@/components/ui/Icon'
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
@@ -85,6 +86,11 @@ export function GenerateSlideModal({ open, onClose, onNeedsApiKey }: GenerateSli
         locale: language,
         existingCopy: replace ? undefined : existingCopy,
       })
+      // Before measuring anything: a card's height comes from how many lines
+      // its description wraps to, and measuring against a font the browser has
+      // not fetched yet gives the fallback's metrics — a card sized too short
+      // with its own text hanging out of the bottom.
+      await Promise.all(fontsUsedBy(plan).map((family) => ensureFontReady(family, 700)))
       applyGeneratedSlide(
         { layers: buildSlideLayers(plan, canvasFor(group)), background: backgroundFillFor(plan) },
         { replace },

@@ -55,6 +55,40 @@ describe('parseSlidePlan', () => {
     expect(parseSlidePlan(wrap({ ...good, layout: 'diagonal' })).layout).toBe('text-above-device')
   })
 
+  it('reads a feature card, with its title and its description apart', () => {
+    const plan = parseSlidePlan(wrap({
+      ...good,
+      layout: 'feature-cards',
+      cardColor: '#FFFFFF',
+      displayFont: 'serif',
+      headlineAccent: 'every habit',
+      blocks: [
+        { type: 'eyebrow', text: 'What you get' },
+        { type: 'headline', text: 'Track every habit' },
+        { type: 'feature', title: 'A tidy shelf', text: 'Collections and tags.', icon: 'book' },
+      ],
+    }))
+    expect(plan.layout).toBe('feature-cards')
+    expect(plan.displayFont).toBe('serif')
+    expect(plan.cardColor).toBe('#FFFFFF')
+    expect(plan.headlineAccent).toBe('every habit')
+    const card = plan.blocks.find((b) => b.type === 'feature')!
+    expect(card.title).toBe('A tidy shelf')
+    expect(card.text).toBe('Collections and tags.')
+  })
+
+  it('keeps a feature card that only sent one of its two lines', () => {
+    const plan = parseSlidePlan(wrap({
+      ...good,
+      blocks: [{ type: 'feature', text: 'Only a description', icon: 'book' }],
+    }))
+    expect(plan.blocks.map((b) => b.type)).toEqual(['feature'])
+  })
+
+  it('falls back to a sans display face when the model invents one', () => {
+    expect(parseSlidePlan(wrap({ ...good, displayFont: 'comic' })).displayFont).toBe('sans')
+  })
+
   it('refuses a plan with no copy, so the caller can retry', () => {
     expect(() => parseSlidePlan(wrap({ ...good, blocks: [{ type: 'phone' }] }))).toThrow()
     expect(() => parseSlidePlan('I cannot help with that.')).toThrow()
@@ -71,6 +105,12 @@ describe('buildSlidePrompt', () => {
     const prompt = buildSlidePrompt({ brief: 'x', locale: 'en' })
     expect(prompt).toContain('Allowed icon names:')
     expect(prompt).toContain('heart')
+  })
+
+  it('explains when to reach for the editorial layout', () => {
+    const prompt = buildSlidePrompt({ brief: 'x', locale: 'en' })
+    expect(prompt).toContain('feature-cards')
+    expect(prompt).toContain('"title"')
   })
 
   it('tells the model which slide of a set it is designing', () => {
