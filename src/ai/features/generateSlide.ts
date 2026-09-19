@@ -1,4 +1,5 @@
 import { transportChat } from '@/ai/transport'
+import { jsonObjects } from '@/ai/json'
 import { ICON_LIBRARY } from '@/assets/icons/library'
 import type { SlideBlock, SlideBlockType, SlidePlan } from '@/utils/slidePlan'
 import type { AiAuth } from './translateText'
@@ -190,40 +191,4 @@ export async function generateSlidePlan(args: {
       throw firstError
     }
   }
-}
-
-/**
- * Every balanced `{…}` in a response, parsed.
- *
- * Models wrap JSON in prose or a fence even when told not to, so the object is
- * found rather than assumed to be the whole reply.
- */
-function jsonObjects(raw: string): unknown[] {
-  const cleaned = raw.replace(/```(?:json)?/gi, '').trim()
-  const found: unknown[] = []
-  for (let start = cleaned.indexOf('{'); start !== -1; start = cleaned.indexOf('{', start + 1)) {
-    const end = objectEnd(cleaned, start)
-    if (end === -1) continue
-    try { found.push(JSON.parse(cleaned.slice(start, end + 1))) } catch { /* keep scanning */ }
-  }
-  return found
-}
-
-function objectEnd(text: string, start: number): number {
-  let depth = 0
-  let inString = false
-  let escaped = false
-  for (let i = start; i < text.length; i++) {
-    const char = text[i]
-    if (inString) {
-      if (escaped) escaped = false
-      else if (char === '\\') escaped = true
-      else if (char === '"') inString = false
-      continue
-    }
-    if (char === '"') inString = true
-    else if (char === '{') depth++
-    else if (char === '}') { depth--; if (depth === 0) return i }
-  }
-  return -1
 }

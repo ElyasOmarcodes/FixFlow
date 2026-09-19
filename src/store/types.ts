@@ -171,6 +171,16 @@ export interface EditorStore {
    * Replaces the existing layers unless `replace` is false.
    */
   applyGeneratedSlide: (slide: GeneratedSlide, options?: { replace?: boolean }) => void
+
+  // ─ Assistant turns (see slices/agentSlice.ts)
+  /** True while an assistant turn is open and history is held. */
+  agentTurnActive: boolean
+  /** Open a turn: snapshot the project and pause history. */
+  beginAgentTurn: () => void
+  /** Close a turn, recording everything it did as one undo step. Returns whether anything changed. */
+  endAgentTurn: () => boolean
+  /** Abandon a turn, putting the project back the way it was. */
+  rollbackAgentTurn: () => void
   setLayerLocked: (layerId: string, locked: boolean) => void
 
   // ─ Selection

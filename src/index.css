@@ -3380,3 +3380,228 @@
 
   .fixflow-loader-word-track { transform: translateY(0); }
 }
+
+/* ── Assistant dock ─────────────────────────────────────────────────────────
+   The fourth column: a conversation that edits the canvas, docked beside it.
+   Its width is a preference, so the grip writes to localStorage rather than to
+   the project; everything here is token-driven so it inverts with the theme
+   like the rest of the chrome. On handheld and tablet the dock is not
+   rendered at all — that surface is a sheet, not a column. */
+
+.pd-assistant {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 0 0 auto;
+  background: var(--pd-panel);
+  border-inline-start: 1px solid var(--pd-field-border);
+}
+
+.pd-assistant-grip {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -3px;
+  width: 7px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 2;
+}
+.pd-assistant-grip:hover, .pd-assistant-grip:focus-visible { background: var(--pd-accent-wash); }
+
+.pd-assistant-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--pd-field-border);
+}
+.pd-assistant-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pd-text);
+}
+.pd-assistant-model {
+  margin-inline-start: auto;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10.5px;
+  color: var(--pd-c-6b6b7a);
+}
+.pd-assistant-header button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  color: var(--pd-c-8a86a0);
+}
+.pd-assistant-header button:hover { background: var(--pd-accent-wash); color: var(--pd-text); }
+
+.pd-assistant-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--pd-field-border);
+}
+.pd-assistant-mode-label { font-size: 11.5px; font-weight: 600; color: var(--pd-text); }
+.pd-assistant-hint { font-size: 11px; line-height: 1.45; color: var(--pd-c-6b6b7a); }
+
+.pd-assistant-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+.pd-assistant-empty {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: start;
+  color: var(--pd-c-8a86a0);
+}
+.pd-assistant-empty h3 { font-size: 13.5px; font-weight: 700; color: var(--pd-text); }
+.pd-assistant-empty p { font-size: 12px; line-height: 1.6; }
+.pd-assistant-suggestions { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.pd-assistant-suggestions button {
+  text-align: start;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 10px;
+  color: var(--pd-text);
+}
+.pd-assistant-suggestions button:hover { border-color: var(--pd-accent); background: var(--pd-accent-wash); }
+
+.pd-assistant-msg { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; line-height: 1.6; }
+.pd-assistant-msg p { overflow-wrap: anywhere; }
+
+.pd-assistant-user {
+  align-self: flex-end;
+  max-width: 90%;
+  padding: 8px 11px;
+  border-radius: 12px;
+  background: var(--pd-accent-wash-strong);
+  color: var(--pd-text);
+}
+.pd-assistant-reply { color: var(--pd-text); }
+
+.pd-assistant-error {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--pd-danger);
+  color: var(--pd-danger);
+}
+.pd-assistant-error p:first-child { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.pd-assistant-error-body { color: var(--pd-c-8a86a0); font-size: 11.5px; }
+
+.pd-assistant-calls summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pd-c-8a86a0);
+  padding: 2px 0;
+}
+.pd-assistant-calls ul { display: flex; flex-direction: column; gap: 4px; padding: 6px 0 2px; }
+.pd-assistant-calls li {
+  display: grid;
+  grid-template-columns: 14px auto 1fr;
+  align-items: start;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--pd-c-8a86a0);
+}
+.pd-assistant-calls code { font-size: 10.5px; color: var(--pd-text); }
+.pd-assistant-calls li span { overflow-wrap: anywhere; }
+.pd-assistant-call-failed { color: var(--pd-danger); }
+
+.pd-assistant-revert {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  font-size: 11px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 999px;
+  color: var(--pd-c-8a86a0);
+}
+.pd-assistant-revert:hover { border-color: var(--pd-accent); color: var(--pd-text); }
+
+.pd-assistant-busy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--pd-c-8a86a0);
+}
+.pd-assistant-busy svg { animation: pd-spin 1s linear infinite; }
+
+.pd-assistant-composer {
+  border-top: 1px solid var(--pd-field-border);
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pd-assistant-context {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--pd-accent-wash);
+  font-size: 10.5px;
+  color: var(--pd-c-8a86a0);
+}
+.pd-assistant-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--pd-field-border);
+  border-radius: 12px;
+  background: var(--pd-field-bg);
+}
+.pd-assistant-input:focus-within { border-color: var(--pd-accent); }
+.pd-assistant-input textarea {
+  flex: 1;
+  min-height: 40px;
+  max-height: 160px;
+  resize: none;
+  border: 0;
+  background: transparent;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--pd-text);
+}
+.pd-assistant-input textarea:focus { outline: none; }
+.pd-assistant-send {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--pd-accent);
+  color: #fff;
+}
+.pd-assistant-send:disabled { opacity: 0.4; }
+
+@media (max-width: 1023px) {
+  .pd-assistant { display: none; }
+}

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, lazy, Suspense } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useEditorStore, useUndoRedo } from '@/store'
 import { notifyProjectConflict, useProjectsStore } from '@/store/projects'
+import { useAssistantStore } from '@/store/assistant'
 import { ProjectConflictError } from '@/store/storage/types'
 import { BrandKitButton } from '@/components/toolbar/BrandKitButton'
 import { Logo } from '@/components/toolbar/Logo'
@@ -121,6 +122,8 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
   useEffect(() => {
     if (editingName) nameInputRef.current?.select()
   }, [editingName])
+  const assistantOpen = useAssistantStore((state) => state.open)
+  const toggleAssistant = useAssistantStore((state) => state.toggleOpen)
   const [projectsOpen, setProjectsOpen] = useState(false)
   const [templatesOpen, setTemplatesOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -233,7 +236,15 @@ export function Toolbar({ mode, onSetMode, onExport, onPreview, onHome }: Toolba
       key: 'ai',
       label: t('menu.ai'),
       items: [
-        { key: 'generate', label: `${t('generate.action')}…`, icon: 'ai', onSelect: () => setGenerateOpen(true) },
+        {
+          key: 'assistant',
+          label: t('assistant.title'),
+          icon: 'sparkles',
+          shortcut: 'Ctrl+J',
+          checked: assistantOpen,
+          onSelect: () => toggleAssistant(),
+        },
+        { key: 'generate', label: `${t('generate.action')}…`, icon: 'ai', separatorBefore: true, onSelect: () => setGenerateOpen(true) },
         { key: 'translate', label: `${t('translateAll.action')}…`, icon: 'sparkles', onSelect: () => setTranslateOpen(true) },
         {
           key: 'localization',

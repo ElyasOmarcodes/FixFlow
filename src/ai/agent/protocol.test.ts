@@ -1,0 +1,77 @@
+import { describe, it, expect } from 'vitest'
+import { buildAgentSystemPrompt, parseAgentReply } from './protocol'
+
+describe('parseAgentReply', () => {
+  it('reads a clean turn', () => {
+    const reply = parseAgentReply(JSON.stringify({
+      say: 'Making the headline bigger.',
+      actions: [{ tool: 'update_layer', args: { id: 'abc', patch: { fontSize: 120 } } }],
+      status: 'done',
+    }))
+    expect(reply.say).toBe('Making the headline bigger.')
+    expect(reply.actions).toEqual([{ tool: 'update_layer', args: { id: 'abc', patch: { fontSize: 120 } } }])
+    expect(reply.status).toBe('done')
+  })
+
+  it('finds the object inside a fence or surrounding prose', () => {
+    const reply = parseAgentReply('Sure!\n```json\n{"say":"ok","actions":[],"status":"done"}\n```\nAnything else?')
+    expect(reply.say).toBe('ok')
+  })
+
+  it('accepts the names models reach for instead of the documented ones', () => {
+    const reply = parseAgentReply(JSON.stringify({
+      message: 'Reading the slide first.',
+      tool_calls: [{ name: 'read_slide', arguments: {} }],
+      state: 'working',
+    }))
+    expect(reply.say).toBe('Reading the slide first.')
+    expect(reply.actions[0].tool).toBe('read_slide')
+    expect(reply.status).toBe('working')
+  })
+
+  it('reads arguments sent as a JSON string, the way tool-calling APIs send them', () => {
+    const reply = parseAgentReply(JSON.stringify({
+      say: 'ok',
+      actions: [{ tool: 'move_layer', args: '{"id":"abc","dx":40}' }],
+    }))
+    expect(reply.actions[0].args).toEqual({ id: 'abc', dx: 40 })
+  })
+
+  it('treats actions with no declared status as more work to come', () => {
+    const reply = parseAgentReply(JSON.stringify({ say: 'Looking.', actions: [{ tool: 'read_slide', args: {} }] }))
+    expect(reply.status).toBe('working')
+  })
+
+  it('treats a bare answer with no actions as finished', () => {
+    expect(parseAgentReply(JSON.stringify({ say: 'That slide has three layers.' })).status).toBe('done')
+  })
+
+  it('drops an action with no tool name rather than failing the turn', () => {
+    const reply = parseAgentReply(JSON.stringify({
+      say: 'ok',
+      actions: [{ args: { id: 'a' } }, { tool: 'delete_layer', args: { id: 'b' } }],
+    }))
+    expect(reply.actions).toHaveLength(1)
+    expect(reply.actions[0].tool).toBe('delete_layer')
+  })
+
+  it('throws when nothing in the reply is a turn', () => {
+    expect(() => parseAgentReply('I am afraid I cannot do that.')).toThrow()
+    // An object that is clearly some other JSON must not be read as an empty turn.
+    expect(() => parseAgentReply('{"temperature": 21}')).toThrow()
+  })
+})
+
+describe('buildAgentSystemPrompt', () => {
+  it('lists the tools, so the model is never guessing names', () => {
+    const prompt = buildAgentSystemPrompt({ uiLanguage: 'ps', readOnly: false })
+    expect(prompt).toContain('read_slide')
+    expect(prompt).toContain('add_layer')
+    expect(prompt).toContain('ps')
+  })
+
+  it('says edits are off in proposal mode', () => {
+    expect(buildAgentSystemPrompt({ uiLanguage: 'en', readOnly: true })).toContain('PROPOSAL MODE')
+    expect(buildAgentSystemPrompt({ uiLanguage: 'en', readOnly: false })).not.toContain('PROPOSAL MODE')
+  })
+})

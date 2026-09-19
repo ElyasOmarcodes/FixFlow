@@ -26,6 +26,10 @@ FixFlow is a React + TypeScript visual editor for designing App Store screenshot
 | Interface language (i18n) | `src/i18n/index.ts` (store + `useT`), `src/i18n/locales/{en,ps,fa}.ts` |
 | Native-control styling | `src/index.css` — the `@layer base` block restyles scrollbars, selects, ranges, checkboxes, colour inputs and focus rings |
 | Desktop shell | `src-tauri/` (Tauri v2); Android shell config `capacitor.config.json`; see `docs/native-apps.md` |
+| AI agent (tools, loop, protocol) | `src/ai/agent/` — `tools.ts` (the catalogue), `runAgent.ts` (the turn loop), `protocol.ts` (the JSON wire format), `snapshot.ts` (what the model reads) |
+| Assistant conversation state | `src/store/assistant.ts` (separate store, not undoable) |
+| Assistant turn boundary | `src/store/slices/agentSlice.ts` — one turn = one undo step |
+| Assistant panel | `src/components/panels/AssistantPanel.tsx` |
 | Properties inspector | `src/components/panels/PropertiesPanel.tsx` |
 | Layer list panel | `src/components/panels/LayersPanel.tsx` |
 | Slide navigator | `src/components/panels/SlideNavigator.tsx` |
@@ -249,6 +253,9 @@ CLI (`cli/export.mjs`) injects `window.__EXPORT_CONFIG__` before page navigation
 - **The canvas wrapper is pinned `dir="ltr"`**: `src/App.tsx` sets `dir="ltr"` on the div holding `StageCanvas`. The UI mirrors for Pashto/Persian, but the design surface must not — mirroring it would flip slide coordinates and pano seams under the user while the exported PNGs stayed identical. Do not "fix" the inconsistency by removing it.
 - **The control CSS lives inside `@layer base`**: the native-widget rules in `src/index.css` are wrapped in `@layer base` so Tailwind utilities still win. Unlayered CSS beats every layered rule in the cascade, so moving those rules out of the layer would override `border`, `bg-*`, `w-*` and `px-*` classes on every button and input in the app.
 - **The `android/` and `src-tauri/icons/` directories are generated, not missing**: CI creates them with `npx cap add android` and `tauri icon`. Do not commit them.
+- **An assistant turn must stay one undo step**: `agentSlice` pauses history, and on close rewinds to the starting project *while still paused*, resumes, then reapplies the result. Pausing alone records nothing at all, and not pausing records one entry per tool call — a person who dislikes a five-call turn would have to press undo five times. Do not "simplify" it to a plain `set`.
+- **Agent tools return strings, including their errors**: a tool that throws ends the turn and leaves half a change behind. Returning `Error: no layer with id …` lets the model correct itself on the next round, which is the whole point of the loop. Do not make them throw.
+- **The agent protocol is JSON, not provider tool-calling**: four providers are supported and they do not agree on how tools are declared or returned (Gemini's native endpoint and arbitrary OpenAI-compatible servers least of all). Native tool-calling may be added per provider later; it cannot replace the JSON path.
 - **`LegacyLocaleLayoutFields` must not be deleted**: `migrateProjectToLocaleAdjust` in `helpers.ts` reads old projects' `localeLayoutOverrides`/`localeBaseDelta` fields through the internal-only `LegacyLocaleLayoutFields` type (via `getLegacyLocaleLayoutFields()`), even though those fields were removed from `BaseLayer` itself. This is the only way old project files on disk still migrate correctly. Deleting it as "dead code referencing deleted fields" silently destroys every legacy project's locale layout on load.
 
 ---

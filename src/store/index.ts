@@ -23,6 +23,7 @@ import { createLayerSlice } from './slices/layerSlice'
 import { createGroupSlice } from './slices/groupSlice'
 import { createTranslateSlice } from './slices/translateSlice'
 import { createGenerateSlice } from './slices/generateSlice'
+import { createAgentSlice } from './slices/agentSlice'
 import { createClipboardSlice } from './slices/clipboardSlice'
 import { createProjectSlice } from './slices/projectSlice'
 
@@ -81,6 +82,10 @@ export const useEditorStore = create<EditorStore>()(
       ...createGroupSlice(set, get),
       ...createTranslateSlice(set, get),
       ...createGenerateSlice(set, get),
+      ...createAgentSlice(set, get, {
+        pause: () => useEditorStore.temporal.getState().pause(),
+        resume: () => useEditorStore.temporal.getState().resume(),
+      }),
       ...createClipboardSlice(set, get),
       ...createProjectSlice(set, get, () => useEditorStore.temporal.getState().clear()),
     })) as StateCreator<EditorStore>,

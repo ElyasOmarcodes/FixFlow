@@ -18,6 +18,7 @@ import { Toolbar } from '@/components/toolbar/Toolbar'
 import { LayersPanel } from '@/components/panels/LayersPanel'
 import { PreviewModal } from '@/components/panels/PreviewModal'
 import { PropertiesPanel } from '@/components/panels/PropertiesPanel'
+import { AssistantPanel } from '@/components/panels/AssistantPanel'
 import { SlideNavigator } from '@/components/panels/SlideNavigator'
 import { StageCanvas } from '@/components/canvas/StageCanvas'
 import { EditingContextAlert, EditingContextBar } from '@/components/canvas/EditingContext'
@@ -25,6 +26,7 @@ import { AppLoadingScreen } from '@/components/AppLoadingScreen'
 import { useThumbnails } from '@/hooks/useThumbnails'
 import { useImageCacheWarmer } from '@/hooks/useImageCacheWarmer'
 import { useEditorStore, useUndoRedo } from '@/store'
+import { useAssistantStore } from '@/store/assistant'
 import { resolveGroupView } from '@/utils/canvasFormats'
 import { registerStage } from '@/utils/stageRegistry'
 import { getScopedEditingIndicator } from '@/utils/scopedEditingIndicator'
@@ -277,6 +279,9 @@ export default function App() {
         } else if (e.key === '1') {
           e.preventDefault()
           useEditorStore.getState().setZoom(1)
+        } else if (e.key === 'j') {
+          e.preventDefault()
+          useAssistantStore.getState().toggleOpen()
         }
       }
 
@@ -441,6 +446,9 @@ export default function App() {
             <button className="pd-panel-close" onClick={() => setMobilePanel(null)} aria-label={t('common.close')}><Icon name="close" size={18} /></button>
             <PropertiesPanel />
           </div>
+
+          {/* Assistant dock — the fourth column, and null while it is closed. */}
+          <AssistantPanel />
         </div>
       </div>
       {view === 'editor' && <nav className="pd-mobile-nav">
