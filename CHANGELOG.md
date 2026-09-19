@@ -7,6 +7,21 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.14.0) - 2026-09-19
+
+### Added
+
+- **Design a whole slide from a sentence.** Describe what the slide should say and it is built out of the layer types that are already here — a chip, a headline, a subheading, an icon, a device — so what lands on the canvas is a real slide whose every piece is selectable and editable, not a picture of one. The model is deliberately not asked for coordinates: a model placing a headline on a 1290×2796 canvas guesses pixel values that collide with the device frame or run off the edge. It supplies the words, the glyphs and the palette; the app measures the copy and owns the geometry, so the device takes the room the words leave rather than having them printed across it. Everything the model sends is treated as a suggestion — a colour that is not a hex falls back, a glyph the library does not have is dropped — and the whole slide is a single undo step.
+
+### Changed
+
+- **The desktop chrome is a menu bar and an options bar.** It was one row of eighteen buttons, and at 1440px it had started truncating its own labels. The top row now names kinds of work — File, Edit, Insert, View, AI, Help — so it stays the same width whatever is added behind it; the second row holds what you reach for while working, and shows duplicate, delete and group only while something is selected. Keyboard access follows the WAI-ARIA menubar pattern: one tab stop for the bar, arrows within and between menus, Escape to leave, and left/right following the writing direction so it walks the way it reads in Pashto and Persian.
+
+### Fixed
+
+- **A chip and an icon can be resized again.** The resize grip looked up a layer's size by width and height, and neither type has either — a chip's box is derived from its type size, padding and glyph, an icon's from its size and its plate — so dragging the grip on one tracked the pointer and changed nothing at all. The failure was silent because a missing property is skipped rather than reported; every layer type is now checked against a real layer of that type.
+- **A transform can no longer resize and move a layer it was not part of.** Chip and icon nodes kept the scale from a transform in a ref that outlived the gesture. A transform that never reports its end — a pinch that cancels it, a pointer lost off-window — left the factor behind, and the next one applied it to the type and padding *and* wrote the node's position.
+
 ## [0.13.0](https://github.com/ElyasOmarcodes/FixFlow/releases/tag/v0.13.0) - 2026-09-17
 
 ### Changed
