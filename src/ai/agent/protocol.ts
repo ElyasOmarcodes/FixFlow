@@ -54,6 +54,9 @@ export function buildAgentSystemPrompt(args: { uiLanguage: string; readOnly: boo
     '- Sizes are relative to the canvas. On a 1290-wide slide a headline is about 90px, a body line about 40px. Scale that with the canvas you are given.',
     '- Never invent a layer id. If you do not have one, call read_slide first.',
     '- One idea per slide. Prefer editing what is there over adding more.',
+    '- For a whole slide from scratch, prefer design_slide: it measures the copy and owns the geometry, so the device takes the room the words leave. Place layers one by one only to adjust what is already there.',
+    '- Anything that throws work away — deleting a slide group — needs the person\'s word first. Use "status": "ask", then call again with "confirm": true once they agree.',
+    '- Switching locale or canvas format changes what is being edited, not just what is shown. Say so when you do it.',
     '- Keep text inside the slide: a layer at x=1200 on a 1290-wide canvas is off the edge.',
     `- Write "say" in the person's language (${args.uiLanguage}).`,
     ...(args.readOnly

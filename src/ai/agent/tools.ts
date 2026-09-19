@@ -3,6 +3,14 @@ import { useEditorStore } from '@/store'
 import { ICON_LIBRARY } from '@/assets/icons/library'
 import { getPhoneSpec } from '@/assets/mockups/specs'
 import { describeProject, describeSlideGroup } from './snapshot'
+import { ensureFontReady } from '@/utils/fonts'
+import { backgroundFillFor, buildSlideLayers, canvasFor, fontsUsedBy } from '@/utils/slidePlan'
+import { parseSlidePlan } from '@/ai/features/generateSlide'
+import { collectCanvasTexts, translateCanvasSlide } from '@/ai/features/translateCanvas'
+import { CANVAS_FORMAT_PRESETS, BASE_CANVAS_FORMAT, getProjectActiveFormats } from '@/utils/canvasFormats'
+import type { CanvasTranslationPatch } from '@/store/slices/translateSlice'
+import type { AiAuth } from '@/ai/features/translateText'
+import type { CanvasFormatId } from '@/types'
 import type {
   ChipLayer, GroupLayer, IconLayer, Layer, LayerType, ShapeLayer, ShapeType, SlideGroup, TextLayer,
 } from '@/types'
@@ -20,6 +28,18 @@ import type {
  * `agentSlice` owns the turn, so a failed turn rolls back whole.
  */
 
+/**
+ * What a tool may need beyond the store.
+ *
+ * Only the tools that make their own model call (translating a slide, designing
+ * one) use this; it is threaded from the turn rather than read from the key
+ * store directly so the same catalogue works under a scripted transport.
+ */
+export interface AgentToolContext {
+  auth?: AiAuth
+  uiLanguage?: string
+}
+
 export interface AgentTool {
   name: string
   /** One line, shown to the model. Kept short — this is prompt weight. */
@@ -28,7 +48,8 @@ export interface AgentTool {
   args: string
   /** Reads nothing but state; safe to run in proposal mode. */
   readOnly?: boolean
-  run: (args: Record<string, unknown>) => string
+  /** Async because some tools load fonts or make a model call of their own. */
+  run: (args: Record<string, unknown>, context: AgentToolContext) => string | Promise<string>
 }
 
 /** What a tool did, for the transcript and for the canvas highlight. */
@@ -512,6 +533,209 @@ export const AGENT_TOOLS: AgentTool[] = [
       return `Now editing "${group.name}".`
     },
   },
+  // ── The slides around this one ──────────────────────────────────────────
+  {
+    name: 'add_slide_group',
+    summary: 'Add another slide to the project and switch to it.',
+    args: '{ "name"?: string, "copyFrom"?: slideGroupId }',
+    run: (args) => {
+      const store = useEditorStore.getState()
+      const before = new Set(store.project.slideGroups.map((group) => group.id))
+      const source = str(args.copyFrom)
+      if (source) {
+        if (!store.project.slideGroups.some((group) => group.id === source)) return `Error: no slide group with id "${source}".`
+        store.duplicateSlideGroup(source)
+      } else {
+        store.addSlideGroup()
+      }
+      const created = useEditorStore.getState().project.slideGroups.find((group) => !before.has(group.id))
+      if (!created) return 'Error: the slide was not created.'
+      const name = str(args.name)
+      if (name) useEditorStore.getState().updateSlideGroup(created.id, { name })
+      useEditorStore.getState().setActiveSlideGroup(created.id)
+      return `Added slide group "${name ?? created.name}" as ${created.id}, and switched to it.`
+    },
+  },
+  {
+    name: 'update_slide_group',
+    summary: 'Rename a slide, or change its canvas size or how many slides wide it is.',
+    args: '{ "id"?: slideGroupId, "name"?: string, "numSlides"?: 1|2|3, "slideWidth"?: number, "slideHeight"?: number }',
+    run: (args) => {
+      const store = useEditorStore.getState()
+      const id = str(args.id) ?? store.activeSlideGroupId
+      const group = store.project.slideGroups.find((entry) => entry.id === id)
+      if (!group) return `Error: no slide group with id "${id}".`
+      const patch: Record<string, unknown> = {}
+      const name = str(args.name)
+      if (name) patch.name = name
+      const numSlides = num(args.numSlides)
+      // A panorama is 1–3 slides wide; anything else is a typo that would
+      // leave layers stranded off the canvas.
+      if (numSlides !== undefined) {
+        if (numSlides < 1 || numSlides > 3) return 'Error: "numSlides" must be 1, 2 or 3.'
+        patch.numSlides = Math.round(numSlides)
+      }
+      const width = num(args.slideWidth)
+      const height = num(args.slideHeight)
+      if (width !== undefined) patch.slideWidth = Math.round(width)
+      if (height !== undefined) patch.slideHeight = Math.round(height)
+      if (Object.keys(patch).length === 0) return 'Error: nothing to change — pass name, numSlides, slideWidth or slideHeight.'
+      store.updateSlideGroup(id, patch)
+      return `Updated slide group ${id} (${Object.keys(patch).join(', ')}).`
+    },
+  },
+  {
+    name: 'delete_slide_group',
+    summary: 'Remove a whole slide. Ask the person first — this throws away their work.',
+    args: '{ "id": slideGroupId, "confirm": true }',
+    run: (args) => {
+      const id = str(args.id)
+      if (!id) return 'Error: delete_slide_group needs an "id".'
+      const store = useEditorStore.getState()
+      const group = store.project.slideGroups.find((entry) => entry.id === id)
+      if (!group) return `Error: no slide group with id "${id}".`
+      // The guard is not ceremony: every other tool changes something the
+      // person can see and undo in place, and this one removes a slide they
+      // may not even be looking at.
+      if (args.confirm !== true) {
+        return `Error: deleting "${group.name}" throws away ${group.layers.length} layers. Ask the person first, then call again with "confirm": true.`
+      }
+      if (store.project.slideGroups.length <= 1) return 'Error: a project needs at least one slide group.'
+      store.removeSlideGroup(id)
+      return `Deleted slide group "${group.name}".`
+    },
+  },
+
+  // ── The axes around the design ──────────────────────────────────────────
+  {
+    name: 'set_locale',
+    summary: 'Switch which language of the design is being edited.',
+    args: '{ "locale": "en" | "ps" | … }',
+    run: (args) => {
+      const locale = str(args.locale)
+      if (!locale) return 'Error: set_locale needs a "locale".'
+      const { project } = useEditorStore.getState()
+      const known = project.settings.locales ?? [project.settings.defaultLocale]
+      if (!known.includes(locale)) return `Error: this project has no "${locale}" locale. It has: ${known.join(', ')}.`
+      useEditorStore.getState().setActiveLocale(locale)
+      return `Now editing the ${locale} design.`
+    },
+  },
+  {
+    name: 'set_canvas_format',
+    summary: 'Switch which store format is being previewed and edited.',
+    args: '{ "format": "base" | "iphone-69" | "ipad-13" | … }',
+    run: (args) => {
+      const format = str(args.format)
+      if (!format) return 'Error: set_canvas_format needs a "format".'
+      const { project } = useEditorStore.getState()
+      const active = [BASE_CANVAS_FORMAT, ...getProjectActiveFormats(project)]
+      if (!active.includes(format as CanvasFormatId)) {
+        return `Error: "${format}" is not one of this project's formats: ${active.join(', ')}.`
+      }
+      useEditorStore.getState().setActiveCanvasFormat(format as CanvasFormatId)
+      return `Now editing the ${format} format.`
+    },
+  },
+  {
+    name: 'list_formats',
+    summary: 'The formats this project exports, and the presets it could add.',
+    args: '{}',
+    readOnly: true,
+    run: () => {
+      const { project, activeCanvasFormat } = useEditorStore.getState()
+      const active = getProjectActiveFormats(project)
+      const presets = CANVAS_FORMAT_PRESETS.map((preset) => `${preset.id} (${preset.width}×${preset.height})`)
+      return [
+        `Editing: ${activeCanvasFormat}`,
+        `Exported: ${active.join(', ') || 'none'}`,
+        `Presets available: ${presets.join(', ')}`,
+      ].join('\n')
+    },
+  },
+  {
+    name: 'set_brand_color',
+    summary: 'Add or change a brand colour, which layers can then reference.',
+    args: '{ "name": string, "value": "#RRGGBB" }',
+    run: (args) => {
+      const name = str(args.name)
+      const value = str(args.value)
+      if (!name || !value) return 'Error: set_brand_color needs a "name" and a "value".'
+      if (!/^#[0-9a-fA-F]{6}$/.test(value)) return `Error: "${value}" is not a #RRGGBB colour.`
+      const store = useEditorStore.getState()
+      const existing = store.project.settings.brandColors?.find((colour) => colour.name.toLowerCase() === name.toLowerCase())
+      if (existing) {
+        store.updateBrandColor(existing.id, { value })
+        return `Changed the brand colour "${name}" to ${value}.`
+      }
+      store.addBrandColor(name, value)
+      return `Added the brand colour "${name}" (${value}).`
+    },
+  },
+
+  // ── The two tools that make a call of their own ─────────────────────────
+  {
+    name: 'design_slide',
+    summary: 'Lay out a whole slide from a plan — the app measures the copy and owns the geometry.',
+    args: '{ "plan": { "backgroundFrom", "backgroundTo", "textColor", "accentColor", "headlineAccent"?, "cardColor"?, "displayFont"?, "layout": "feature-cards"|"text-above-device"|"text-below-device"|"text-only", "blocks": [{ "type": "eyebrow"|"chip"|"headline"|"subhead"|"body"|"icon"|"feature"|"phone", "title"?, "text"?, "icon"? }] }, "replace"?: boolean }',
+    run: async (args) => {
+      const store = useEditorStore.getState()
+      const group = store.project.slideGroups.find((entry) => entry.id === store.activeSlideGroupId)
+      if (!group) return 'Error: no slide group is active.'
+      let plan
+      try {
+        plan = parseSlidePlan(JSON.stringify(args.plan ?? args))
+      } catch (error) {
+        return `Error: ${error instanceof Error ? error.message : String(error)}`
+      }
+      // A card's height comes from how many lines its description wraps to,
+      // and measuring against a font the browser has not fetched yet returns
+      // the fallback's metrics — a card too short for its own text. A face
+      // that cannot be fetched at all is not a reason to refuse the slide,
+      // though: the layout still lands, measured against the fallback.
+      await Promise.all(fontsUsedBy(plan).map(async (family) => {
+        try { await ensureFontReady(family, 700) } catch { /* offline, blocked, or headless */ }
+      }))
+      useEditorStore.getState().applyGeneratedSlide(
+        { layers: buildSlideLayers(plan, canvasFor(group)), background: backgroundFillFor(plan) },
+        { replace: args.replace !== false },
+      )
+      return `Laid out a ${plan.layout} slide with ${plan.blocks.length} blocks.`
+    },
+  },
+  {
+    name: 'translate_slide',
+    summary: 'Rewrite every string on this slide into another language, in place.',
+    args: '{ "locale": "ps" | "fa" | "en" | … }',
+    run: async (args, context) => {
+      const locale = str(args.locale)
+      if (!locale) return 'Error: translate_slide needs a "locale".'
+      if (!context.auth) return 'Error: no AI credentials are available for translation.'
+      const store = useEditorStore.getState()
+      const group = store.project.slideGroups.find((entry) => entry.id === store.activeSlideGroupId)
+      if (!group) return 'Error: no slide group is active.'
+      const targets = collectCanvasTexts(group)
+      if (targets.length === 0) return 'There is no text on this slide to translate.'
+      const result = await translateCanvasSlide({
+        auth: context.auth,
+        project: store.project,
+        slideGroup: group,
+        targets,
+        targetLocale: locale,
+      })
+      const patches: CanvasTranslationPatch[] = result.translations.map((translation) => ({
+        slideGroupId: translation.target.slideGroupId,
+        layerId: translation.target.layerId,
+        text: translation.text,
+        marks: translation.marks,
+      }))
+      // Whatever did come back is applied: a half-translated slide is better
+      // than a wasted call, and the turn is one undo either way.
+      useEditorStore.getState().applyCanvasTranslations(patches)
+      const failed = result.failed.length ? ` ${result.failed.length} could not be translated.` : ''
+      return `Rewrote ${patches.length} string(s) into ${locale}.${failed}`
+    },
+  },
 ]
 
 /** A layer's on-canvas box, as far as a bare layer record can say. */
@@ -554,7 +778,11 @@ export function findTool(name: string): AgentTool | undefined {
  * the turn: the loop's whole value is that the model gets to read what went
  * wrong and try something else.
  */
-export function runTool(name: string, args: Record<string, unknown>): AgentToolResult {
+export async function runTool(
+  name: string,
+  args: Record<string, unknown>,
+  context: AgentToolContext = {},
+): Promise<AgentToolResult> {
   const tool = findTool(name)
   if (!tool) {
     return {
@@ -564,7 +792,7 @@ export function runTool(name: string, args: Record<string, unknown>): AgentToolR
   }
   const before = layerIdsNow()
   try {
-    const result = tool.run(args)
+    const result = await tool.run(args, context)
     return { tool: name, args, result, failed: result.startsWith('Error:'), touched: touchedSince(before, args) }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

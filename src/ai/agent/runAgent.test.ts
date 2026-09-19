@@ -147,6 +147,14 @@ describe('runAgentTurn', () => {
     expect(layers().some((layer) => layer.type === 'text')).toBe(false)
   })
 
+  it('hands a tool that makes its own call the credentials the turn is using', async () => {
+    replies({ say: 'ok', actions: [{ tool: 'translate_slide', args: { locale: 'ps' } }], status: 'done' })
+    const summary = await turn('translate this slide')
+    // There is no text on a fresh slide, so the tool stops before any request —
+    // what matters is that it saw the auth rather than refusing for want of it.
+    expect(summary.calls[0].result).not.toContain('no AI credentials')
+  })
+
   it('reports each call as it happens, so the panel can show progress', async () => {
     replies({
       say: 'Two things.',

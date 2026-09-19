@@ -125,7 +125,7 @@ export async function runAgentTurn(options: AgentRunOptions): Promise<AgentRunSu
     const results: AgentToolResult[] = []
     for (const action of allowed) {
       checkAborted(options.signal)
-      const result = runTool(action.tool, action.args)
+      const result = await runTool(action.tool, action.args, { auth: options.auth, uiLanguage: options.uiLanguage })
       results.push(result)
       summary.calls.push(result)
       for (const id of result.touched) if (!summary.touched.includes(id)) summary.touched.push(id)
