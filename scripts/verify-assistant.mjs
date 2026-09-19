@@ -211,6 +211,94 @@ try {
     await page.screenshot({ path: 'test-results/assistant/05-pashto.png' })
     await page.close()
   }
+  // ── The phone: a sheet, not a column ──────────────────────────────────────
+  {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true })
+    await openEditor(page)
+
+    await check('the dock is not rendered on a phone', async () => {
+      await expect(page.locator('.pd-assistant:not(.pd-assistant-embedded)')).toBeHidden()
+    })
+
+    await check('the bottom bar opens the assistant sheet', async () => {
+      const label = await uiString('en', 'assistant.title')
+      await page.locator('.pd-mobile-nav').getByRole('button', { name: label }).click()
+      await page.waitForTimeout(500)
+      await expect(page.locator('#mobile-assistant.pd-sidebar-open')).toBeVisible()
+      await expect(page.locator('.pd-assistant-embedded')).toBeVisible()
+    })
+
+    await page.screenshot({ path: 'test-results/assistant/06-phone-sheet.png' })
+
+    await check('a turn from the phone edits the canvas', async () => {
+      const before = await layerCount(page)
+      await page.locator('.pd-assistant-input textarea').fill('add a headline and a device')
+      await page.locator('.pd-assistant-input textarea').press('Enter')
+      await page.waitForTimeout(2200)
+      expect(await layerCount(page)).toBe(before + 2)
+    })
+
+    await check('the composer sits above the bottom of the screen', async () => {
+      const box = await page.locator('.pd-assistant-composer').boundingBox()
+      expect(box.y + box.height).toBeLessThanOrEqual(844)
+    })
+
+    await page.screenshot({ path: 'test-results/assistant/07-phone-turn.png' })
+
+    await check('closing the sheet returns to the canvas', async () => {
+      await page.locator('.pd-assistant-header button').last().click()
+      await page.waitForTimeout(400)
+      await expect(page.locator('#mobile-assistant.pd-sidebar-open')).toHaveCount(0)
+    })
+
+    await page.close()
+  }
+
+  // ── The canvas asks the assistant ──────────────────────────────────────────
+  {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+    await openEditor(page)
+    await page.evaluate(async () => {
+      const store = await import('/src/store/assistant.ts')
+      store.useAssistantStore.getState().setOpen(false)
+    })
+
+    await check('"ask the assistant" on a selected layer opens the panel', async () => {
+      // Select something the way a person would: through the layers panel.
+      await page.evaluate(async () => {
+        const store = await import('/src/store/index.ts')
+        const state = store.useEditorStore.getState()
+        const group = state.project.slideGroups.find((entry) => entry.id === state.activeSlideGroupId)
+        state.addText()
+        const after = store.useEditorStore.getState().project.slideGroups.find((entry) => entry.id === group.id)
+        store.useEditorStore.getState().select(after.layers[after.layers.length - 1].id)
+      })
+      await page.waitForTimeout(400)
+      const label = await uiString('en', 'assistant.ask')
+      await page.locator('.pd-selection-actions').getByRole('button', { name: label }).click()
+      await expect(page.locator('.pd-assistant')).toBeVisible()
+      // And the selection travels with the message.
+      await expect(page.locator('.pd-assistant-context')).toBeVisible()
+    })
+
+    await check('the canvas flashes the layers a turn touched', async () => {
+      await page.locator('.pd-assistant-input textarea').fill('add a headline and a device')
+      await page.locator('.pd-assistant-input textarea').press('Enter')
+      // Caught mid-flash: it is deliberately short, so a long wait here would
+      // be testing that it had already gone.
+      await page.waitForTimeout(900)
+      expect(await page.locator('.pd-agent-flash').count()).toBeGreaterThan(0)
+    })
+
+    await page.screenshot({ path: 'test-results/assistant/08-flash.png' })
+
+    await check('the flash fades instead of staying on the canvas', async () => {
+      await page.waitForTimeout(2000)
+      await expect(page.locator('.pd-agent-flash')).toHaveCount(0)
+    })
+
+    await page.close()
+  }
 } finally {
   await browser.close()
   server.kill()

@@ -3605,3 +3605,52 @@
 @media (max-width: 1023px) {
   .pd-assistant { display: none; }
 }
+
+/* Where the assistant just worked. A short outline, drawn over the stage in
+   the DOM so no capture can pick it up. */
+.pd-agent-flash {
+  border: 2px solid var(--pd-accent);
+  border-radius: 6px;
+  box-shadow: 0 0 0 4px var(--pd-accent-wash);
+  animation: pd-agent-flash 1.6s var(--pd-ease-standard) both;
+}
+
+@keyframes pd-agent-flash {
+  0% { opacity: 0; transform: scale(1.02); }
+  12% { opacity: 1; transform: scale(1); }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-agent-flash { animation: none; opacity: 1; }
+}
+
+/* ── Assistant as a sheet ───────────────────────────────────────────────────
+   On a phone the assistant is one of the surfaces the bottom bar switches
+   between, not a column. It keeps the canvas visible above it on a tablet the
+   way the layers sheet does, and its own header carries the close button, so
+   the 42px the other sheets reserve for a floating one is wasted here. */
+@media (max-width: 1023px) {
+  .pd-assistant-sheet > aside.pd-assistant {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding-top: 0;
+    border: 0;
+    background: transparent;
+  }
+  .pd-assistant-sheet .pd-assistant-header { padding-top: 12px; }
+
+  /* The assistant edits the thing behind it, so unlike the other sheets it
+     does not take the whole screen: the canvas stays visible above it and the
+     change appears while you are still reading the reply. */
+  .pd-assistant-sheet.pd-sidebar-open {
+    inset: auto 0 0 0;
+    height: min(62dvh, 560px);
+    max-height: calc(100dvh - 180px);
+  }
+  /* A phone keyboard leaves little room; the mode row is one line there. */
+  .pd-assistant-sheet .pd-assistant-hint { display: none; }
+}

@@ -538,6 +538,7 @@ export const ps: Record<TranslationKey, string> = {
   'assistant.selected': '{count} ټاکل شوي',
   'assistant.selectionHint': 'څه چې دې ټاکلي، له پیغام سره ځي.',
   'assistant.resize': 'د اسیستنټ پینل اندازه بدله کړه',
+  'assistant.ask': 'د دې په اړه له اسیستنټ وپوښته',
   'assistant.failed': 'دا ونه شول',
   // ─ د منو بار
   'menu.file': 'فایل',

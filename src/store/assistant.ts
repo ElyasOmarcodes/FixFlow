@@ -50,8 +50,15 @@ interface AssistantState extends AssistantPrefs {
   busy: boolean
   /** Set while a turn is in flight, so it can be stopped. */
   controller: AbortController | null
+  /**
+   * The layers a turn just touched, and when. The canvas flashes them: a
+   * person who asked for one change and got four needs to see where the other
+   * three landed, and a list of ids in the transcript is not that.
+   */
+  highlight: { ids: string[]; at: number } | null
 
   setOpen: (open: boolean) => void
+  setHighlight: (ids: string[]) => void
   toggleOpen: () => void
   setWidth: (width: number) => void
   setReadOnly: (readOnly: boolean) => void
@@ -106,6 +113,7 @@ export const useAssistantStore = create<AssistantState>()((set, get) => ({
   messages: [],
   busy: false,
   controller: null,
+  highlight: null,
 
   // Only the three preference keys are persisted, never the state around them:
   // spreading the store here would write the whole transcript to localStorage
@@ -114,7 +122,8 @@ export const useAssistantStore = create<AssistantState>()((set, get) => ({
   toggleOpen: () => get().setOpen(!get().open),
   setWidth: (width) => { const next = clampWidth(width); set({ width: next }); writePrefs({ ...prefsOf(get()), width: next }) },
   setReadOnly: (readOnly) => { set({ readOnly }); writePrefs({ ...prefsOf(get()), readOnly }) },
-  clear: () => set({ messages: [] }),
+  clear: () => set({ messages: [], highlight: null }),
+  setHighlight: (ids) => set({ highlight: ids.length ? { ids, at: Date.now() } : null }),
 
   stop: () => { get().controller?.abort() },
 
@@ -194,6 +203,7 @@ export const useAssistantStore = create<AssistantState>()((set, get) => ({
       })
 
       const changed = useEditorStore.getState().endAgentTurn()
+      get().setHighlight(summary.touched)
       patchTurn({
         touched: summary.touched,
         undoable: changed,

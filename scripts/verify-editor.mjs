@@ -152,7 +152,9 @@ try {
     }
     if (width < 1024) await page.locator('.pd-mobile-nav button').first().click()
     await page.locator('.pd-layer-list').getByText('Text', { exact: true }).last().click()
-    if (width < 1024) await page.locator('.pd-mobile-nav button').last().click()
+    // Addressed by what it controls: the bar has since grown an assistant
+    // item, so `last()` no longer means properties.
+    if (width < 1024) await page.locator('.pd-mobile-nav button[aria-controls="mobile-properties"]').click()
     await page.screenshot({ path: `test-results/editor/workspace-${width}-light.png` })
     if (width < 1024) await page.locator('#mobile-properties .pd-panel-close').click()
     await openMoreIfCompact()
@@ -476,6 +478,7 @@ try {
         .evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))
       expect(bottomActions).toEqual([
         'Duplicate', 'Bring to front', 'Bring forward', 'Send backward', 'Send to back',
+        'Ask the assistant about this',
       ])
 
       // Ids, not types: both content layers are shapes, so a type list would look

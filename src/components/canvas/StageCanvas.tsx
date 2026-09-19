@@ -10,6 +10,7 @@ import type { Layer as AppLayer, BackgroundLayer } from '@/types'
 import { CanvasTextEditor } from './CanvasTextEditor'
 import { StageLayerItem } from './stage/StageLayerItem'
 import { CanvasShadow, SeamGuides, StageChrome } from './stage/StageOverlays'
+import { AgentHighlight } from './AgentHighlight'
 import { useAssetDropTarget } from './stage/useAssetDropTarget'
 import { useRubberBandSelection } from './stage/useRubberBandSelection'
 import { useSelectionTransformers } from './stage/useSelectionTransformers'
@@ -226,6 +227,7 @@ export function StageCanvas({ stageRef }: StageCanvasProps) {
       </Stage>
       {/* Visual-only DOM separators never appear in Stage exports. */}
       <SeamGuides group={group} showSeamGuides={showSeamGuides} panoCompensate={panoCompensate} visualGapPx={visualGapPx} effectiveCompensationPx={effectiveCompensationPx} totalHeight={totalHeight} zoom={zoom} viewportX={viewportX} viewportY={viewportY} />
+      <AgentHighlight group={group} zoom={zoom} viewportX={viewportX} viewportY={viewportY} />
       {editingTextId && <CanvasTextEditor stageRef={stageRef} />}
       <StageChrome group={group} effectiveCompensationPx={effectiveCompensationPx} displayHeight={displayHeight} zoom={zoom} viewportX={viewportX} viewportY={viewportY} editingGroupId={editingGroupId} exitGroupEdit={exitGroupEdit} setZoom={setZoom} zoomInput={zoomInput} setZoomInput={setZoomInput} handleFit={handleFit} assetDropHighlight={assetDropHighlight} spaceDown={spaceDown} />
     </>}

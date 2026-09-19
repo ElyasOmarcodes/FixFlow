@@ -85,6 +85,15 @@ export function SelectionActions() {
         run: () => { for (const id of [...targetIds].reverse()) store().sendLayerToBack(id) },
       },
     ] : []),
+    {
+      // The shortest path from "this layer is wrong" to asking for it to be
+      // fixed: the selection is already the assistant's context, so the button
+      // only has to open the panel.
+      key: 'ask-ai',
+      icon: 'sparkles' as IconName,
+      label: t('assistant.ask'),
+      run: () => window.dispatchEvent(new CustomEvent('fixflow:assistant')),
+    },
   ]
 
   return (

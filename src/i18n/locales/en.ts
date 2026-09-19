@@ -543,6 +543,7 @@ export const en = {
   'assistant.selected': '{count} selected',
   'assistant.selectionHint': 'What you have selected goes with the message.',
   'assistant.resize': 'Resize the assistant panel',
+  'assistant.ask': 'Ask the assistant about this',
   'assistant.failed': 'That did not work',
   // ─ Menu bar
   'menu.file': 'File',

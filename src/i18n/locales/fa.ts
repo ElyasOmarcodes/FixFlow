@@ -538,6 +538,7 @@ export const fa: Record<TranslationKey, string> = {
   'assistant.selected': '{count} انتخاب‌شده',
   'assistant.selectionHint': 'آنچه انتخاب کرده‌ای همراه پیام می‌رود.',
   'assistant.resize': 'تغییر اندازهٔ پنل دستیار',
+  'assistant.ask': 'دربارهٔ این از دستیار بپرس',
   'assistant.failed': 'این کار نشد',
   // ─ نوار منو
   'menu.file': 'فایل',

@@ -27,6 +27,7 @@ import { useThumbnails } from '@/hooks/useThumbnails'
 import { useImageCacheWarmer } from '@/hooks/useImageCacheWarmer'
 import { useEditorStore, useUndoRedo } from '@/store'
 import { useAssistantStore } from '@/store/assistant'
+import { useCompactLayout } from '@/hooks/useCompactLayout'
 import { resolveGroupView } from '@/utils/canvasFormats'
 import { registerStage } from '@/utils/stageRegistry'
 import { getScopedEditingIndicator } from '@/utils/scopedEditingIndicator'
@@ -53,7 +54,7 @@ const EXIT_CONFIRM_MS = 2200
 
 export default function App() {
   const t = useT()
-  const [mobilePanel, setMobilePanel] = useState<'layers' | 'properties' | null>(null)
+  const [mobilePanel, setMobilePanel] = useState<'layers' | 'properties' | 'assistant' | null>(null)
   // Read once, at mount: flipping the preference from inside the screen must
   // not close the screen the user is still looking at.
   const [startOpen, setStartOpen] = useState(shouldShowStartScreenOnLaunch)
@@ -92,6 +93,21 @@ export default function App() {
 
   // The mobile panels and the start screen are surfaces like any other.
   useBackDismiss(mobilePanel !== null, () => setMobilePanel(null), BACK_PRIORITY.panel)
+
+  /**
+   * "Ask AI" on the canvas opens whichever surface this screen has — the dock
+   * on a desktop, the sheet on a phone. The canvas cannot know which, so it
+   * asks for the assistant and the shell decides.
+   */
+  const compact = useCompactLayout()
+  useEffect(() => {
+    const open = () => {
+      if (compact) setMobilePanel('assistant')
+      else useAssistantStore.getState().setOpen(true)
+    }
+    window.addEventListener('fixflow:assistant', open)
+    return () => window.removeEventListener('fixflow:assistant', open)
+  }, [compact])
   useBackDismiss(startOpen, () => setStartOpen(false), BACK_PRIORITY.sheet)
 
   // Editor state unwinds before the app does: an open text editor, then group
@@ -449,12 +465,22 @@ export default function App() {
 
           {/* Assistant dock — the fourth column, and null while it is closed. */}
           <AssistantPanel />
+
+          {/* The same panel as a sheet on a phone or tablet, where a fourth
+              column does not fit. It is mounted only while it is the open
+              surface: the transcript lives in its own store, so nothing is
+              lost by unmounting, and a mounted textarea under the canvas
+              would take the focus a tap on the canvas should get. */}
+          <div id="mobile-assistant" className={`pd-sidebar pd-assistant-sheet ${mobilePanel === 'assistant' ? 'pd-sidebar-open' : ''}`}>
+            {mobilePanel === 'assistant' && <AssistantPanel embedded onClose={() => setMobilePanel(null)} />}
+          </div>
         </div>
       </div>
       {view === 'editor' && <nav className="pd-mobile-nav">
         <button aria-controls="mobile-layers" aria-expanded={mobilePanel === 'layers'} onClick={() => setMobilePanel(mobilePanel === 'layers' ? null : 'layers')}><Icon name="layers" size={20} /><span>{t('layers.title')}</span></button>
         <button aria-pressed={mobilePanel === null} onClick={() => setMobilePanel(null)}><Icon name="image" size={20} /><span>{t('toolbar.backToDesign')}</span></button>
         <button aria-controls="mobile-properties" aria-expanded={mobilePanel === 'properties'} onClick={() => setMobilePanel(mobilePanel === 'properties' ? null : 'properties')}><Icon name="settings" size={20} /><span>{t('props.title')}</span></button>
+        <button aria-controls="mobile-assistant" aria-expanded={mobilePanel === 'assistant'} onClick={() => setMobilePanel(mobilePanel === 'assistant' ? null : 'assistant')}><Icon name="sparkles" size={20} /><span>{t('assistant.title')}</span></button>
       </nav>}
       <ExportModal open={exportOpen} onClose={() => setExportOpen(false)} stageRef={stageRef} />
       <SlideNavigator thumbnails={thumbnails} staleGroupIds={staleGroupIds} stageRef={stageRef} onCaptureThumbnail={(groupId) => { void captureNow(groupId) }} />

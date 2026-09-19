@@ -45,7 +45,9 @@ try {
       await expect(insert).toHaveCount(0)
       await page.locator('#mobile-layers .pd-panel-close').click()
       await expect(page.locator('#mobile-layers')).toBeHidden()
-      await page.locator('.pd-mobile-nav button').last().click()
+      // By what it controls, not by its position in the bar: the bar has since
+      // grown a fourth item, and `last()` silently became the assistant.
+      await page.locator('.pd-mobile-nav button[aria-controls="mobile-properties"]').click()
       await expect(page.locator('#mobile-properties')).toBeVisible()
       await page.locator('#mobile-properties .pd-panel-close').click()
     }

@@ -4,6 +4,7 @@ import { useEditorStore } from '@/store'
 import { useAssistantStore, MAX_ASSISTANT_WIDTH, MIN_ASSISTANT_WIDTH } from '@/store/assistant'
 import type { AssistantMessage } from '@/store/assistant'
 import { useApiKeysStore } from '@/store/apiKeys'
+import { useCompactLayout } from '@/hooks/useCompactLayout'
 import { Icon } from '@/components/ui/Icon'
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch'
 import { useT } from '@/i18n'
@@ -21,7 +22,20 @@ import { useT } from '@/i18n'
  * updated your slide" with no list is exactly the kind of claim a person
  * cannot check.
  */
-export function AssistantPanel() {
+interface AssistantPanelProps {
+  /**
+   * Rendered inside the mobile sheet rather than as the desktop dock.
+   *
+   * The two differ in what controls their visibility: the dock is governed by
+   * its own remembered preference, while the sheet is one of the surfaces the
+   * bottom bar switches between — and on a phone the width grip and the
+   * "close the dock" button would both be lies.
+   */
+  embedded?: boolean
+  onClose?: () => void
+}
+
+export function AssistantPanel({ embedded = false, onClose }: AssistantPanelProps = {}) {
   const t = useT()
   const [draft, setDraft] = useState('')
   const threadRef = useRef<HTMLDivElement | null>(null)
@@ -42,6 +56,11 @@ export function AssistantPanel() {
       clear: state.clear,
       revert: state.revert,
     })))
+
+  // Not merely hidden below 1024px: a dock left mounted on a phone is a second
+  // transcript and a second composer in the accessibility tree, and its
+  // textarea competes for focus with the sheet's.
+  const compact = useCompactLayout()
 
   const selectionCount = useEditorStore((state) => (
     state.selectedLayerIds.length || (state.selection ? 1 : 0)
@@ -89,11 +108,15 @@ export function AssistantPanel() {
     handle.addEventListener('pointercancel', end)
   }
 
-  if (!open) return null
+  if (!embedded && (!open || compact)) return null
 
   return (
-    <aside className="pd-assistant" style={{ width }} aria-label={t('assistant.title')}>
-      <div
+    <aside
+      className={embedded ? 'pd-assistant pd-assistant-embedded' : 'pd-assistant'}
+      style={embedded ? undefined : { width }}
+      aria-label={t('assistant.title')}
+    >
+      {!embedded && <div
         className="pd-assistant-grip"
         role="separator"
         aria-orientation="vertical"
@@ -107,7 +130,7 @@ export function AssistantPanel() {
           if (event.key === 'ArrowLeft') setWidth(width + 16)
           else if (event.key === 'ArrowRight') setWidth(width - 16)
         }}
-      />
+      />}
 
       <header className="pd-assistant-header">
         <span className="pd-assistant-title"><Icon name="sparkles" size={16} />{t('assistant.title')}</span>
@@ -115,7 +138,7 @@ export function AssistantPanel() {
         <button type="button" onClick={clear} title={t('assistant.newChat')} aria-label={t('assistant.newChat')}>
           <Icon name="plus" size={16} />
         </button>
-        <button type="button" onClick={() => setOpen(false)} title={t('assistant.close')} aria-label={t('assistant.close')}>
+        <button type="button" onClick={() => (embedded ? onClose?.() : setOpen(false))} title={t('assistant.close')} aria-label={t('assistant.close')}>
           <Icon name="close" size={16} />
         </button>
       </header>
