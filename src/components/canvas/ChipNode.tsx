@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Group, Path, Rect, Text } from 'react-konva'
 import type Konva from 'konva'
 import type { ChipLayer } from '@/types'
@@ -56,11 +56,6 @@ export function ChipNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
     `chip:${layer.text}:${layer.icon ?? ''}:${layer.fontSize}:${box.width}x${box.height}:${iconFilled}`,
   )
 
-  // Held in a ref because a live transform mutates the node without a re-render;
-  // the commit at the end reads back from here.
-  const scaleRef = useRef(1)
-  useEffect(() => { scaleRef.current = 1 }, [layer.fontSize, layer.iconSize, layer.paddingX, layer.paddingY])
-
   const interactionProps = useLayerInteraction({
     nodeRef: groupRef,
     locked: layer.locked,
@@ -72,11 +67,16 @@ export function ChipNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
   const handleTransformEnd = useLayerTransform({
     nodeRef: groupRef,
     onChange: onTransformEnd,
-    buildPatch: (node): Partial<ChipLayer> => {
-      const scale = scaleRef.current
-      scaleRef.current = 1
-      node.scaleX(1)
-      node.scaleY(1)
+    // The scale comes from the node at the end of the gesture, not from a ref
+    // kept across gestures. A ref survives a transform that never reports its
+    // end — a pinch that cancels it, a pointer lost off-window — and the next
+    // transform then applies that stale factor to the pill's type and padding
+    // *and* writes the node's position, so an unrelated nudge would resize and
+    // move the chip at once. `useLayerTransform` reads the scale off the node
+    // and hands it over, which cannot go stale.
+    buildPatch: (node, scale): Partial<ChipLayer> => {
+      // A chip has one size, so the two axes average into it.
+      const factor = (scale.scaleX + scale.scaleY) / 2
       return {
         x: node.x(),
         y: node.y(),
@@ -84,12 +84,12 @@ export function ChipNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
         // Everything that contributes to the box scales together, so the pill
         // keeps its proportions instead of stretching the text inside a fixed
         // rectangle.
-        fontSize: Math.max(6, layer.fontSize * scale),
-        iconSize: Math.max(6, layer.iconSize * scale),
-        paddingX: Math.max(0, layer.paddingX * scale),
-        paddingY: Math.max(0, layer.paddingY * scale),
-        cornerRadius: Math.max(0, layer.cornerRadius * scale),
-        iconGap: Math.max(0, layer.iconGap * scale),
+        fontSize: Math.max(6, layer.fontSize * factor),
+        iconSize: Math.max(6, layer.iconSize * factor),
+        paddingX: Math.max(0, layer.paddingX * factor),
+        paddingY: Math.max(0, layer.paddingY * factor),
+        cornerRadius: Math.max(0, layer.cornerRadius * factor),
+        iconGap: Math.max(0, layer.iconGap * factor),
       }
     },
   })
@@ -107,13 +107,6 @@ export function ChipNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
       rotation={layer.rotation}
       draggable={!forceNotDraggable && !layer.locked}
       {...interactionProps}
-      onTransform={() => {
-        const node = groupRef.current
-        if (!node) return
-        // Konva reports a scale per axis; a chip only has one size, so the two
-        // are averaged and reset — the node never carries a scale of its own.
-        scaleRef.current = (node.scaleX() + node.scaleY()) / 2
-      }}
       onTransformEnd={handleTransformEnd}
     >
       <Rect

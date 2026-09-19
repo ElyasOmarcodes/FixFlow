@@ -33,7 +33,6 @@ interface IconNodeProps {
 export function IconNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotDraggable }: IconNodeProps) {
   const groupRef = useRef<Konva.Group>(null)
   const brandColors = useBrandColors()
-  const scaleRef = useRef(1)
 
   // A fetched icon carries its own path; a library one is looked up by name.
   const pathData = layer.customPath ?? getIconGlyph(layer.icon)?.d
@@ -58,11 +57,10 @@ export function IconNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
   const handleTransformEnd = useLayerTransform({
     nodeRef: groupRef,
     onChange: onTransformEnd,
-    buildPatch: (node): Partial<IconLayer> => {
-      const factor = scaleRef.current
-      scaleRef.current = 1
-      node.scaleX(1)
-      node.scaleY(1)
+    // Read from the node at the end of the gesture rather than from a ref held
+    // across gestures — see the note in ChipNode for what a stale one does.
+    buildPatch: (node, scale): Partial<IconLayer> => {
+      const factor = (scale.scaleX + scale.scaleY) / 2
       return {
         x: node.x(),
         y: node.y(),
@@ -85,11 +83,6 @@ export function IconNode({ layer, onSelect, onDragEnd, onTransformEnd, forceNotD
       rotation={layer.rotation}
       draggable={!forceNotDraggable && !layer.locked}
       {...interactionProps}
-      onTransform={() => {
-        const node = groupRef.current
-        if (!node) return
-        scaleRef.current = (node.scaleX() + node.scaleY()) / 2
-      }}
       onTransformEnd={handleTransformEnd}
     >
       {layer.background && (

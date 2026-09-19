@@ -57,14 +57,24 @@ export function resolveResizeFactor(startDistance: number, currentDistance: numb
  * Which numeric properties carry a layer's size, by type.
  *
  * Groups and phones are scaled as a unit; text and emoji grow by font size
- * (with their box, so wrapping keeps up); everything else has an explicit
- * width and height. Matching this to the layer type is what keeps a resize
- * from silently doing nothing on a mockup or stretching a headline's box
- * without changing the type size.
+ * (with their box, so wrapping keeps up); a chip and an icon have no width or
+ * height at all — a chip's box is derived from its type, padding and glyph,
+ * and an icon's from its `size` and its plate — so scaling them means scaling
+ * every input to that geometry together. Everything else has an explicit
+ * width and height.
+ *
+ * Getting this list wrong does not throw: `scaledSizePatch` skips keys the
+ * layer does not carry, so a missing case makes the resize grip silently do
+ * nothing. That is exactly what chip and icon layers did until this had cases
+ * for them, which is why every type is named in the test.
  */
 export function resizeKeysFor(type: Layer['type']): readonly string[] {
   if (type === 'group' || type === 'phone') return ['scale']
   if (type === 'text' || type === 'emoji') return ['fontSize', 'width', 'height']
+  // The same keys ChipNode commits from a transformer drag, so the grip and
+  // the corner anchors cannot disagree about what "bigger" means.
+  if (type === 'chip') return ['fontSize', 'iconSize', 'paddingX', 'paddingY', 'cornerRadius', 'iconGap']
+  if (type === 'icon') return ['size', 'backgroundPadding', 'backgroundRadius']
   return ['width', 'height']
 }
 

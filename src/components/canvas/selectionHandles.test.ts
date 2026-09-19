@@ -84,6 +84,36 @@ describe('resizeKeysFor', () => {
     expect(resizeKeysFor('shape')).toEqual(['width', 'height'])
     expect(resizeKeysFor('image')).toEqual(['width', 'height'])
   })
+
+  it('scales a chip and an icon by the properties their geometry is derived from', () => {
+    // Neither type has a width or a height; they had been falling through to
+    // the box case, so dragging the grip on one moved the pointer and changed
+    // nothing at all.
+    expect(resizeKeysFor('chip')).toEqual(['fontSize', 'iconSize', 'paddingX', 'paddingY', 'cornerRadius', 'iconGap'])
+    expect(resizeKeysFor('icon')).toEqual(['size', 'backgroundPadding', 'backgroundRadius'])
+  })
+
+  it('names a key every layer of that type actually carries', () => {
+    // The failure mode is silent: `scaledSizePatch` skips a key the layer does
+    // not have, so a wrong list is a resize that does nothing. Every type is
+    // checked against a real layer of that type rather than against this list.
+    const samples: Partial<Record<Layer['type'], Record<string, unknown>>> = {
+      group: { scale: 1 },
+      phone: { scale: 1 },
+      text: { fontSize: 20, width: 100, height: 40 },
+      emoji: { fontSize: 20, width: 100, height: 40 },
+      shape: { width: 100, height: 40 },
+      image: { width: 100, height: 40 },
+      chip: { fontSize: 20, iconSize: 10, paddingX: 8, paddingY: 4, cornerRadius: 12, iconGap: 6 },
+      icon: { size: 40, backgroundPadding: 8, backgroundRadius: 6 },
+      brand: { width: 100, height: 40 },
+      background: { width: 100, height: 40 },
+    }
+    for (const [type, fields] of Object.entries(samples)) {
+      const captured = captureSizeValues(layer({ type: type as Layer['type'], ...fields }))
+      expect(Object.keys(captured).sort(), type).toEqual([...resizeKeysFor(type as Layer['type'])].sort())
+    }
+  })
 })
 
 describe('captureSizeValues', () => {
