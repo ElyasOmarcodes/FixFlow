@@ -137,6 +137,8 @@ export interface AiChatOptions {
   timeoutMs?: number
   /** Retries after the initial attempt for network, timeout, 429, and 5xx errors. */
   retries?: number
+  /** Abort a streaming request when the person presses stop. */
+  signal?: AbortSignal
 }
 
 export interface AiImageEditOptions {
@@ -267,6 +269,129 @@ export async function chat(options: AiChatOptions): Promise<string> {
     options.forceJsonMode,
     options,
   )
+}
+
+
+/**
+ * The same request, delivered as it is written.
+ *
+ * A turn is one JSON object, so nothing can be *parsed* until it is complete —
+ * but the sentence inside it can be shown while it arrives, which is the
+ * difference between a spinner and a reply on a slow connection.
+ *
+ * Streaming is attempted only where it is known to work: the OpenAI-compatible
+ * Chat Completions SSE shape. Google's native endpoint speaks a different
+ * protocol and an arbitrary custom server may speak none, so both fall back to
+ * the ordinary request and report the whole answer in one delta. The caller
+ * cannot tell the difference except in how often `onDelta` fires.
+ */
+export async function chatStream(
+  options: AiChatOptions,
+  onDelta: (text: string) => void,
+): Promise<string> {
+  const apiKey = options.apiKey.trim()
+  if (!apiKey) throw new Error('No API key configured. Open AI Settings in the toolbar.')
+  const baseUrl = resolveBaseUrl(options.provider, options.baseUrl)
+  if (!baseUrl) throw new Error('No custom API base URL configured. Open AI Settings in the toolbar.')
+  const model = options.model?.trim() || getDefaultModel(options.provider)
+
+  const streamable = options.provider === 'openai' || options.provider === 'openrouter'
+  if (!streamable) {
+    const whole = await chat(options)
+    onDelta(whole)
+    return whole
+  }
+
+  const headers = buildOpenAiCompatibleHeaders(options.provider, apiKey, { contentType: true })
+  const isOpenAiOModel = options.provider === 'openai' && /^o\d/i.test(model)
+  const body: Record<string, unknown> = {
+    model,
+    stream: true,
+    messages: options.messages.map((message) => ({
+      role: message.role,
+      content: typeof message.content === 'string'
+        ? message.content
+        : message.content.map((part) => (part.type === 'text'
+          ? { type: 'text' as const, text: part.text }
+          : { type: 'image_url' as const, image_url: { url: part.dataUrl } })),
+    })),
+    ...(options.maxTokens
+      ? isOpenAiOModel ? { max_completion_tokens: options.maxTokens } : { max_tokens: options.maxTokens }
+      : {}),
+    ...(options.forceJsonMode ? { response_format: { type: 'json_object' } } : {}),
+  }
+
+  let response: Response
+  try {
+    response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal: options.signal,
+    })
+  } catch (error) {
+    if (options.signal?.aborted) throw error
+    // A proxy that refuses a streaming request is not a failed turn: the
+    // ordinary path still works, so take it rather than showing an error.
+    const whole = await chat(options)
+    onDelta(whole)
+    return whole
+  }
+
+  if (!response.ok || !response.body) {
+    const detail = response.ok ? '' : await response.text()
+    if (!response.ok && (response.status === 400 || response.status === 404)) {
+      // Some gateways reject `stream` outright; others do not implement it.
+      const whole = await chat(options)
+      onDelta(whole)
+      return whole
+    }
+    throw new AiClientError('http', formatProviderHttpError(`${options.provider} API error`, response.status, detail, options.provider), { status: response.status })
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let text = ''
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      // SSE frames are separated by a blank line; a frame can straddle chunks.
+      let cut = buffer.indexOf('\n\n')
+      while (cut !== -1) {
+        const frame = buffer.slice(0, cut)
+        buffer = buffer.slice(cut + 2)
+        const delta = deltaFromFrame(frame)
+        if (delta) { text += delta; onDelta(text) }
+        cut = buffer.indexOf('\n\n')
+      }
+    }
+  } finally {
+    await reader.cancel().catch(() => { /* already closed */ })
+  }
+
+  if (!text.trim()) throw new Error(`${options.provider} returned empty content.`)
+  return text.trim()
+}
+
+/** The text a single `data:` frame carries, if any. */
+function deltaFromFrame(frame: string): string {
+  let out = ''
+  for (const line of frame.split('\n')) {
+    if (!line.startsWith('data:')) continue
+    const payload = line.slice(5).trim()
+    if (!payload || payload === '[DONE]') continue
+    try {
+      const parsed = JSON.parse(payload) as { choices?: { delta?: { content?: string } }[] }
+      const piece = parsed.choices?.[0]?.delta?.content
+      if (typeof piece === 'string') out += piece
+    } catch {
+      // A partial or non-JSON frame; the next one carries the rest.
+    }
+  }
+  return out
 }
 
 export async function editImage(options: AiImageEditOptions): Promise<string> {

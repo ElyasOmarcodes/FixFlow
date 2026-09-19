@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { chat, editImage } from '@/ai/client'
 import { getFixFlowConfig } from '@/config'
-import { transportChat, transportEditImage } from './transport'
+import { transportChat, transportChatStream, transportEditImage } from './transport'
 import type { AiTransport } from './transport'
 
 vi.mock('@/ai/client', () => ({
   chat: vi.fn(),
+  chatStream: vi.fn(),
   editImage: vi.fn(),
 }))
 
@@ -74,5 +75,29 @@ describe('AI transport', () => {
     mockedGetFixFlowConfig.mockReturnValue({ aiTransport: injectedTransport })
 
     await expect(transportChat(chatOptions)).rejects.toBe(error)
+  })
+})
+
+describe('streaming through the transport', () => {
+  it('uses the transport\'s own stream when it has one', async () => {
+    const chatStream = vi.fn(async (_options: unknown, onDelta: (text: string) => void) => { onDelta('piece'); return 'piece' })
+    mockedGetFixFlowConfig.mockReturnValue({
+      aiTransport: { chat: vi.fn(), editImage: vi.fn(), chatStream } as unknown as AiTransport,
+    })
+
+    const seen: string[] = []
+    expect(await transportChatStream(chatOptions, (text) => seen.push(text))).toBe('piece')
+    expect(seen).toEqual(['piece'])
+    expect(mockedChat).not.toHaveBeenCalled()
+  })
+
+  it('falls back to one whole answer when the transport cannot stream', async () => {
+    const chat = vi.fn().mockResolvedValue('whole answer')
+    mockedGetFixFlowConfig.mockReturnValue({ aiTransport: { chat, editImage: vi.fn() } as unknown as AiTransport })
+
+    const seen: string[] = []
+    expect(await transportChatStream(chatOptions, (text) => seen.push(text))).toBe('whole answer')
+    // One delta, carrying everything: a caller cannot tell the two apart.
+    expect(seen).toEqual(['whole answer'])
   })
 })

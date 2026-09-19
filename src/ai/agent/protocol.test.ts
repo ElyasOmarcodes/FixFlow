@@ -75,3 +75,41 @@ describe('buildAgentSystemPrompt', () => {
     expect(buildAgentSystemPrompt({ uiLanguage: 'en', readOnly: false })).not.toContain('PROPOSAL MODE')
   })
 })
+
+describe('partialSay', () => {
+  it('reads the sentence out of a half-arrived object', async () => {
+    const { partialSay } = await import('./protocol')
+    expect(partialSay('{"say":"Adding a head')).toBe('Adding a head')
+  })
+
+  it('stops at the end of the string, not at the end of the buffer', async () => {
+    const { partialSay } = await import('./protocol')
+    expect(partialSay('{"say":"Done.","actions":[]}')).toBe('Done.')
+  })
+
+  it('is empty until the field turns up', async () => {
+    const { partialSay } = await import('./protocol')
+    expect(partialSay('{"actions":[{"tool":"read_slide"')).toBe('')
+  })
+
+  it('handles the escapes a model actually emits', async () => {
+    const { partialSay } = await import('./protocol')
+    expect(partialSay('{"say":"Line one\\nLine \\"two\\""}')).toBe('Line one\nLine "two"')
+    expect(partialSay('{"say":"\\u067e\\u069a\\u062a\\u0648"}')).toBe('پښتو')
+  })
+
+  it('waits rather than guessing when an escape is still in flight', async () => {
+    const { partialSay } = await import('./protocol')
+    // A lone trailing backslash: whatever it escapes has not arrived yet.
+    expect(partialSay('{"say":"half' + '\\')).toBe('half')
+    // Half a \uXXXX sequence, likewise.
+    expect(partialSay('{"say":"half' + '\\u06')).toBe('half')
+    // A complete escaped backslash is a backslash, and is shown.
+    expect(partialSay('{"say":"half' + '\\\\')).toBe('half' + '\\')
+  })
+
+  it('reads the field names models reach for instead', async () => {
+    const { partialSay } = await import('./protocol')
+    expect(partialSay('{"message":"Working on it')).toBe('Working on it')
+  })
+})

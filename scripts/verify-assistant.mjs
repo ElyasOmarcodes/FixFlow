@@ -68,9 +68,12 @@ async function openEditor(page, language = 'en') {
       window.localStorage.setItem('pixeldeck.assistant', JSON.stringify({ open: true, width: 360, readOnly: false }))
     } catch { /* private window */ }
     let turn = 0
+    const reply = () => JSON.stringify(script[Math.min(turn++, script.length - 1)])
     window.__FIXFLOW_CONFIG__ = {
       aiTransport: {
-        chat: async () => JSON.stringify(script[Math.min(turn++, script.length - 1)]),
+        chat: async () => reply(),
+        // A transport with no `chatStream` exercises the fallback; the
+        // streaming page below installs one that really does arrive in pieces.
         editImage: async () => { throw new Error('not used') },
       },
     }
@@ -295,6 +298,88 @@ try {
     await check('the flash fades instead of staying on the canvas', async () => {
       await page.waitForTimeout(2000)
       await expect(page.locator('.pd-agent-flash')).toHaveCount(0)
+    })
+
+    await page.close()
+  }
+  // ── The sentence appears while it is being written ────────────────────────
+  {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('pixeldeck:start-screen', 'off')
+        window.localStorage.setItem('pixeldeck-api-keys', JSON.stringify({
+          state: { provider: 'openai', openaiKey: 'test-key', selectedModels: { openai: 'scripted-model' } },
+          version: 2,
+        }))
+        window.localStorage.setItem('pixeldeck.assistant', JSON.stringify({ open: true, width: 360, readOnly: false }))
+      } catch { /* private window */ }
+      const full = '{"say":"Reading the slide, then adding a headline.","actions":[],"status":"done"}'
+      window.__FIXFLOW_CONFIG__ = {
+        aiTransport: {
+          chat: async () => full,
+          chatStream: async (_options, onDelta) => {
+            // Arrives in pieces, slowly enough that the panel can be caught
+            // mid-sentence the way a person would see it.
+            for (let cut = 20; cut < full.length; cut += 6) {
+              onDelta(full.slice(0, cut))
+              await new Promise((resolve) => setTimeout(resolve, 250))
+            }
+            onDelta(full)
+            return full
+          },
+          editImage: async () => { throw new Error('not used') },
+        },
+      }
+    })
+    await page.goto(`http://127.0.0.1:${PORT}`)
+    await page.waitForTimeout(2500)
+
+    await check('the reply is on screen before the turn has finished', async () => {
+      await page.locator('.pd-assistant-input textarea').fill('what is on this slide?')
+      await page.locator('.pd-assistant-input textarea').press('Enter')
+      // Sampled early on purpose: the point is that something readable is on
+      // screen before the turn is finished, not what it says at that instant.
+      await page.waitForTimeout(600)
+      const partial = await page.locator('.pd-assistant-reply').last().innerText()
+      expect(partial.length).toBeGreaterThan(0)
+      expect(partial.length).toBeLessThan('Reading the slide, then adding a headline.'.length)
+      await page.waitForTimeout(4000)
+      await expect(page.locator('.pd-assistant-reply').last())
+        .toContainText('Reading the slide, then adding a headline.')
+    })
+
+    await page.screenshot({ path: 'test-results/assistant/09-streaming.png' })
+    await page.close()
+  }
+
+  // ── The conversation is still there tomorrow ──────────────────────────────
+  {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+    await openEditor(page)
+
+    await check('a transcript survives a reload of the same project', async () => {
+      await page.locator('.pd-assistant-input textarea').fill('remember this message')
+      await page.locator('.pd-assistant-input textarea').press('Enter')
+      await page.waitForTimeout(2200)
+      await page.reload()
+      await page.waitForTimeout(3000)
+      await expect(page.locator('.pd-assistant-user').last()).toContainText('remember this message')
+    })
+
+    await check('a restored turn does not offer to undo a history that is gone', async () => {
+      expect(await page.locator('.pd-assistant-revert').count()).toBe(0)
+    })
+
+    await page.screenshot({ path: 'test-results/assistant/10-restored.png' })
+
+    await check('starting a new conversation clears what was stored', async () => {
+      const label = await uiString('en', 'assistant.newChat')
+      await page.locator('.pd-assistant-header').getByRole('button', { name: label }).click()
+      await page.waitForTimeout(800)
+      await page.reload()
+      await page.waitForTimeout(3000)
+      expect(await page.locator('.pd-assistant-user').count()).toBe(0)
     })
 
     await page.close()

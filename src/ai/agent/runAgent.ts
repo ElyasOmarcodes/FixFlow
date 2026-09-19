@@ -1,7 +1,7 @@
-import { transportChat } from '@/ai/transport'
+import { transportChatStream } from '@/ai/transport'
 import type { AiChatMessage } from '@/ai/client'
 import type { AiAuth } from '@/ai/features/translateText'
-import { buildAgentSystemPrompt, formatToolResults, parseAgentReply, type AgentAction } from './protocol'
+import { buildAgentSystemPrompt, formatToolResults, parseAgentReply, partialSay, type AgentAction } from './protocol'
 import { findTool, runTool, type AgentToolResult } from './tools'
 
 /**
@@ -21,6 +21,8 @@ import { findTool, runTool, type AgentToolResult } from './tools'
 export const DEFAULT_MAX_ROUNDS = 5
 
 export type AgentEvent =
+  /** The sentence so far, while it is still arriving. Replaces, never appends. */
+  | { type: 'delta'; text: string }
   | { type: 'say'; text: string }
   | { type: 'tool'; result: AgentToolResult }
   | { type: 'question'; text: string }
@@ -94,7 +96,16 @@ export async function runAgentTurn(options: AgentRunOptions): Promise<AgentRunSu
     summary.rounds = round + 1
     emit({ type: 'round', index: round })
 
-    const raw = await transportChat({ ...options.auth, forceJsonMode: true, maxTokens: 2048, messages })
+    // Streamed so the sentence appears while it is written; the authoritative
+    // read is still the parse of the finished text below.
+    let shown = ''
+    const raw = await transportChatStream(
+      { ...options.auth, forceJsonMode: true, maxTokens: 2048, messages, signal: options.signal },
+      (text) => {
+        const say = partialSay(text)
+        if (say && say !== shown) { shown = say; emit({ type: 'delta', text: say }) }
+      },
+    )
     checkAborted(options.signal)
 
     let reply
@@ -103,14 +114,17 @@ export async function runAgentTurn(options: AgentRunOptions): Promise<AgentRunSu
     } catch (firstError) {
       // One repair attempt, the same way the slide generator recovers: the
       // answer is usually right and merely fenced or prefaced.
-      const repaired = await transportChat({
+      // Streamed like any other request, but silently: the person should not
+      // watch a reply being corrected, only the corrected one.
+      const repaired = await transportChatStream({
         ...options.auth,
         forceJsonMode: true,
         maxTokens: 2048,
+        signal: options.signal,
         messages: [...messages,
           { role: 'assistant', content: raw.slice(0, 4000) },
           { role: 'user', content: 'Reply again with the JSON object only — no prose, no markdown fence.' }],
-      })
+      }, () => {})
       try { reply = parseAgentReply(repaired) } catch { throw firstError }
     }
 
@@ -142,11 +156,31 @@ export async function runAgentTurn(options: AgentRunOptions): Promise<AgentRunSu
       ? [...results, { tool: 'proposal mode', result: `${refused} action(s) were not run because edits are turned off.` }]
       : results
     messages.push({ role: 'assistant', content: raw.slice(0, 4000) })
-    messages.push({ role: 'user', content: formatToolResults(feedback) })
+    messages.push({ role: 'user', content: resultsMessage(feedback, results) })
   }
 
   summary.hitRoundCap = true
   return summary
+}
+
+/**
+ * The results of a round, as one message.
+ *
+ * Plain text unless the model asked to look at the slide, in which case the
+ * picture rides along as an image part. Only the last one is sent: a turn that
+ * looks three times would otherwise carry three full-size images into every
+ * later round, at the person's expense.
+ */
+export { resultsMessage as resultsMessageForTest }
+
+function resultsMessage(
+  feedback: { tool: string; result: string }[],
+  results: AgentToolResult[],
+): AiChatMessage['content'] {
+  const text = formatToolResults(feedback)
+  const picture = [...results].reverse().find((result) => result.image)?.image
+  if (!picture) return text
+  return [{ type: 'text', text }, { type: 'image', dataUrl: picture }]
 }
 
 function isReadOnly(action: AgentAction): boolean {

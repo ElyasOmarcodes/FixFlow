@@ -8,6 +8,8 @@ import { backgroundFillFor, buildSlideLayers, canvasFor, fontsUsedBy } from '@/u
 import { parseSlidePlan } from '@/ai/features/generateSlide'
 import { collectCanvasTexts, translateCanvasSlide } from '@/ai/features/translateCanvas'
 import { CANVAS_FORMAT_PRESETS, BASE_CANVAS_FORMAT, getProjectActiveFormats } from '@/utils/canvasFormats'
+import { getStage } from '@/utils/stageRegistry'
+import { runExclusiveCapture, withIdentityTransform } from '@/utils/stageCapture'
 import type { CanvasTranslationPatch } from '@/store/slices/translateSlice'
 import type { AiAuth } from '@/ai/features/translateText'
 import type { CanvasFormatId } from '@/types'
@@ -60,6 +62,14 @@ export interface AgentToolResult {
   failed: boolean
   /** Layers this call created or changed, so the canvas can flash them. */
   touched: string[]
+  /**
+   * A picture for the model to look at, as a data URL.
+   *
+   * Only `look_at_slide` sets it. The loop turns it into an image part on the
+   * next request; the transcript never shows it, because the person is already
+   * looking at the canvas it is a picture of.
+   */
+  image?: string
 }
 
 // ── Argument coercion ────────────────────────────────────────────────────────
@@ -158,6 +168,9 @@ function filterPatch(type: LayerType, patch: Record<string, unknown>): { patch: 
 }
 
 const ICON_NAMES = new Set(ICON_LIBRARY.map((glyph) => glyph.name))
+
+/** The widest a picture of the slide is sent at. Layout reads fine at 720px. */
+const LOOK_MAX_WIDTH = 720
 
 // ── Layer construction ───────────────────────────────────────────────────────
 
@@ -326,6 +339,28 @@ export const AGENT_TOOLS: AgentTool[] = [
       const names = [...ICON_NAMES].filter((name) => !query || name.includes(query))
       if (names.length === 0) return `No glyph matches "${query}". Try a broader word.`
       return names.join(', ')
+    },
+  },
+  {
+    name: 'look_at_slide',
+    summary: 'Look at the slide as a picture. Use it to check your own work before saying you are done.',
+    args: '{}',
+    readOnly: true,
+    run: async () => {
+      const stage = getStage()
+      if (!stage) return 'Error: the canvas is not on screen, so there is nothing to look at.'
+      const store = useEditorStore.getState()
+      const group = store.project.slideGroups.find((entry) => entry.id === store.activeSlideGroupId)
+      if (!group) return 'Error: no slide group is active.'
+      const width = group.slideWidth * group.numSlides
+      // Downscaled hard: a 1290×2796 slide at full size is megabytes of base64
+      // for no gain — a model judging layout needs the arrangement, not the
+      // pixels. The mutex is mandatory here, as for every other stage capture.
+      const pixelRatio = Math.min(1, LOOK_MAX_WIDTH / width)
+      const image = await runExclusiveCapture(async () => withIdentityTransform(stage, () => stage.toDataURL({
+        x: 0, y: 0, width, height: group.slideHeight, pixelRatio, mimeType: 'image/jpeg', quality: 0.75,
+      })))
+      return `__IMAGE__${image}`
     },
   },
   {
@@ -793,6 +828,15 @@ export async function runTool(
   const before = layerIdsNow()
   try {
     const result = await tool.run(args, context)
+    // A tool answers with a string; the one that answers with a picture says so
+    // with a sentinel rather than by widening every other tool's return type.
+    if (result.startsWith('__IMAGE__')) {
+      return {
+        tool: name, args, failed: false, touched: [],
+        result: 'Here is the slide as it looks now.',
+        image: result.slice('__IMAGE__'.length),
+      }
+    }
     return { tool: name, args, result, failed: result.startsWith('Error:'), touched: touchedSince(before, args) }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

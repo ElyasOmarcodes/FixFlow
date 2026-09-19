@@ -58,6 +58,7 @@ export function buildAgentSystemPrompt(args: { uiLanguage: string; readOnly: boo
     '- Anything that throws work away — deleting a slide group — needs the person\'s word first. Use "status": "ask", then call again with "confirm": true once they agree.',
     '- Switching locale or canvas format changes what is being edited, not just what is shown. Say so when you do it.',
     '- Keep text inside the slide: a layer at x=1200 on a 1290-wide canvas is off the edge.',
+    '- look_at_slide returns a picture of the slide. Use it to check a layout you just changed, especially overlaps and things falling off the edge — but only when you will act on what you see, since it costs the person a paid image.',
     `- Write "say" in the person's language (${args.uiLanguage}).`,
     ...(args.readOnly
       ? ['- PROPOSAL MODE: the person has turned edits off. Send no actions that change the design; describe what you would do instead.']
@@ -136,4 +137,43 @@ function firstString(...values: unknown[]): string | undefined {
 function firstArray(...values: unknown[]): unknown[] {
   for (const value of values) if (Array.isArray(value)) return value
   return []
+}
+
+/**
+ * The `say` field out of a half-arrived JSON object.
+ *
+ * A turn is one JSON object, so nothing can be shown until it is complete —
+ * which, on a slow connection, is several seconds of a spinner and no idea
+ * whether anything is happening. This reads the sentence out of the buffer as
+ * it arrives: find the key, take the string that follows, stop at the first
+ * unescaped quote or at whatever has turned up so far.
+ *
+ * Deliberately not a streaming JSON parser. It reads one known string field
+ * and is wrong about nothing else, because the authoritative read is still
+ * `parseAgentReply` on the finished text.
+ */
+export function partialSay(buffer: string): string {
+  const key = /"(?:say|message|reply)"\s*:\s*"/.exec(buffer)
+  if (!key) return ''
+  let out = ''
+  for (let i = key.index + key[0].length; i < buffer.length; i++) {
+    const char = buffer[i]
+    if (char === '\\') {
+      const next = buffer[i + 1]
+      if (next === undefined) break          // the escape itself is still in flight
+      if (next === 'u') {
+        const code = buffer.slice(i + 2, i + 6)
+        if (code.length < 4) break
+        out += String.fromCharCode(parseInt(code, 16))
+        i += 5
+        continue
+      }
+      out += next === 'n' ? '\n' : next === 't' ? '\t' : next
+      i += 1
+      continue
+    }
+    if (char === '"') break
+    out += char
+  }
+  return out
 }

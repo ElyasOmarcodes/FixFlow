@@ -122,6 +122,14 @@ export default function App() {
   useBackDismiss(selectedCount > 0, () => useEditorStore.getState().clearMultiSelection(), BACK_PRIORITY.canvas)
   useBackDismiss(selectedCount === 0 && hasSelection, () => useEditorStore.getState().deselect(), BACK_PRIORITY.canvas)
 
+  // The assistant's transcript belongs to a project, not to the app: opening
+  // another project must not show its conversation, and coming back to this
+  // one should show what was said here.
+  const projectId = useEditorStore((s) => s.project.id)
+  useEffect(() => {
+    void useAssistantStore.getState().bindProject(projectId)
+  }, [projectId])
+
   // Native chrome: stop the WebView panning the whole app under the keyboard,
   // and publish its height so a bottom sheet can sit above it.
   // The theme is applied here, at the root, so a phone is never left on the
